@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="lignage.js"></script>
+        <style>
+            svg {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="lignage">
+            <style>
+                .royal rect {
+                    fill: royalblue;
+                }
+                .royal text {
+                    fill: white;
+                }
+                .cadetBranch rect {
+                    fill: orange;
+                }
+                .cadetBranch text {
+                    fill: white;
+                    font-weight: bold;
+                    font-size: 16px;
+                }
+            </style>
+        </svg>
+        <script>
+            const nodes = [
+                {id: "henriIV", name: "HENRI IV", text: "1553-1610", class: "royal", url: "https://fr.wikipedia.org/wiki/Henri_IV_(roi_de_France)"},
+                {id: "margueriteValois", name: "Marguerite de Valois", spouse: "henriIV", text: "1553-1615", url: "https://fr.wikipedia.org/wiki/Marguerite_de_France_(1553-1615)"},
+                {id: "marieMedicis", name: "Marie de Médicis", spouse: "henriIV", text: "1575-1642", url: "https://fr.wikipedia.org/wiki/Marie_de_M%C3%A9dicis"},
+                {id: "louisXIII", name: "LOUIS XIII", parent: "marieMedicis", text: "1601-1643", class: "royal", url: "https://fr.wikipedia.org/wiki/Louis_XIII"},
+                {id: "elisabeth", name: "Élisabeth", parent: "marieMedicis", text: "1602-1644", url: "https://fr.wikipedia.org/wiki/%C3%89lisabeth_de_France_(1602-1644)"},
+                {id: "christine", name: "Christine", parent: "marieMedicis", text: "1606-1663", url: "https://fr.wikipedia.org/wiki/Christine_de_France"},
+                {id: "monsieurOrleans", name: "Monsieur d'Orléans", parent: "marieMedicis", text: "1607-1611", url: "https://fr.wikipedia.org/wiki/Monsieur_d%27Orl%C3%A9ans"},
+                {id: "gaston", name: "Gaston", parent: "marieMedicis", text: "1608-1660", url: "https://fr.wikipedia.org/wiki/Gaston_de_France"},
+                {id: "henrietteMarie", name: "Henriette-Marie", parent: "marieMedicis", text: "1609-1669", url: "https://fr.wikipedia.org/wiki/Henriette-Marie_de_France"},
+                {id: "anneAutriche", name: "Anne d'Autriche", spouse: "louisXIII", text: "1601-1666", url: "https://fr.wikipedia.org/wiki/Anne_d%27Autriche_(1601-1666)"},
+                {id: "louisXIV", name: "LOUIS XIV", parent: "anneAutriche", text: "1638-1715", class: "royal", url: "https://fr.wikipedia.org/wiki/Louis_XIV"},
+                {id: "marieThereseAutriche", name: "M.-Thérèse d'Autriche", spouse: "louisXIV", text: "1638-1683", url: "https://fr.wikipedia.org/wiki/Marie-Th%C3%A9r%C3%A8se_d%27Autriche_(1638-1683)"},
+                {id: "philippeOrleans1", name: "Philippe d'Orléans", parent: "anneAutriche", text: "1640-1701", url: "https://fr.wikipedia.org/wiki/Philippe_d%27Orl%C3%A9ans_(1640-1701)"},
+                {id: "henrietteAngleterre", name: "Henriette d'Angleterre", spouse: "philippeOrleans1", text: "1644-1670", url: "https://fr.wikipedia.org/wiki/Henriette_d%27Angleterre"},
+                {id: "elisabethCharlotteBaviere", name: "É.-Charlotte de Bavière", spouse: "philippeOrleans1", text: "1652-1722", url: "https://fr.wikipedia.org/wiki/%C3%89lisabeth-Charlotte_de_Bavi%C3%A8re"},
+                {id: "louis1", name: "Louis", parent: "marieThereseAutriche", text: "1661-1711", url: "https://fr.wikipedia.org/wiki/Louis_de_France_(1661-1711)"},
+                {id: "marieAnneBaviere", name: "M.-Anne de Bavière", spouse: "louis1", text: "1660-1690", url: "https://fr.wikipedia.org/wiki/Marie-Anne_de_Bavi%C3%A8re_(1660-1690)"},
+                {id: "anneElisabeth", name: "Anne-Élisabeth", parent: "marieThereseAutriche", text: "1662-1662", url: "https://fr.wikipedia.org/wiki/Anne-%C3%89lisabeth_de_France"},
+                {id: "marieAnne", name: "Marie-Anne", parent: "marieThereseAutriche", text: "1664-1664", url: "https://fr.wikipedia.org/wiki/Marie-Anne_de_France"},
+                {id: "marieTherese", name: "Marie-Thérèse", parent: "marieThereseAutriche", text: "1667-1672", url: "https://fr.wikipedia.org/wiki/Marie-Th%C3%A9r%C3%A8se_de_France_(1667-1672)"},
+                {id: "philippeCharles", name: "Philippe-Charles", parent: "marieThereseAutriche", text: "1668-1671", url: "https://fr.wikipedia.org/wiki/Philippe_Charles_de_France"},
+                {id: "louisFrancois", name: "Louis-François", parent: "marieThereseAutriche", text: "1672-1672", url: "https://fr.wikipedia.org/wiki/Louis-Fran%C3%A7ois_de_France"},
+                {id: "louis2", name: "Louis", parent: "marieAnneBaviere", text: "1682-1712", url: "https://fr.wikipedia.org/wiki/Louis_de_France_(1682-1712)"},
+                {id: "marieAdelaideSavoie", name: "M.-Adélaïde de Savoie", spouse: "louis2", text: "1685-1712", url: "https://fr.wikipedia.org/wiki/Marie-Ad%C3%A9la%C3%AFde_de_Savoie"},
+                {id: "philippe", name: "Philippe", parent: "marieAnneBaviere", text: "1683-1746", url: "https://fr.wikipedia.org/wiki/Philippe_V_(roi_d%27Espagne)"},
+                {id: "marieLouiseSavoie", name: "M.-Louise de Savoie", spouse: "philippe", text: "1688-1714", url: "https://fr.wikipedia.org/wiki/Marie-Louise_Gabrielle_de_Savoie"},
+                {id: "elisabethFarnese", name: "Élisabeth Farnèse", spouse: "philippe", text: "1692-1766", url: "https://fr.wikipedia.org/wiki/%C3%89lisabeth_Farn%C3%A8se"},
+                {id: "charles", name: "Charles", parent: "marieAnneBaviere", text: "1686-1714", url: "https://fr.wikipedia.org/wiki/Charles_de_France_(1686-1714)"},
+                {id: "louis3", name: "Louis", parent: "marieAdelaideSavoie", text: "1704-1705", url: ""},
+                {id: "louis4", name: "Louis", parent: "marieAdelaideSavoie", text: "1707-1712", url: "https://fr.wikipedia.org/wiki/Louis_de_France_(1707-1712)"},
+                {id: "louisXV", name: "LOUIS XV", parent: "marieAdelaideSavoie", text: "1710-1774", class: "royal", url: "https://fr.wikipedia.org/wiki/Louis_XV"},
+                {id: "marieLeszczynska", name: "Marie Leszczynska", spouse: "louisXV", text: "1703-1768", url: "https://fr.wikipedia.org/wiki/Marie_Leszczynska"},
+                {id: "maisonEspagne", name: "BRANCHE", parent: "elisabethFarnese", text: "D'ESPAGNE", class: "cadetBranch", url: ""},
+                {id: "louiseElisabeth", name: "Louise-Élisabeth", parent: "marieLeszczynska", text: "1727-1759", url: "https://fr.wikipedia.org/wiki/%C3%89lisabeth_de_France_(1727-1759)"},
+                {id: "philippeParme", name: "Philippe de Parme", spouse: "louiseElisabeth", text: "1720-1765", url: "https://fr.wikipedia.org/wiki/Philippe_Ier_de_Parme"},
+                {id: "henriette", name: "Henriette", parent: "marieLeszczynska", text: "1727-1752", url: "https://fr.wikipedia.org/wiki/Henriette_de_France_(1727-1752)"},
+                {id: "marieLouise", name: "Marie-Louise", parent: "marieLeszczynska", text: "1728-1733", url: "https://fr.wikipedia.org/wiki/Marie-Louise_de_France"},
+                {id: "louisFerdinand", name: "Louis-Ferdinand", parent: "marieLeszczynska", text: "1729-1765", url: "https://fr.wikipedia.org/wiki/Louis_de_France_(1729-1765)"},
+                {id: "marieThereseEspagne", name: "M.-Thérèse d'Espagne", spouse: "louisFerdinand", text: "1726-1746", url: "https://fr.wikipedia.org/wiki/Marie-Th%C3%A9r%C3%A8se_d%27Espagne"},
+                {id: "marieJosepheSaxe", name: "M.-Josèphe de Saxe", spouse: "louisFerdinand", text: "1731-1767", url: "https://fr.wikipedia.org/wiki/Marie-Jos%C3%A8phe_de_Saxe_(1731-1767)"},
+                {id: "philippe2", name: "Philippe", parent: "marieLeszczynska", text: "1730-1733", url: "https://fr.wikipedia.org/wiki/Philippe_Louis_de_France"},
+                {id: "adelaide", name: "Adélaïde", parent: "marieLeszczynska", text: "1732-1800", url: "https://fr.wikipedia.org/wiki/Ad%C3%A9la%C3%AFde_de_France_(1732-1800)"},
+                {id: "victoire", name: "Victoire", parent: "marieLeszczynska", text: "1733-1799", url: "https://fr.wikipedia.org/wiki/Victoire_de_France_(1733-1799)"},
+                {id: "sophie", name: "Sophie", parent: "marieLeszczynska", text: "1734-1782", url: "https://fr.wikipedia.org/wiki/Sophie_de_France_(1734-1782)"},
+                {id: "therese", name: "Thérèse", parent: "marieLeszczynska", text: "1736-1744", url: "https://fr.wikipedia.org/wiki/Th%C3%A9r%C3%A8se_de_France_(1736-1744)"},
+                {id: "louiseMarie", name: "Louise-Marie", parent: "marieLeszczynska", text: "1737-1787", url: "https://fr.wikipedia.org/wiki/Louise_de_France"},
+                {id: "louisJosephXavier", name: "Louis-Joseph-Xavier", parent: "marieJosepheSaxe", text: "1751-1761", url: "https://fr.wikipedia.org/wiki/Louis_de_France_(1751-1761)"},
+                {id: "xavierMarieJoseph", name: "Xavier-Marie-Joseph", parent: "marieJosepheSaxe", text: "1753-1754", url: "https://fr.wikipedia.org/wiki/Xavier_de_France"},
+                {id: "louisXVI", name: "LOUIS XVI", parent: "marieJosepheSaxe", text: "1754-1793", class: "royal", url: "https://fr.wikipedia.org/wiki/Louis_XVI"},
+                {id: "marieAntoinetteAutriche", name: "M.-Antoinette d'Autriche", spouse: "louisXVI", text: "1755-1793", url: "https://fr.wikipedia.org/wiki/Marie-Antoinette_d%27Autriche"},
+                {id: "louisXVIII", name: "LOUIS XVIII", parent: "marieJosepheSaxe", text: "1755-1824", class: "royal", url: "https://fr.wikipedia.org/wiki/Louis_XVIII"},
+                {id: "marieJosepheSavoie", name: "M.-Josèphe de Savoie", spouse: "louisXVIII", text: "1753-1810", url: "https://fr.wikipedia.org/wiki/Marie-Jos%C3%A9phine_de_Savoie"},
+                {id: "charlesX", name: "CHARLES X", parent: "marieJosepheSaxe", text: "1757-1830", class: "royal", url: "https://fr.wikipedia.org/wiki/Charles_X"},
+                {id: "marieThereseSavoie", name: "M.-Thérèse de Savoie", spouse: "charlesX", text: "1756-1805", url: "https://fr.wikipedia.org/wiki/Marie-Th%C3%A9r%C3%A8se_de_Savoie_(1756-1805)"},
+                {id: "clotilde", name: "Clotilde", parent: "marieJosepheSaxe", text: "1759-1802", url: "https://fr.wikipedia.org/wiki/Clotilde_de_France"},
+                {id: "charlesEmmanuelSavoie", name: "Charles-Emm. de Savoie", spouse: "clotilde", text: "1756-1805", url: "https://fr.wikipedia.org/wiki/Charles-Emmanuel_IV"},
+                {id: "elisabeth2", name: "Élisabeth", parent: "marieJosepheSaxe", text: "1764-1794", url: "https://fr.wikipedia.org/wiki/%C3%89lisabeth_de_France_(1764-1794)"},
+                {id: "marieThereseCharlotte", name: "M.-Thérèse-Charlotte", parent: "marieAntoinetteAutriche", text: "1778-1851", url: "https://fr.wikipedia.org/wiki/Marie-Th%C3%A9r%C3%A8se_de_France_(1778-1851)"},
+                {id: "louisJoseph", name: "Louis-Joseph", parent: "marieAntoinetteAutriche", text: "1781-1789", url: "https://fr.wikipedia.org/wiki/Louis-Joseph_de_France"},
+                {id: "louisCharles", name: "Louis-Charles", parent: "marieAntoinetteAutriche", text: "1785-1795", url: "https://fr.wikipedia.org/wiki/Louis_XVII"},
+                {id: "sophie2", name: "Sophie", parent: "marieAntoinetteAutriche", text: "1786-1787", url: "https://fr.wikipedia.org/wiki/Sophie_de_France_(1786-1787)"},
+                {id: "louisAntoineArtois", name: "Louis-Antoine", parent: "marieThereseSavoie", text: "1775-1844", url: "https://fr.wikipedia.org/wiki/Louis_XIX"},
+                {id: "charlesFerdinandArtois", name: "Charles-Ferdinand", parent: "marieThereseSavoie", text: "1778-1820", url: "https://fr.wikipedia.org/wiki/Charles-Ferdinand_d%27Artois"},
+                {id: "marieCarolineBourbonSiciles", name: "M.-Caroline de B.-Siciles", spouse: "charlesFerdinandArtois", text: "1798-1870", url: "https://fr.wikipedia.org/wiki/Marie-Caroline_de_Bourbon-Siciles_(1798-1870)"},
+                {id: "henriArtois", name: "Henri d'Artois", parent: "marieCarolineBourbonSiciles", text: "1820-1883", url: "https://fr.wikipedia.org/wiki/Henri_d%27Artois"},
+                {id: "marieThereseModene", name: "M.-Thérèse de Modène", spouse: "henriArtois", text: "1817-1886", url: "https://fr.wikipedia.org/wiki/Marie-Th%C3%A9r%C3%A8se_de_Mod%C3%A8ne"},
+                {id: "marieLouiseOrleans1", name: "Marie-Louise", parent: "elisabethCharlotteBaviere", text: "1662-1689", url: "https://fr.wikipedia.org/wiki/Marie-Louise_d%27Orl%C3%A9ans"},
+                {id: "philippeCharlesOrleans", name: "Philippe-Charles", parent: "elisabethCharlotteBaviere", text: "1664-1666", url: "https://fr.wikipedia.org/wiki/Philippe-Charles_d%27Orl%C3%A9ans"},
+                {id: "anneMarieOrleans", name: "Anne-Marie", parent: "elisabethCharlotteBaviere", text: "1669-1728", url: "https://fr.wikipedia.org/wiki/Anne-Marie_d%27Orl%C3%A9ans"},
+                {id: "alexandreLouisOrleans", name: "Alexandre-Louis", parent: "elisabethCharlotteBaviere", text: "1673-1676", url: "https://fr.wikipedia.org/wiki/Alexandre-Louis_d%27Orl%C3%A9ans"},
+                {id: "philippeOrleans2", name: "Philippe d'Orléans", parent: "elisabethCharlotteBaviere", text: "1674-1723", url: "https://fr.wikipedia.org/wiki/Philippe_d%27Orl%C3%A9ans_(1674-1723)"},
+                {id: "elisabethCharlotteOrleans", name: "Élisabeth-Charlotte", parent: "elisabethCharlotteBaviere", text: "1676-1744", url: "https://fr.wikipedia.org/wiki/%C3%89lisabeth-Charlotte_d%27Orl%C3%A9ans"},
+                {id: "francoiseMarieBourbon", name: "Françoise-Marie de B.", spouse: "philippeOrleans2", text: "1677-1749", url: "https://fr.wikipedia.org/wiki/Fran%C3%A7oise-Marie_de_Bourbon"},
+                {id: "marieLouiseElisabethOrleans", name: "Marie-Louise-Élisabeth", parent: "francoiseMarieBourbon", text: "1695-1719", url: "https://fr.wikipedia.org/wiki/Marie-Louise-%C3%89lisabeth_d%27Orl%C3%A9ans"},
+                {id: "adelaideOrleans1", name: "Adélaïde", parent: "francoiseMarieBourbon", text: "1698-1743", url: "https://fr.wikipedia.org/wiki/Ad%C3%A9la%C3%AFde_d%27Orl%C3%A9ans_(1698-1743)"},
+                {id: "charlotteAglaeOrleans", name: "Charlotte-Aglaé", parent: "francoiseMarieBourbon", text: "1700-1761", url: "https://fr.wikipedia.org/wiki/Charlotte-Agla%C3%A9_d%27Orl%C3%A9ans"},
+                {id: "louisOrleans1", name: "Louis d'Orléans", parent: "francoiseMarieBourbon", text: "1703-1752", url: "https://fr.wikipedia.org/wiki/Louis_d%27Orl%C3%A9ans_(1703-1752)"},
+                {id: "louiseElisabethOrleans", name: "Louise-Élisabeth", parent: "francoiseMarieBourbon", text: "1709-1742", url: "https://fr.wikipedia.org/wiki/Louise-%C3%89lisabeth_d%27Orl%C3%A9ans"},
+                {id: "philippineElisabethOrleans", name: "Philippine-Élisabeth", parent: "francoiseMarieBourbon", text: "1714-1734", url: "https://fr.wikipedia.org/wiki/Philippine-%C3%89lisabeth_d%27Orl%C3%A9ans"},
+                {id: "louiseOrleans1", name: "Louise", parent: "francoiseMarieBourbon", text: "1716-1736", url: "https://fr.wikipedia.org/wiki/Louise_d%27Orl%C3%A9ans_(1716-1736)"},
+                {id: "augusteBadeBade", name: "Auguste de Bade-Bade", spouse: "louisOrleans1", text: "1704-1726", url: "https://fr.wikipedia.org/wiki/Auguste_de_Bade-Bade"},
+                {id: "louisPhilippeOrleans1", name: "Louis-Philippe", parent: "augusteBadeBade", text: "1725-1785", url: "https://fr.wikipedia.org/wiki/Louis-Philippe_d%27Orl%C3%A9ans_(1725-1785)"},
+                {id: "louiseMarieOrleans", name: "Louise-Marie", parent: "augusteBadeBade", text: "1726-1728", url: ""},
+                {id: "louiseHenrietteBourbonConti", name: "L.-Henriette de B.-Conti", spouse: "louisPhilippeOrleans1", text: "1726-1759", url: "https://fr.wikipedia.org/wiki/Louise-Henriette_de_Bourbon-Conti"},
+                {id: "louisPhilippeOrleans2", name: "Louis-Philippe", parent: "louiseHenrietteBourbonConti", text: "1747-1793", url: "https://fr.wikipedia.org/wiki/Louis-Philippe_d%27Orl%C3%A9ans_(1747-1793)"},
+                {id: "bathildeOrleans", name: "Bathilde", parent: "louiseHenrietteBourbonConti", text: "1750-1822", url: "https://fr.wikipedia.org/wiki/Bathilde_d%27Orl%C3%A9ans"},
+                {id: "marieAdelaideBourbon", name: "M.-Adélaïde de B.", spouse: "louisPhilippeOrleans2", text: "1753-1821", url: "https://fr.wikipedia.org/wiki/Marie-Ad%C3%A9la%C3%AFde_de_Bourbon"},
+                {id: "louisPhilippeI", name: "LOUIS-PHILIPPE", parent: "marieAdelaideBourbon", text: "1773-1850", class: "royal", url: "https://fr.wikipedia.org/wiki/Louis-Philippe_Ier"},
+                {id: "antoineOrleans1", name: "Antoine", parent: "marieAdelaideBourbon", text: "1775-1807", url: "https://fr.wikipedia.org/wiki/Antoine_d%27Orl%C3%A9ans_(1775-1807)"},
+                {id: "adelaideOrleans2", name: "Adélaïde", parent: "marieAdelaideBourbon", text: "1777-1847", url: "https://fr.wikipedia.org/wiki/Ad%C3%A9la%C3%AFde_d%27Orl%C3%A9ans_(1777-1847)"},
+                {id: "louisCharlesOrleans", name: "Louis-Charles", parent: "marieAdelaideBourbon", text: "1779-1808", url: "https://fr.wikipedia.org/wiki/Louis-Charles_d%27Orl%C3%A9ans"},
+                {id: "marieAmelieBourbonSiciles", name: "M.-Amélie de B.-Siciles", spouse: "louisPhilippeI", text: "1782-1866", url: "https://fr.wikipedia.org/wiki/Marie-Am%C3%A9lie_de_Bourbon-Siciles"},
+                {id: "ferdinandPhilippeOrleans", name: "Ferdinand-Philippe", parent: "marieAmelieBourbonSiciles", text: "1810-1842", url: "https://fr.wikipedia.org/wiki/Ferdinand-Philippe_d%27Orl%C3%A9ans"},
+                {id: "louiseOrleans2", name: "Louise", parent: "marieAmelieBourbonSiciles", text: "1812-1850", url: "https://fr.wikipedia.org/wiki/Louise_d%27Orl%C3%A9ans_(1812-1850)"},
+                {id: "marieOrleans", name: "Marie", parent: "marieAmelieBourbonSiciles", text: "1813-1839", url: "https://fr.wikipedia.org/wiki/Marie_d%27Orl%C3%A9ans_(1813-1839)"},
+                {id: "louisOrleans2", name: "Louis", parent: "marieAmelieBourbonSiciles", text: "1814-1896", url: "https://fr.wikipedia.org/wiki/Louis_d%27Orl%C3%A9ans_(1814-1896)"},
+                {id: "francoiseOrleans", name: "Françoise", parent: "marieAmelieBourbonSiciles", text: "1816-1818", url: "https://fr.wikipedia.org/wiki/Fran%C3%A7oise_d%27Orl%C3%A9ans_(1816-1818)"},
+                {id: "clementineOrleans", name: "Clémentine", parent: "marieAmelieBourbonSiciles", text: "1817-1907", url: "https://fr.wikipedia.org/wiki/Cl%C3%A9mentine_d%27Orl%C3%A9ans"},
+                {id: "francoisOrleans", name: "François", parent: "marieAmelieBourbonSiciles", text: "1818-1900", url: "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_d%27Orl%C3%A9ans_(1818-1900)"},
+                {id: "charlesOrleans", name: "Charles", parent: "marieAmelieBourbonSiciles", text: "1820-1828", url: "https://fr.wikipedia.org/wiki/Charles_d%27Orl%C3%A9ans_(1820-1828)"},
+                {id: "henriOrleans", name: "Henri", parent: "marieAmelieBourbonSiciles", text: "1822-1897", url: "https://fr.wikipedia.org/wiki/Henri_d%27Orl%C3%A9ans_(1822-1897)"},
+                {id: "antoineOrleans2", name: "Antoine", parent: "marieAmelieBourbonSiciles", text: "1824-1890", url: "https://fr.wikipedia.org/wiki/Antoine_d%27Orl%C3%A9ans_(1824-1890)"},
+                {id: "heleneMecklembourgSchwerin", name: "Hélène de Meckl.-Schwerin", spouse: "ferdinandPhilippeOrleans", text: "1814-1858", url: "https://fr.wikipedia.org/wiki/H%C3%A9l%C3%A8ne_de_Mecklembourg-Schwerin"},
+                {id: "philippeOrleans3", name: "Philippe", parent: "heleneMecklembourgSchwerin", text: "1838-1894", url: "https://fr.wikipedia.org/wiki/Philippe_d%27Orl%C3%A9ans_(1838-1894)"},
+                {id: "robertOrleans", name: "Robert", parent: "heleneMecklembourgSchwerin", text: "1840-1910", url: "https://fr.wikipedia.org/wiki/Robert_d%27Orl%C3%A9ans_(1840-1910)"},
+            ];
+            Lignage(document.getElementById("lignage"), nodes, {vMargin: 50});
+        </script>
+    </body>
+</html>
