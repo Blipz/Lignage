@@ -1,6 +1,14 @@
 class Node {
 	static TREE = {};
 
+	static get(id) {
+		let ret = Node.TREE[id];
+		if (!ret) {
+			throw(`Unknown id: ${id}`);
+		}
+		return ret;
+	}
+
 	constructor(obj) {
 		if (obj.id === undefined) {
 			throw("Node without an id");
@@ -35,18 +43,22 @@ class Node {
 		Node.TREE[this.id] = this;
 	}
 
-	static get(id) {
-		let ret = Node.TREE[id];
-		if (!ret) {
-			throw(`Unknown id: ${id}`);
-		}
-		return ret;
+	hasChildren() {
+		return this.children.length > 0;
+	}
+
+	isMarried() {
+		return this.spouses.length > 0;
+	}
+
+	isRemarried() {
+		return this.spouses.length > 1;
 	}
 
 	getDepth() {
 		let depth = 0;
-		for (let i=0; i<this.children.length; i++) {
-			let d = this.children[i].getDepth() + 1;
+		for (let child of this.children) {
+			let d = child.getDepth() + 1;
 			if (d > depth) depth = d;
 		}
 		return depth;
@@ -55,8 +67,8 @@ class Node {
 	translate(dx, dy) {
 		this.x += dx;
 		this.y += dy;
-		for (let i=0; i<this.children.length; i++) {
-			this.children[i].translate(dx, dy);
+		for (let child of this.children) {
+			child.translate(dx, dy);
 		}
 	}
 }
@@ -81,34 +93,34 @@ function Lignage(svg, nodes, options = {image: false}) {
 	svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 	svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
 
-	for (let i=0; i<nodes.length; i++) {
-		new Node(nodes[i]);
+	for (let node of nodes) {
+		new Node(node);
 	}
 
 	const rootNode = Node.get(options.root || nodes[0].id);
 	rootNode.parents = [];
-	for (let i=0; i<(options.exclude || []).length; i++) {
-		node = Node.get(options.exclude[i]);
-		for (let j=0; j<node.parents.length; j++) {
-			node.parents[j].children = node.parents[j].children.filter(x => x != node);
+	for (let exclude of (options.exclude || [])) {
+		node = Node.get(exclude);
+		for (parentNode of node.parents) {
+			parentNode.children = parentNode.children.filter(x => x != node);
 		}
-		for (let j=0; j<node.spouses.length; j++) {
-			node.spouses[j].spouses = node.spouses[j].spouses.filter(x => x != node);
+		for (spouse of node.spouses) {
+			spouse.spouses = spouse.spouses.filter(x => x != node);
 		}
-		for (let j=0; j<node.children.length; j++) {
-			node.spouses[0].children = node.spouses[0].children.filter(x => x != node.children[j]);
+		for (child in node.children) {
+			node.spouses[0].children = node.spouses[0].children.filter(x => x != child);
 		}
 	}
 
 	function drawNodes(node, container, recursive = true) {
 		let x = node.x;
 		let y = node.y;
-		if (node.spouses.length > 0) {
+		if (node.isMarried()) {
 			if (recursive) {
-				if (node.spouses.length > 1) x += width + spouseMargin;
+				if (node.isRemarried()) x += width + spouseMargin;
 			}
 			else {
-				if (node.spouses[0].spouses.length > 1)
+				if (node.spouses[0].isRemarried())
 					x = node.spouses[0].x + (node == node.spouses[0].spouses[0] ? 0 : (width + spouseMargin) * 2);
 				else
 					x = node.spouses[0].x + width + spouseMargin;
@@ -175,25 +187,25 @@ function Lignage(svg, nodes, options = {image: false}) {
 		}
 
 		if (recursive) {
-			for (let i=0; i<node.spouses.length; i++) {
-				drawNodes(node.spouses[i], container, false);
+			for (let spouse of node.spouses) {
+				drawNodes(spouse, container, false);
 			}
-			for (let i=0; i<node.children.length; i++) {
-				drawNodes(node.children[i], container);
+			for (let child of node.children) {
+				drawNodes(child, container);
 			}
 		}
 	}
 
 	function drawLinks(node, container, recursive = true) {
 		// Draw links between spouses, and between parents and children
-		if (node.spouses.length == 0) return;
+		if (!node.isMarried()) return;
 
 		if (recursive) {
-			for (let i=0; i<node.spouses.length; i++) {
-				drawLinks(node.spouses[i], container, false);
+			for (let spouse of node.spouses) {
+				drawLinks(spouse, container, false);
 			}
-			for (let i=0; i<node.children.length; i++) {
-				drawLinks(node.children[i], container);
+			for (let child of node.children) {
+				drawLinks(child, container);
 			}
 			return;
 		}
@@ -203,17 +215,17 @@ function Lignage(svg, nodes, options = {image: false}) {
 		container.append(makeElement("circle", {cx: x, cy: y, r: 5, fill: "black"}));
 		container.append(makeElement("path", {d: `M${x - spouseMargin / 2} ${y} h${spouseMargin}`, stroke: "black"}));
 
-		for (let i=0; i<node.children.length; i++) {
-			let dx = node.children[i].x - node.spouses[0].x - (width + spouseMargin) / 2;
+		for (let child of node.children) {
+			let dx = child.x - node.spouses[0].x - (width + spouseMargin) / 2;
 			let fraction = 1/2;
 			if (node.spouses[0].spouses[0] != node) {
 				dx -= width + spouseMargin;
-				if (node.spouses[0].spouses[0].children.length > 0) fraction = 2/3;
+				if (node.spouses[0].spouses[0].hasChildren()) fraction = 2/3;
 			}
-			else if (node.spouses[0].spouses.length > 1) {
-				if (node.spouses[0].spouses[1].children.length > 0) fraction = 1/3;
+			else if (node.spouses[0].isRemarried()) {
+				if (node.spouses[0].spouses[1].hasChildren()) fraction = 1/3;
 			}
-			if (node.children[i].spouses.length > 1) {
+			if (child.isRemarried()) {
 				dx += width + spouseMargin;
 			}
 			let link = makeElement("path", {d: `M${x} ${y} v${height / 2 + parentMargin * fraction} h${dx} v${parentMargin * (1 - fraction)}}`, stroke: "black", fill: "none"});
@@ -224,20 +236,20 @@ function Lignage(svg, nodes, options = {image: false}) {
 	function computePositions(node, depth = 0) {
 		if (depth == maxDepth) {
 			node.translate(currentShift, 0);
-			if (node.children.length == 0) {
+			if (!node.hasChildren()) {
 				return null;
 			}
 			let nodeWidth = width + (width + spouseMargin) * node.spouses.length;
 			let delta = 0;
-			if (node.spouses.length > 1 && (node.spouses[0].children.length == 0 || node.spouses[1].children.length == 0)) {
+			if (node.isRemarried() && (!node.spouses[0].hasChildren() || !node.spouses[1].hasChildren())) {
 				// Double marriage (including one without children)
 				nodeWidth -= width + spouseMargin;
-				if (node.spouses[0].children.length == 0)
+				if (!node.spouses[0].hasChildren())
 					delta += width + spouseMargin;
 			}
 			// Align parent in regard to first and last child
 			function getChildX(index) {
-				return node.children[index].x + (node.children[index].spouses.length > 1 ? width + spouseMargin : 0);
+				return node.children[index].x + (node.children[index].isRemarried() ? width + spouseMargin : 0);
 			}
 			let diff = (getChildX(0) + getChildX(node.children.length - 1) + width) / 2 - (node.x + delta + nodeWidth / 2);
 			if (depth == 0) {
@@ -246,20 +258,20 @@ function Lignage(svg, nodes, options = {image: false}) {
 			return node.x + diff;
 		}
 
-		if (node.children.length == 0) {
+		if (!node.hasChildren()) {
 			return;
 		}
 
 		if (depth + 1 != maxDepth) {
-			for (let i=0; i<node.children.length; i++) {
-				computePositions(node.children[i], depth + 1);
+			for (let child of node.children) {
+				computePositions(child, depth + 1);
 			}
 			return;
 		}
 
 		let positions = [];
-		for (let i=0; i<node.children.length; i++) {
-			positions.push(computePositions(node.children[i], depth + 1));
+		for (let child of node.children) {
+			positions.push(computePositions(child, depth + 1));
 		}
 		let start = 0;
 		let y = (depth + 1) * (height + parentMargin);
