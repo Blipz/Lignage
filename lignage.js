@@ -205,19 +205,18 @@ function Lignage(svg, nodes, options = {image: false}) {
 
 		for (let i=0; i<node.children.length; i++) {
 			let dx = node.children[i].x - node.spouses[0].x - (width + spouseMargin) / 2;
-			let dy = height / 2 + parentMargin;
-			let fraction = 2/3;
+			let fraction = 1/2;
 			if (node.spouses[0].spouses[0] != node) {
 				dx -= width + spouseMargin;
-				fraction = 3/4;
+				if (node.spouses[0].spouses[0].children.length > 0) fraction = 2/3;
 			}
 			else if (node.spouses[0].spouses.length > 1) {
-				fraction = 1/2;
+				if (node.spouses[0].spouses[1].children.length > 0) fraction = 1/3;
 			}
 			if (node.children[i].spouses.length > 1) {
 				dx += width + spouseMargin;
 			}
-			let link = makeElement("path", {d: `M${x} ${y} v${dy * fraction} h${dx} v${dy * (1 - fraction)}}`, stroke: "black", fill: "none"});
+			let link = makeElement("path", {d: `M${x} ${y} v${height / 2 + parentMargin * fraction} h${dx} v${parentMargin * (1 - fraction)}}`, stroke: "black", fill: "none"});
 			container.appendChild(link);
 		}
 	}
