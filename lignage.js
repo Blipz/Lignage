@@ -71,16 +71,12 @@ function makeElement(name, attr = {}) {
 }
 
 function Lignage(svg, nodes, options = {image: false}) {
-	const baseHeight = options.height || (options.image? 160 : 50);
-	const baseWidth = options.width || 120;
-	const height = options.vMargin !== undefined ? (baseHeight + options.vMargin) : baseHeight + 80;
-	const width = options.hMargin !== undefined ? (baseWidth + options.hMargin) : baseWidth + 30;
-	const subtreeMargin = options.subtreeMargin !== undefined ? options.subtreeMargin : width * 0.5;
-	// TODO
-	// const siblingMargin
-	// const parentMargin
-	// const cousinMargin
-	// const spouseMargin
+	const height = options.height || (options.image? 160 : 50);
+	const width = options.width || 120;
+	const parentMargin = options.parentMargin !== undefined ? options.parentMargin : 80;
+	const spouseMargin = options.spouseMargin !== undefined ? options.spouseMargin : 30;
+	const siblingMargin = options.siblingMargin !== undefined ? options.siblingMargin : 30;
+	const cousinMargin = options.cousinMargin !== undefined ? options.cousinMargin : 100;
 
 	svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 	svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
@@ -109,13 +105,13 @@ function Lignage(svg, nodes, options = {image: false}) {
 		let y = node.y;
 		if (node.spouses.length > 0) {
 			if (recursive) {
-				if (node.spouses.length > 1) x += width;
+				if (node.spouses.length > 1) x += width + spouseMargin;
 			}
 			else {
 				if (node.spouses[0].spouses.length > 1)
-					x = node.spouses[0].x + (node == node.spouses[0].spouses[0] ? 0 : width * 2);
+					x = node.spouses[0].x + (node == node.spouses[0].spouses[0] ? 0 : (width + spouseMargin) * 2);
 				else
-					x = node.spouses[0].x + width;
+					x = node.spouses[0].x + width + spouseMargin;
 				y = node.spouses[0].y;
 			}
 		}
@@ -129,8 +125,8 @@ function Lignage(svg, nodes, options = {image: false}) {
 			y: 0,
 			rx: 7,
 			ry: 7,
-			height: baseHeight,
-			width: baseWidth,
+			height: height,
+			width: width,
 			fill: "white",
 			stroke: "black"
 		});
@@ -138,7 +134,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 		let fontSize = options.fontSize || 16;
 		let text1 = makeElement("text", {
 			class: "name",
-			x: baseWidth / 2,
+			x: width / 2,
 			y: 20,
 			fill: "black",
 			"font-size": fontSize,
@@ -154,8 +150,8 @@ function Lignage(svg, nodes, options = {image: false}) {
 		else elem.appendChild(text1);
 		let text2 = makeElement("text", {
 			class: "text",
-			x: baseWidth / 2,
-			y: baseHeight - 10,
+			x: width / 2,
+			y: height - 10,
 			fill: "black",
 			"font-size": 14,
 			"text-anchor": "middle"
@@ -174,7 +170,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 			});
 			elem.appendChild(image);
 		}
-		while (text1.getBBox().width > baseWidth) {
+		while (text1.getBBox().width > width) {
 			text1.setAttribute("font-size", fontSize--);
 		}
 
@@ -202,24 +198,24 @@ function Lignage(svg, nodes, options = {image: false}) {
 			return;
 		}
 
-		let x = node.spouses[0].x + (width + baseWidth) / 2 + (node.spouses[0].spouses[0] != node ? width : 0);
-		let y = node.spouses[0].y + baseHeight / 2;
+		let x = node.spouses[0].x + width + spouseMargin / 2 + (node.spouses[0].spouses[0] != node ? width + spouseMargin : 0);
+		let y = node.spouses[0].y + height / 2;
 		container.append(makeElement("circle", {cx: x, cy: y, r: 5, fill: "black"}));
-		container.append(makeElement("path", {d: `M${x - (width - baseWidth) / 2} ${y} h${width - baseWidth}`, stroke: "black"}));
+		container.append(makeElement("path", {d: `M${x - spouseMargin / 2} ${y} h${spouseMargin}`, stroke: "black"}));
 
 		for (let i=0; i<node.children.length; i++) {
-			let dx = node.children[i].x - node.spouses[0].x - width / 2;
-			let dy = height - baseHeight / 2;
+			let dx = node.children[i].x - node.spouses[0].x - (width + spouseMargin) / 2;
+			let dy = height / 2 + parentMargin;
 			let fraction = 2/3;
 			if (node.spouses[0].spouses[0] != node) {
-				dx -= width;
+				dx -= width + spouseMargin;
 				fraction = 3/4;
 			}
 			else if (node.spouses[0].spouses.length > 1) {
 				fraction = 1/2;
 			}
 			if (node.children[i].spouses.length > 1) {
-				dx += width;
+				dx += width + spouseMargin;
 			}
 			let link = makeElement("path", {d: `M${x} ${y} v${dy * fraction} h${dx} v${dy * (1 - fraction)}}`, stroke: "black", fill: "none"});
 			container.appendChild(link);
@@ -232,19 +228,19 @@ function Lignage(svg, nodes, options = {image: false}) {
 			if (node.children.length == 0) {
 				return null;
 			}
-			let nodeWidth = baseWidth + width * node.spouses.length;
+			let nodeWidth = width + (width + spouseMargin) * node.spouses.length;
 			let delta = 0;
 			if (node.spouses.length > 1 && (node.spouses[0].children.length == 0 || node.spouses[1].children.length == 0)) {
 				// Double marriage (including one without children)
-				nodeWidth -= width;
+				nodeWidth -= width + spouseMargin;
 				if (node.spouses[0].children.length == 0)
-					delta += width;
+					delta += width + spouseMargin;
 			}
 			// Align parent in regard to first and last child
 			function getChildX(index) {
-				return node.children[index].x + (node.children[index].spouses.length > 1 ? width : 0);
+				return node.children[index].x + (node.children[index].spouses.length > 1 ? width + spouseMargin : 0);
 			}
-			let diff = (getChildX(0) + getChildX(node.children.length - 1) + baseWidth) / 2 - (node.x + delta + nodeWidth / 2);
+			let diff = (getChildX(0) + getChildX(node.children.length - 1) + width) / 2 - (node.x + delta + nodeWidth / 2);
 			if (depth == 0) {
 				node.x += diff;
 			}
@@ -267,6 +263,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 			positions.push(computePositions(node.children[i], depth + 1));
 		}
 		let start = 0;
+		let y = (depth + 1) * (height + parentMargin);
 		while (start < positions.length) {
 			let end = start;
 			let found = false;
@@ -280,7 +277,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 			if (!found) end = positions.length;
 			let widthSum = 0;
 			for (let i=start; i<end; i++) {
-				widthSum += baseWidth + width * node.children[i].spouses.length;
+				widthSum += width + (width + spouseMargin) * node.children[i].spouses.length;
 			}
 			let collisionShift = 0;
 			let margin;
@@ -291,49 +288,49 @@ function Lignage(svg, nodes, options = {image: false}) {
 				}
 			}
 			else {
-				margin = (start == 0 && basePos == 0 || end == positions.length) ? (width - baseWidth) : (positions[end] - widthSum - basePos + (width - baseWidth)) / (end - start + 1);
-				if (margin < width - baseWidth) {
+				margin = (start == 0 && basePos == 0 || end == positions.length) ? siblingMargin : (positions[end] - widthSum - basePos + siblingMargin) / (end - start + 1);
+				if (margin < siblingMargin) {
 					if (end < positions.length) {
-						collisionShift = (width - baseWidth - margin) * (end - start + 1);
+						collisionShift = (siblingMargin - margin) * (end - start + 1);
 					}
-					margin = width - baseWidth;
+					margin = siblingMargin;
 				}
 				else if (start == 0) {
-					margin = width - baseWidth;
+					margin = siblingMargin;
 				}
 
 				if (start == 0 && end < positions.length) {
 					let shift = positions[end];
 					for (let i=end-1; i>=start; i--) {
-						shift -= (baseWidth + width * node.children[i].spouses.length) + margin;
+						shift -= (width + (width + spouseMargin) * node.children[i].spouses.length) + margin;
 						node.children[i].x = shift + collisionShift;
-						node.children[i].y = (depth + 1) * height;
+						node.children[i].y = y;
 					}
 				}
 				else {
 					for (let i=start; i<end; i++) {
-						node.children[i].x = basePos + margin - (width - baseWidth);
-						node.children[i].y = (depth + 1) * height;
-						basePos += (baseWidth + width * node.children[i].spouses.length) + margin;
+						node.children[i].x = basePos + margin - siblingMargin;
+						node.children[i].y = y;
+						basePos += (width + (width + spouseMargin) * node.children[i].spouses.length) + margin;
 					}
 				}
 			}
 
 			if (end < positions.length) {
 				node.children[end].x = positions[end];
-				node.children[end].y = (depth + 1) * height;
+				node.children[end].y = y;
 				if (collisionShift) {
 					for (let i=end; i<positions.length; i++) {
 						node.children[i].translate(collisionShift, 0);
 						if (positions[i] !== null) positions[i] += collisionShift;
 					}
 				}
-				basePos = positions[end] + (baseWidth + width * node.children[end].spouses.length) + width - baseWidth;
+				basePos = positions[end] + (width + (width + spouseMargin) * node.children[end].spouses.length) + siblingMargin;
 			}
 			start = end + 1;
 			currentShift += collisionShift;
 		}
-		basePos += subtreeMargin;
+		basePos += cousinMargin - siblingMargin;
 	}
 
 	let basePos = 0;
