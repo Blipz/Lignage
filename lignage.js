@@ -291,10 +291,10 @@ function Lignage(svg, nodes, options = {image: false}) {
 				}
 			}
 			else {
-				margin = (start == 0 && basePos == 0 || end == positions.length) ? (width - baseWidth) : (positions[end] - widthSum - basePos) / (end - start);
+				margin = (start == 0 && basePos == 0 || end == positions.length) ? (width - baseWidth) : (positions[end] - widthSum - basePos + (width - baseWidth)) / (end - start + 1);
 				if (margin < width - baseWidth) {
 					if (end < positions.length) {
-						collisionShift = (width - baseWidth - margin) * (end - start);
+						collisionShift = (width - baseWidth - margin) * (end - start + 1);
 					}
 					margin = width - baseWidth;
 				}
@@ -312,7 +312,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 				}
 				else {
 					for (let i=start; i<end; i++) {
-						node.children[i].x = basePos;
+						node.children[i].x = basePos + margin - (width - baseWidth);
 						node.children[i].y = (depth + 1) * height;
 						basePos += (baseWidth + width * node.children[i].spouses.length) + margin;
 					}
@@ -323,9 +323,12 @@ function Lignage(svg, nodes, options = {image: false}) {
 				node.children[end].x = positions[end];
 				node.children[end].y = (depth + 1) * height;
 				if (collisionShift) {
-					node.children[end].translate(collisionShift, 0);
+					for (let i=end; i<positions.length; i++) {
+						node.children[i].translate(collisionShift, 0);
+						if (positions[i] !== null) positions[i] += collisionShift;
+					}
 				}
-				basePos = positions[end] + (baseWidth + width * node.children[end].spouses.length) + collisionShift + width - baseWidth;
+				basePos = positions[end] + (baseWidth + width * node.children[end].spouses.length) + width - baseWidth;
 			}
 			start = end + 1;
 			currentShift += collisionShift;
