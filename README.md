@@ -3,7 +3,7 @@
 Lignage is a JavaScript tool aimed at generating family trees, with an ancestor as a root.
 All descendents of this ancestor, as well as all their spouses, will be displayed.
 
-![Bourbon dynasty](example.png)
+![Bourbon dynasty](examples/bourbon.png)
 
 ## Limitations
 
