@@ -21,12 +21,12 @@ All descendents of this ancestor, as well as all their spouses, will be displaye
 <script>
     const nodes = [
         {id: "johnDoe", "name": "John Doe"},
-	{id: "janeDoe", "name": "Jane Doe", spouse: "johnDoe"},
-	{id: "babyDoe", "name": "Baby Doe", parent: "janeDoe"}
+        {id: "janeDoe", "name": "Jane Doe", spouse: "johnDoe"},
+        {id: "babyDoe", "name": "Baby Doe", parent: "janeDoe"}
     ];
     const options = {};
     Lignage(document.getElementById("lignage"), nodes, options);
-<script>
+</script>
 ```
 
 ## Data

@@ -228,7 +228,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 			if (child.isRemarried()) {
 				dx += width + spouseMargin;
 			}
-			let link = makeElement("path", {d: `M${x} ${y} v${height / 2 + parentMargin * fraction} h${dx} v${parentMargin * (1 - fraction)}}`, stroke: "black", fill: "none"});
+			let link = makeElement("path", {d: `M${x} ${y} v${height / 2 + parentMargin * fraction} h${dx} v${parentMargin * (1 - fraction)}`, stroke: "black", fill: "none"});
 			container.appendChild(link);
 		}
 	}
