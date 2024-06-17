@@ -281,125 +281,138 @@ function Lignage(svg, nodes, options = {image: false}) {
 			}
 		}
 
-		function computePositions(node, depth = 0) {
-			if (depth == maxDepth) {
-				node.translate(currentShift, 0);
-				if (!node.hasChildren()) {
-					return null;
-				}
-				let nodeWidth = width + (width + spouseMargin) * node.spouses.length;
-				let delta = 0;
-				if (node.isRemarried() && (!node.spouses[0].hasChildren() || !node.spouses[1].hasChildren())) {
-					// Double marriage (including one without children)
-					nodeWidth -= width + spouseMargin;
-					if (!node.spouses[0].hasChildren())
-						delta += width + spouseMargin;
-				}
-				// Align parent in regard to first and last child
-				function getChildX(index) {
-					return node.children[index].x + (node.children[index].isRemarried() ? width + spouseMargin : 0);
-				}
-				let diff = (getChildX(0) + getChildX(node.children.length - 1) + width) / 2 - (node.x + delta + nodeWidth / 2);
-				if (depth == 0) {
-					node.x += diff;
-				}
-				return node.x + diff;
+		function getNodes(node, depth) {
+			if (depth == 0) {
+				return [[node]];
 			}
-
-			if (!node.hasChildren()) {
-				return;
+			else if (depth == 1) {
+				return node.hasChildren() ? [node.children] : [];
 			}
-
-			if (depth + 1 != maxDepth) {
+			else {
+				let ret = [];
 				for (let child of node.children) {
-					computePositions(child, depth + 1);
+					ret = ret.concat(getNodes(child, depth - 1));
 				}
-				return;
+				return ret;
 			}
+		}
 
-			let positions = [];
-			for (let child of node.children) {
-				positions.push(computePositions(child, depth + 1));
+		function computePosition(node) {
+			if (!node.hasChildren()) {
+				return null;
 			}
-			let start = 0;
+			let nodeWidth = width + (width + spouseMargin) * node.spouses.length;
+			let delta = 0;
+			if (node.isRemarried() && (!node.spouses[0].hasChildren() || !node.spouses[1].hasChildren())) {
+				// Double marriage (including one without children)
+				nodeWidth -= width + spouseMargin;
+				if (!node.spouses[0].hasChildren())
+					delta = width + spouseMargin;
+			}
+			// Align parent in regard to first and last child
+			function getChildX(index) {
+				return node.children[index].x + (node.children[index].isRemarried() ? width + spouseMargin : 0);
+			}
+			return (getChildX(0) + getChildX(node.children.length - 1) + width) / 2 - (delta + nodeWidth / 2);
+		}
+
+		function adjustPositions(depth) {
 			let y = (depth + 1) * (height + parentMargin);
-			while (start < positions.length) {
-				let end = start;
-				let found = false;
-				for (let i=start; i<positions.length; i++) {
-					if (positions[i] !== null) {
-						end = i;
-						found = true;
-						break;
-					}
-				}
-				if (!found) end = positions.length;
-				let widthSum = 0;
-				for (let i=start; i<end; i++) {
-					widthSum += width + (width + spouseMargin) * node.children[i].spouses.length;
-				}
-				let collisionShift = 0;
-				let margin;
-				// Collision check
-				if (start == end) {
-					if (positions[end] < basePos) {
-						collisionShift = basePos - positions[end];
-					}
-				}
-				else {
-					margin = (start == 0 && basePos == 0 || end == positions.length) ? siblingMargin : (positions[end] - widthSum - basePos + siblingMargin) / (end - start + 1);
-					if (margin < siblingMargin) {
-						if (end < positions.length) {
-							collisionShift = (siblingMargin - margin) * (end - start + 1);
-						}
-						margin = siblingMargin;
-					}
-					else if (start == 0) {
-						margin = siblingMargin;
-					}
+			let basePos = 0;
+			let currentShift = 0;
+			let anchored = false;
+			let levelNodes = getNodes(rootNode, depth);
+			let index = -1;
 
-					if (start == 0 && end < positions.length) {
-						let shift = positions[end];
-						for (let i=end-1; i>=start; i--) {
-							shift -= (width + (width + spouseMargin) * node.children[i].spouses.length) + margin;
-							node.children[i].x = shift + collisionShift;
-							node.children[i].y = y;
+			for (let nodes of levelNodes) {
+				index++;
+				for (let node of nodes) {
+					if (currentShift) node.translate(currentShift, 0);
+				}
+				let positions = nodes.map(computePosition);
+				let start = 0;
+				while (start < positions.length) {
+					let end = start;
+					let found = false;
+					for (let i=start; i<positions.length; i++) {
+						if (positions[i] !== null) {
+							end = i;
+							found = true;
+							break;
+						}
+					}
+					if (!found) end = positions.length;
+					let widthSum = 0;
+					for (let i=start; i<end; i++) {
+						widthSum += width + (width + spouseMargin) * nodes[i].spouses.length;
+					}
+					let collisionShift = 0;
+					let margin;
+					// Collision check
+					if (start == end) {
+						if (positions[end] < basePos) {
+							collisionShift = basePos - positions[end];
 						}
 					}
 					else {
-						for (let i=start; i<end; i++) {
-							node.children[i].x = basePos + margin - siblingMargin;
-							node.children[i].y = y;
-							basePos += (width + (width + spouseMargin) * node.children[i].spouses.length) + margin;
+						margin = (start == 0 && basePos == 0 || end == positions.length) ? siblingMargin : (positions[end] - widthSum - basePos + siblingMargin) / (end - start + 1);
+						if (margin < siblingMargin) {
+							if (end < positions.length) {
+								collisionShift = (siblingMargin - margin) * (end - start + 1);
+							}
+							margin = siblingMargin;
 						}
-					}
-				}
+						else if (start == 0) {
+							margin = siblingMargin;
+						}
 
-				if (end < positions.length) {
-					node.children[end].x = positions[end];
-					node.children[end].y = y;
-					if (collisionShift) {
-						for (let i=end; i<positions.length; i++) {
-							node.children[i].translate(collisionShift, 0);
-							if (positions[i] !== null) positions[i] += collisionShift;
+						if (start == 0 && end < positions.length) {
+							let shift = positions[end];
+							for (let i=end-1; i>=start; i--) {
+								shift -= (width + (width + spouseMargin) * nodes[i].spouses.length) + margin;
+								nodes[i].x = shift + collisionShift;
+								nodes[i].y = y;
+							}
+						}
+						else {
+							for (let i=start; i<end; i++) {
+								nodes[i].x = basePos + margin - siblingMargin;
+								nodes[i].y = y;
+								basePos += (width + (width + spouseMargin) * nodes[i].spouses.length) + margin;
+							}
 						}
 					}
-					basePos = positions[end] + (width + (width + spouseMargin) * node.children[end].spouses.length) + siblingMargin;
+
+					if (end < positions.length) {
+						nodes[end].x = positions[end];
+						nodes[end].y = y;
+						if (collisionShift) {
+							for (let i=end; i<positions.length; i++) {
+								nodes[i].translate(collisionShift, 0);
+								if (positions[i] !== null) positions[i] += collisionShift;
+							}
+						}
+						if (!anchored) {
+							anchored = true;
+							let delta = index == 0 ? null : levelNodes[index][0].x - width - cousinMargin - levelNodes[index - 1][levelNodes[index - 1].length - 1].x;
+							for (let i=0; i<index; i++) {
+								for (let node of levelNodes[i]) {
+									node.translate(delta, 0);
+								}
+							}
+
+						}
+						basePos = positions[end] + (width + (width + spouseMargin) * nodes[end].spouses.length) + siblingMargin;
+					}
+					start = end + 1;
+					currentShift += collisionShift;
 				}
-				start = end + 1;
-				currentShift += collisionShift;
+				basePos += cousinMargin - siblingMargin;
 			}
-			basePos += cousinMargin - siblingMargin;
 		}
 
-		let basePos = 0;
-		let currentShift = 0;
-		let maxDepth = rootNode.getDepth();
-		while (maxDepth >= 0) {
-			computePositions(rootNode);
-			basePos = 0;
-			currentShift = 0;
-			maxDepth--;
+		for (let depth=rootNode.getDepth(); depth>=0; depth--) {
+			adjustPositions(depth);
 		}
 
 		let nodeContainer = makeElement("g", {id: "nodes"});
