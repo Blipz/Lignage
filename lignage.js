@@ -250,18 +250,31 @@ function Lignage(svg, nodes, options = {image: false}) {
 			container.append(makeElement("circle", {cx: x, cy: y, r: 5, fill: "black"}));
 			container.append(makeElement("path", {d: `M${x - spouseMargin / 2} ${y} h${spouseMargin}`, stroke: "black"}));
 
-			for (let child of node.children) {
+			function computeDx(child) {
 				let dx = child.x - node.spouses[0].x - (width + spouseMargin) / 2;
-				let fraction = 1/2;
-				if (node.spouses[0].spouses[0] != node) {
+				if (node.spouses[0].spouses[0] != child.parents[0]) {
 					dx -= width + spouseMargin;
-					if (node.spouses[0].spouses[0].hasChildren()) fraction = 2/3;
-				}
-				else if (node.spouses[0].isRemarried()) {
-					if (node.spouses[0].spouses[1].hasChildren()) fraction = 1/3;
 				}
 				if (child.isRemarried()) {
 					dx += width + spouseMargin;
+				}
+				return dx;
+			}
+
+			for (let child of node.children) {
+				let dx = computeDx(child);
+				let fraction = 1/2;
+				if (node.spouses[0].spouses[0] != node) {
+					let firstSpouse = node.spouses[0].spouses[0];
+					if (firstSpouse.hasChildren()) {
+						fraction = computeDx(node.children[0]) > 0 ? 1/3 : 2/3;
+					}
+				}
+				else if (node.spouses[0].isRemarried()) {
+					let secondSpouse = node.spouses[0].spouses[1];
+					if (secondSpouse.hasChildren()) {
+						fraction = computeDx(secondSpouse.children[0]) > 0 ? 2/3 : 1/3;
+					}
 				}
 				let link = makeElement("path", {d: `M${x} ${y} v${height / 2 + parentMargin * fraction} h${dx} v${parentMargin * (1 - fraction)}`, stroke: "black", fill: "none"});
 				container.appendChild(link);
