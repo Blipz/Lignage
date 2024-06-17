@@ -188,7 +188,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 				"font-weight": "bold",
 				"text-anchor": "middle"
 			});
-			text1.innerHTML = node.name;
+			text1.innerHTML = node.name || "";
 			if (node.url) {
 				let a = makeElement("a", {href: node.url, target: "_blank"});
 				a.appendChild(text1);
