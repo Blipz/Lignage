@@ -1,88 +1,131 @@
-class Node {
-	static TREE = {};
-
-	static get(id) {
-		let ret = Node.TREE[id];
-		if (!ret) {
-			throw(`Unknown id: ${id}`);
-		}
-		return ret;
-	}
-
-	constructor(obj) {
-		if (obj.id === undefined) {
-			throw("Node without an id");
-		}
-		if (Object.entries(Node.TREE).length > 0 && !obj.spouse && !obj.parent) {
-			throw(`Non-root node ${obj.id} without spouse nor parent`);
-		}
-		this.id = obj.id;
-		this.name = obj.name;
-		if (obj.text) this.text = obj.text;
-		if (obj.class) this.class = obj.class;
-		if (obj.url) this.url = obj.url;
-		if (obj.image) this.image = obj.image;
-		if (obj.parent) {
-			this.parents = [Node.get(obj.parent), Node.get(obj.parent).spouses[0]];
-			Node.get(obj.parent).children.push(this);
-			Node.get(obj.parent).spouses[0].children.push(this);
-		}
-		else {
-			this.parents = [];
-		}
-		if (obj.spouse) {
-			this.spouses = [Node.get(obj.spouse)];
-			Node.get(obj.spouse).spouses.push(this);
-		}
-		else {
-			this.spouses = [];
-		}
-		this.children = [];
-		this.x = 0;
-		this.y = 0;
-		Node.TREE[this.id] = this;
-	}
-
-	hasChildren() {
-		return this.children.length > 0;
-	}
-
-	isMarried() {
-		return this.spouses.length > 0;
-	}
-
-	isRemarried() {
-		return this.spouses.length > 1;
-	}
-
-	getDepth() {
-		let depth = 0;
-		for (let child of this.children) {
-			let d = child.getDepth() + 1;
-			if (d > depth) depth = d;
-		}
-		return depth;
-	}
-
-	translate(dx, dy) {
-		this.x += dx;
-		this.y += dy;
-		for (let child of this.children) {
-			child.translate(dx, dy);
-		}
-	}
-}
-
-function makeElement(name, attr = {}) {
-	const ns = "http://www.w3.org/2000/svg";
-	const elem = document.createElementNS(ns, name);
-	Object.entries(attr).forEach(function([k, v]) {
-		elem.setAttribute(k, v);
-	});
-	return elem;
-}
-
 function Lignage(svg, nodes, options = {image: false}) {
+	class Node {
+		static TREE = {};
+
+		static get(id) {
+			let ret = Node.TREE[id];
+			if (!ret) {
+				throw Error(`Unknown id '${id}'`);
+			}
+			return ret;
+		}
+
+		static remove(id) {
+			let node = Node.get(id);
+			if (node.isRoot) {
+				throw Error(`Cannot remove root node '${id}'`);
+			}
+			for (let parentNode of node.parents) {
+				parentNode.children = parentNode.children.filter(x => x != node);
+			}
+			for (let spouse of node.spouses) {
+				spouse.spouses = spouse.spouses.filter(x => x != node);
+			}
+			for (let child of node.children) {
+				Node.remove(child.id);
+			}
+			delete Node.TREE[id];
+		}
+
+		constructor(obj) {
+			if (obj.id === undefined) {
+				throw Error("Node without an id");
+			}
+			if (Node.TREE[obj.id]) {
+				throw Error(`Node '${obj.id}' already exists`);
+			}
+			if (Object.entries(Node.TREE).length > 0 && !obj.spouse && !obj.parent) {
+				throw Error(`Non-root node '${obj.id}' without spouse nor parent`);
+			}
+			if (obj.spouse && !Node.get(obj.spouse).isKin()) {
+				throw Error(`Cannot add spouse to non-kin node '${obj.spouse}'`);
+			}
+			if (obj.spouse && Node.get(obj.spouse).spouses.length == 2) {
+				throw Error(`Node '${obj.spouse}' cannot have more than two spouses`);
+			}
+			if (obj.parent && Node.get(obj.parent).isKin()) {
+				throw Error(`Cannot add child to kin node '${obj.parent}'`);
+			}
+			if (obj.spouse && obj.parent) {
+				throw Error(`Cannot handle consanguine union between '${obj.id}' and '${obj.spouse}'`);
+			}
+			this.id = obj.id;
+			this.name = obj.name;
+			if (obj.text) this.text = obj.text;
+			if (obj.class) this.class = obj.class;
+			if (obj.url) this.url = obj.url;
+			if (obj.image) this.image = obj.image;
+			if (obj.parent) {
+				let parent = Node.get(obj.parent);
+				this.parents = [parent, parent.spouses[0]];
+				parent.children.push(this);
+				if (parent == parent.spouses[0].spouses[0] && parent.spouses[0].isRemarried()) {
+					parent.spouses[0].children = parent.children.concat(parent.spouses[0].spouses[1].children);
+				}
+				else {
+					parent.spouses[0].children.push(this);
+				}
+			}
+			else {
+				this.parents = [];
+			}
+			if (obj.spouse) {
+				this.spouses = [Node.get(obj.spouse)];
+				Node.get(obj.spouse).spouses.push(this);
+			}
+			else {
+				this.spouses = [];
+			}
+			this.children = [];
+			this.x = 0;
+			this.y = 0;
+			this.isRoot = (Object.entries(Node.TREE).length == 0);
+			Node.TREE[this.id] = this;
+		}
+
+		hasChildren() {
+			return this.children.length > 0;
+		}
+
+		isMarried() {
+			return this.spouses.length > 0;
+		}
+
+		isRemarried() {
+			return this.spouses.length > 1;
+		}
+
+		isKin() {
+			return this.isRoot || this.parents.length != 0;
+		}
+
+		getDepth() {
+			let depth = 0;
+			for (let child of this.children) {
+				let d = child.getDepth() + 1;
+				if (d > depth) depth = d;
+			}
+			return depth;
+		}
+
+		translate(dx, dy) {
+			this.x += dx;
+			this.y += dy;
+			for (let child of this.children) {
+				child.translate(dx, dy);
+			}
+		}
+	}
+
+	function makeElement(name, attr = {}) {
+		const ns = "http://www.w3.org/2000/svg";
+		const elem = document.createElementNS(ns, name);
+		Object.entries(attr).forEach(function([k, v]) {
+			elem.setAttribute(k, v);
+		});
+		return elem;
+	}
+
 	const height = options.height || (options.image? 160 : 50);
 	const width = options.width || 120;
 	const parentMargin = options.parentMargin !== undefined ? options.parentMargin : 80;
@@ -100,270 +143,339 @@ function Lignage(svg, nodes, options = {image: false}) {
 	const rootNode = Node.get(options.root || nodes[0].id);
 	rootNode.parents = [];
 	for (let exclude of (options.exclude || [])) {
-		node = Node.get(exclude);
-		for (parentNode of node.parents) {
-			parentNode.children = parentNode.children.filter(x => x != node);
-		}
-		for (spouse of node.spouses) {
-			spouse.spouses = spouse.spouses.filter(x => x != node);
-		}
-		for (child in node.children) {
-			node.spouses[0].children = node.spouses[0].children.filter(x => x != child);
-		}
+		Node.remove(exclude);
 	}
 
-	function drawNodes(node, container, recursive = true) {
-		let x = node.x;
-		let y = node.y;
-		if (node.isMarried()) {
-			if (recursive) {
-				if (node.isRemarried()) x += width + spouseMargin;
+	function drawTree() {
+		function drawNodes(node, container, recursive = true) {
+			let x = node.x;
+			let y = node.y;
+			if (node.isMarried()) {
+				if (recursive) {
+					if (node.isRemarried()) x += width + spouseMargin;
+				}
+				else {
+					if (node.spouses[0].isRemarried())
+						x = node.spouses[0].x + (node == node.spouses[0].spouses[0] ? 0 : (width + spouseMargin) * 2);
+					else
+						x = node.spouses[0].x + width + spouseMargin;
+					y = node.spouses[0].y;
+				}
 			}
-			else {
-				if (node.spouses[0].isRemarried())
-					x = node.spouses[0].x + (node == node.spouses[0].spouses[0] ? 0 : (width + spouseMargin) * 2);
-				else
-					x = node.spouses[0].x + width + spouseMargin;
-				y = node.spouses[0].y;
-			}
-		}
 
-		let elem = makeElement("g", {id: node.id, transform: `translate(${x} ${y})`});
-		if (node.class) elem.classList.add(node.class);
-		container.appendChild(elem);
+			let elem = makeElement("g", {id: node.id, transform: `translate(${x} ${y})`});
+			if (node.class) elem.classList.add(node.class);
+			container.appendChild(elem);
 
-		let rect = makeElement("rect", {
-			x: 0,
-			y: 0,
-			rx: 7,
-			ry: 7,
-			height: height,
-			width: width,
-			fill: "white",
-			stroke: "black"
-		});
-		elem.appendChild(rect);
-		let fontSize = options.fontSize || 16;
-		let text1 = makeElement("text", {
-			class: "name",
-			x: width / 2,
-			y: 20,
-			fill: "black",
-			"font-size": fontSize,
-			"font-weight": "bold",
-			"text-anchor": "middle"
-		});
-		text1.innerHTML = node.name;
-		if (node.url) {
-			let a = makeElement("a", {href: node.url, target: "_blank"});
-			a.appendChild(text1);
-			elem.appendChild(a);
-		}
-		else elem.appendChild(text1);
-		let text2 = makeElement("text", {
-			class: "text",
-			x: width / 2,
-			y: height - 10,
-			fill: "black",
-			"font-size": 14,
-			"text-anchor": "middle"
-		});
-		text2.innerHTML = node.text || "";
-		elem.appendChild(text2);
-		if (options.image) {
-			let image = makeElement("image", {
-				preserveAspectRatio: "xMidYMid slice",
-				"clip-path": "url(#clipImage)",
-				href: node.image,
-				x: 10,
-				y: 30,
-				width: 100,
-				height: 100
+			let rect = makeElement("rect", {
+				x: 0,
+				y: 0,
+				rx: 7,
+				ry: 7,
+				height: height,
+				width: width,
+				fill: "white",
+				stroke: "black"
 			});
-			elem.appendChild(image);
-		}
-		while (text1.getBBox().width > width) {
-			text1.setAttribute("font-size", fontSize--);
+			elem.appendChild(rect);
+			let fontSize = options.fontSize || 16;
+			let text1 = makeElement("text", {
+				class: "name",
+				x: width / 2,
+				y: 20,
+				fill: "black",
+				"font-size": fontSize,
+				"font-weight": "bold",
+				"text-anchor": "middle"
+			});
+			text1.innerHTML = node.name;
+			if (node.url) {
+				let a = makeElement("a", {href: node.url, target: "_blank"});
+				a.appendChild(text1);
+				elem.appendChild(a);
+			}
+			else elem.appendChild(text1);
+			let text2 = makeElement("text", {
+				class: "text",
+				x: width / 2,
+				y: height - 10,
+				fill: "black",
+				"font-size": 14,
+				"text-anchor": "middle"
+			});
+			text2.innerHTML = node.text || "";
+			elem.appendChild(text2);
+			if (options.image) {
+				let image = makeElement("image", {
+					preserveAspectRatio: "xMidYMid slice",
+					"clip-path": "url(#clipImage)",
+					href: node.image,
+					x: 10,
+					y: 30,
+					width: 100,
+					height: 100
+				});
+				elem.appendChild(image);
+			}
+			while (text1.getBBox().width > width) {
+				text1.setAttribute("font-size", fontSize--);
+			}
+
+			if (recursive) {
+				for (let spouse of node.spouses) {
+					drawNodes(spouse, container, false);
+				}
+				for (let child of node.children) {
+					drawNodes(child, container);
+				}
+			}
 		}
 
-		if (recursive) {
-			for (let spouse of node.spouses) {
-				drawNodes(spouse, container, false);
+		function drawLinks(node, container, recursive = true) {
+			// Draw links between spouses, and between parents and children
+			if (!node.isMarried()) return;
+
+			if (recursive) {
+				for (let spouse of node.spouses) {
+					drawLinks(spouse, container, false);
+				}
+				for (let child of node.children) {
+					drawLinks(child, container);
+				}
+				return;
 			}
+
+			let x = node.spouses[0].x + width + spouseMargin / 2 + (node.spouses[0].spouses[0] != node ? width + spouseMargin : 0);
+			let y = node.spouses[0].y + height / 2;
+			container.append(makeElement("circle", {cx: x, cy: y, r: 5, fill: "black"}));
+			container.append(makeElement("path", {d: `M${x - spouseMargin / 2} ${y} h${spouseMargin}`, stroke: "black"}));
+
 			for (let child of node.children) {
-				drawNodes(child, container);
+				let dx = child.x - node.spouses[0].x - (width + spouseMargin) / 2;
+				let fraction = 1/2;
+				if (node.spouses[0].spouses[0] != node) {
+					dx -= width + spouseMargin;
+					if (node.spouses[0].spouses[0].hasChildren()) fraction = 2/3;
+				}
+				else if (node.spouses[0].isRemarried()) {
+					if (node.spouses[0].spouses[1].hasChildren()) fraction = 1/3;
+				}
+				if (child.isRemarried()) {
+					dx += width + spouseMargin;
+				}
+				let link = makeElement("path", {d: `M${x} ${y} v${height / 2 + parentMargin * fraction} h${dx} v${parentMargin * (1 - fraction)}`, stroke: "black", fill: "none"});
+				container.appendChild(link);
 			}
 		}
-	}
 
-	function drawLinks(node, container, recursive = true) {
-		// Draw links between spouses, and between parents and children
-		if (!node.isMarried()) return;
+		function computePositions(node, depth = 0) {
+			if (depth == maxDepth) {
+				node.translate(currentShift, 0);
+				if (!node.hasChildren()) {
+					return null;
+				}
+				let nodeWidth = width + (width + spouseMargin) * node.spouses.length;
+				let delta = 0;
+				if (node.isRemarried() && (!node.spouses[0].hasChildren() || !node.spouses[1].hasChildren())) {
+					// Double marriage (including one without children)
+					nodeWidth -= width + spouseMargin;
+					if (!node.spouses[0].hasChildren())
+						delta += width + spouseMargin;
+				}
+				// Align parent in regard to first and last child
+				function getChildX(index) {
+					return node.children[index].x + (node.children[index].isRemarried() ? width + spouseMargin : 0);
+				}
+				let diff = (getChildX(0) + getChildX(node.children.length - 1) + width) / 2 - (node.x + delta + nodeWidth / 2);
+				if (depth == 0) {
+					node.x += diff;
+				}
+				return node.x + diff;
+			}
 
-		if (recursive) {
-			for (let spouse of node.spouses) {
-				drawLinks(spouse, container, false);
-			}
-			for (let child of node.children) {
-				drawLinks(child, container);
-			}
-			return;
-		}
-
-		let x = node.spouses[0].x + width + spouseMargin / 2 + (node.spouses[0].spouses[0] != node ? width + spouseMargin : 0);
-		let y = node.spouses[0].y + height / 2;
-		container.append(makeElement("circle", {cx: x, cy: y, r: 5, fill: "black"}));
-		container.append(makeElement("path", {d: `M${x - spouseMargin / 2} ${y} h${spouseMargin}`, stroke: "black"}));
-
-		for (let child of node.children) {
-			let dx = child.x - node.spouses[0].x - (width + spouseMargin) / 2;
-			let fraction = 1/2;
-			if (node.spouses[0].spouses[0] != node) {
-				dx -= width + spouseMargin;
-				if (node.spouses[0].spouses[0].hasChildren()) fraction = 2/3;
-			}
-			else if (node.spouses[0].isRemarried()) {
-				if (node.spouses[0].spouses[1].hasChildren()) fraction = 1/3;
-			}
-			if (child.isRemarried()) {
-				dx += width + spouseMargin;
-			}
-			let link = makeElement("path", {d: `M${x} ${y} v${height / 2 + parentMargin * fraction} h${dx} v${parentMargin * (1 - fraction)}`, stroke: "black", fill: "none"});
-			container.appendChild(link);
-		}
-	}
-
-	function computePositions(node, depth = 0) {
-		if (depth == maxDepth) {
-			node.translate(currentShift, 0);
 			if (!node.hasChildren()) {
-				return null;
+				return;
 			}
-			let nodeWidth = width + (width + spouseMargin) * node.spouses.length;
-			let delta = 0;
-			if (node.isRemarried() && (!node.spouses[0].hasChildren() || !node.spouses[1].hasChildren())) {
-				// Double marriage (including one without children)
-				nodeWidth -= width + spouseMargin;
-				if (!node.spouses[0].hasChildren())
-					delta += width + spouseMargin;
-			}
-			// Align parent in regard to first and last child
-			function getChildX(index) {
-				return node.children[index].x + (node.children[index].isRemarried() ? width + spouseMargin : 0);
-			}
-			let diff = (getChildX(0) + getChildX(node.children.length - 1) + width) / 2 - (node.x + delta + nodeWidth / 2);
-			if (depth == 0) {
-				node.x += diff;
-			}
-			return node.x + diff;
-		}
 
-		if (!node.hasChildren()) {
-			return;
-		}
+			if (depth + 1 != maxDepth) {
+				for (let child of node.children) {
+					computePositions(child, depth + 1);
+				}
+				return;
+			}
 
-		if (depth + 1 != maxDepth) {
+			let positions = [];
 			for (let child of node.children) {
-				computePositions(child, depth + 1);
+				positions.push(computePositions(child, depth + 1));
 			}
-			return;
-		}
-
-		let positions = [];
-		for (let child of node.children) {
-			positions.push(computePositions(child, depth + 1));
-		}
-		let start = 0;
-		let y = (depth + 1) * (height + parentMargin);
-		while (start < positions.length) {
-			let end = start;
-			let found = false;
-			for (let i=start; i<positions.length; i++) {
-				if (positions[i] !== null) {
-					end = i;
-					found = true;
-					break;
-				}
-			}
-			if (!found) end = positions.length;
-			let widthSum = 0;
-			for (let i=start; i<end; i++) {
-				widthSum += width + (width + spouseMargin) * node.children[i].spouses.length;
-			}
-			let collisionShift = 0;
-			let margin;
-			// Collision check
-			if (start == end) {
-				if (positions[end] < basePos) {
-					collisionShift = basePos - positions[end];
-				}
-			}
-			else {
-				margin = (start == 0 && basePos == 0 || end == positions.length) ? siblingMargin : (positions[end] - widthSum - basePos + siblingMargin) / (end - start + 1);
-				if (margin < siblingMargin) {
-					if (end < positions.length) {
-						collisionShift = (siblingMargin - margin) * (end - start + 1);
+			let start = 0;
+			let y = (depth + 1) * (height + parentMargin);
+			while (start < positions.length) {
+				let end = start;
+				let found = false;
+				for (let i=start; i<positions.length; i++) {
+					if (positions[i] !== null) {
+						end = i;
+						found = true;
+						break;
 					}
-					margin = siblingMargin;
 				}
-				else if (start == 0) {
-					margin = siblingMargin;
+				if (!found) end = positions.length;
+				let widthSum = 0;
+				for (let i=start; i<end; i++) {
+					widthSum += width + (width + spouseMargin) * node.children[i].spouses.length;
 				}
-
-				if (start == 0 && end < positions.length) {
-					let shift = positions[end];
-					for (let i=end-1; i>=start; i--) {
-						shift -= (width + (width + spouseMargin) * node.children[i].spouses.length) + margin;
-						node.children[i].x = shift + collisionShift;
-						node.children[i].y = y;
+				let collisionShift = 0;
+				let margin;
+				// Collision check
+				if (start == end) {
+					if (positions[end] < basePos) {
+						collisionShift = basePos - positions[end];
 					}
 				}
 				else {
-					for (let i=start; i<end; i++) {
-						node.children[i].x = basePos + margin - siblingMargin;
-						node.children[i].y = y;
-						basePos += (width + (width + spouseMargin) * node.children[i].spouses.length) + margin;
+					margin = (start == 0 && basePos == 0 || end == positions.length) ? siblingMargin : (positions[end] - widthSum - basePos + siblingMargin) / (end - start + 1);
+					if (margin < siblingMargin) {
+						if (end < positions.length) {
+							collisionShift = (siblingMargin - margin) * (end - start + 1);
+						}
+						margin = siblingMargin;
 					}
-				}
-			}
+					else if (start == 0) {
+						margin = siblingMargin;
+					}
 
-			if (end < positions.length) {
-				node.children[end].x = positions[end];
-				node.children[end].y = y;
-				if (collisionShift) {
-					for (let i=end; i<positions.length; i++) {
-						node.children[i].translate(collisionShift, 0);
-						if (positions[i] !== null) positions[i] += collisionShift;
+					if (start == 0 && end < positions.length) {
+						let shift = positions[end];
+						for (let i=end-1; i>=start; i--) {
+							shift -= (width + (width + spouseMargin) * node.children[i].spouses.length) + margin;
+							node.children[i].x = shift + collisionShift;
+							node.children[i].y = y;
+						}
+					}
+					else {
+						for (let i=start; i<end; i++) {
+							node.children[i].x = basePos + margin - siblingMargin;
+							node.children[i].y = y;
+							basePos += (width + (width + spouseMargin) * node.children[i].spouses.length) + margin;
+						}
 					}
 				}
-				basePos = positions[end] + (width + (width + spouseMargin) * node.children[end].spouses.length) + siblingMargin;
+
+				if (end < positions.length) {
+					node.children[end].x = positions[end];
+					node.children[end].y = y;
+					if (collisionShift) {
+						for (let i=end; i<positions.length; i++) {
+							node.children[i].translate(collisionShift, 0);
+							if (positions[i] !== null) positions[i] += collisionShift;
+						}
+					}
+					basePos = positions[end] + (width + (width + spouseMargin) * node.children[end].spouses.length) + siblingMargin;
+				}
+				start = end + 1;
+				currentShift += collisionShift;
 			}
-			start = end + 1;
-			currentShift += collisionShift;
+			basePos += cousinMargin - siblingMargin;
 		}
-		basePos += cousinMargin - siblingMargin;
+
+		let basePos = 0;
+		let currentShift = 0;
+		let maxDepth = rootNode.getDepth();
+		while (maxDepth >= 0) {
+			computePositions(rootNode);
+			basePos = 0;
+			currentShift = 0;
+			maxDepth--;
+		}
+
+		let nodeContainer = makeElement("g", {id: "nodes"});
+		svg.appendChild(nodeContainer);
+		drawNodes(rootNode, nodeContainer);
+
+		let linkContainer = makeElement("g", {id: "links"});
+		svg.appendChild(linkContainer);
+		drawLinks(rootNode, linkContainer);
+
+		let bbox = nodeContainer.getBBox();
+		svg.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+		svg.setAttribute("width", bbox.width);
+		svg.setAttribute("height", bbox.height);
 	}
 
-	let basePos = 0;
-	let currentShift = 0;
-	let maxDepth = rootNode.getDepth();
-	while (maxDepth >= 0) {
-		computePositions(rootNode);
-		basePos = 0;
-		currentShift = 0;
-		maxDepth--;
+	function redrawTree() {
+		document.getElementById("nodes").remove();
+		document.getElementById("links").remove();
+		drawTree();
 	}
 
-	let nodeContainer = makeElement("g", {id: "nodes"});
-	svg.appendChild(nodeContainer);
-	drawNodes(rootNode, nodeContainer);
+	drawTree();
 
-	let linkContainer = makeElement("g", {id: "links"});
-	svg.appendChild(linkContainer);
-	drawLinks(rootNode, linkContainer);
+	function serializeTree(node, recursive = true) {
+		let obj = {id: node.id};
+		let ret = [obj];
+		for (let k of ["name", "text", "class", "url", "image"]) {
+			if (node[k]) obj[k] = node[k];
+		}
+		if (node.parents.length > 0) obj.parent = node.parents[0].id;
+		if (node.isMarried() && !node.isKin()) obj.spouse = node.spouses[0].id;
+		if (recursive) {
+			for (let spouse of node.spouses) {
+				ret = ret.concat(serializeTree(spouse, false));
+			}
+			for (let child of node.children) {
+				ret = ret.concat(serializeTree(child));
+			}
+		}
+		return ret;
+	}
 
-	let bbox = nodeContainer.getBBox();
-	svg.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
-	svg.setAttribute("width", bbox.width);
-	svg.setAttribute("height", bbox.height);
+	let ret = {};
+	ret.get = function(id) {
+		return Node.get(id);
+	};
+
+	ret.add = function(obj) {
+		new Node(obj);
+		redrawTree();
+	};
+
+	ret.remove = function(id) {
+		Node.remove(id);
+		redrawTree();
+	};
+
+	ret.exportJSON = function() {
+		const json = JSON.stringify(serializeTree(rootNode));
+		navigator.clipboard.writeText(json);
+	};
+
+	ret.downloadPNG = function(filename) {
+		const xml = new XMLSerializer().serializeToString(svg);
+		const image = new Image();
+		image.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml);
+		image.style.visibility = "hidden";
+		document.body.appendChild(image);
+		image.onload = function() {
+			const canvas = document.createElement("canvas");
+			canvas.width = image.clientWidth;
+			canvas.height = image.clientHeight;
+			canvas.getContext("2d").drawImage(image, 0, 0);
+			const a = document.createElement("a");
+			a.href = canvas.toDataURL("image/png", 1.0);
+			a.download = filename;
+			a.click();
+			document.body.removeChild(image);
+		};
+	};
+
+	ret.downloadSVG = function(filename) {
+		const xml = new XMLSerializer().serializeToString(svg);
+		const a = document.createElement("a");
+		a.href = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml);
+		a.download = filename;
+		a.click();
+	};
+
+	return ret;
 }
