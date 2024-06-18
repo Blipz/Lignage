@@ -108,6 +108,23 @@ function Lignage(svg, nodes, options = {image: false}) {
 			return depth;
 		}
 
+		getPosition() {
+			if (!this.isMarried()) {
+				return {x: this.x, y: this.y};
+			}
+			if (this.isKin()) {
+				return {x: this.x + (this.isRemarried() ? width + spouseMargin : 0), y: this.y};
+			}
+			if (this.spouses[0].isRemarried()) {
+				return {x: this.spouses[0].x + (this == this.spouses[0].spouses[0] ? 0 : (width + spouseMargin) * 2), y: this.spouses[0].y};
+			}
+			return {x: this.spouses[0].x + width + spouseMargin, y: this.spouses[0].y};
+		}
+
+		getWidth() {
+			return width + (width + spouseMargin) * this.spouses.length;
+		}
+
 		translate(dx, dy) {
 			this.x += dx;
 			this.y += dy;
@@ -148,22 +165,9 @@ function Lignage(svg, nodes, options = {image: false}) {
 
 	function drawTree() {
 		function drawNodes(node, container, recursive = true) {
-			let x = node.x;
-			let y = node.y;
-			if (node.isMarried()) {
-				if (recursive) {
-					if (node.isRemarried()) x += width + spouseMargin;
-				}
-				else {
-					if (node.spouses[0].isRemarried())
-						x = node.spouses[0].x + (node == node.spouses[0].spouses[0] ? 0 : (width + spouseMargin) * 2);
-					else
-						x = node.spouses[0].x + width + spouseMargin;
-					y = node.spouses[0].y;
-				}
-			}
+			let {x, y} = node.getPosition();
 
-			let elem = makeElement("g", {id: node.id, transform: `translate(${x} ${y})`});
+			let elem = makeElement("g", {id: node.id, class: "node", transform: `translate(${x} ${y})`});
 			if (node.class) elem.classList.add(node.class);
 			container.appendChild(elem);
 
@@ -186,7 +190,8 @@ function Lignage(svg, nodes, options = {image: false}) {
 				fill: "black",
 				"font-size": fontSize,
 				"font-weight": "bold",
-				"text-anchor": "middle"
+				"text-anchor": "middle",
+				cursor: node.url ? "pointer" : "default"
 			});
 			text1.innerHTML = node.name || "";
 			if (node.url) {
@@ -201,7 +206,8 @@ function Lignage(svg, nodes, options = {image: false}) {
 				y: height - 10,
 				fill: "black",
 				"font-size": 14,
-				"text-anchor": "middle"
+				"text-anchor": "middle",
+				cursor: "default"
 			});
 			text2.innerHTML = node.text || "";
 			elem.appendChild(text2);
@@ -301,7 +307,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 			if (!node.hasChildren()) {
 				return null;
 			}
-			let nodeWidth = width + (width + spouseMargin) * node.spouses.length;
+			let nodeWidth = node.getWidth();
 			let delta = 0;
 			if (node.isRemarried() && (!node.spouses[0].hasChildren() || !node.spouses[1].hasChildren())) {
 				// Double marriage (including one without children)
@@ -317,15 +323,13 @@ function Lignage(svg, nodes, options = {image: false}) {
 		}
 
 		function adjustPositions(depth) {
-			let y = (depth + 1) * (height + parentMargin);
+			let y = depth * (height + parentMargin);
 			let basePos = 0;
 			let currentShift = 0;
 			let anchored = false;
 			let levelNodes = getNodes(rootNode, depth);
-			let index = -1;
 
-			for (let nodes of levelNodes) {
-				index++;
+			for (let [index, nodes] of levelNodes.entries()) {
 				for (let node of nodes) {
 					if (currentShift) node.translate(currentShift, 0);
 				}
@@ -344,7 +348,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 					if (!found) end = positions.length;
 					let widthSum = 0;
 					for (let i=start; i<end; i++) {
-						widthSum += width + (width + spouseMargin) * nodes[i].spouses.length;
+						widthSum += nodes[i].getWidth();
 					}
 					let collisionShift = 0;
 					let margin;
@@ -369,7 +373,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 						if (start == 0 && end < positions.length) {
 							let shift = positions[end];
 							for (let i=end-1; i>=start; i--) {
-								shift -= (width + (width + spouseMargin) * nodes[i].spouses.length) + margin;
+								shift -= nodes[i].getWidth() + margin;
 								nodes[i].x = shift + collisionShift;
 								nodes[i].y = y;
 							}
@@ -378,7 +382,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 							for (let i=start; i<end; i++) {
 								nodes[i].x = basePos + margin - siblingMargin;
 								nodes[i].y = y;
-								basePos += (width + (width + spouseMargin) * nodes[i].spouses.length) + margin;
+								basePos += nodes[i].getWidth() + margin;
 							}
 						}
 					}
@@ -402,7 +406,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 							}
 
 						}
-						basePos = positions[end] + (width + (width + spouseMargin) * nodes[end].spouses.length) + siblingMargin;
+						basePos = positions[end] + nodes[end].getWidth() + siblingMargin;
 					}
 					start = end + 1;
 					currentShift += collisionShift;
