@@ -153,6 +153,29 @@ function Lignage(svg, nodes, options = {image: false}) {
 	svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 	svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
 
+	const defs = makeElement("defs");
+	svg.appendChild(defs);
+	const clipImageRect = makeElement("rect", {x: 10, y: 30, width: 100, height: 100, rx: 10, ry: 10});
+	const clipImage = makeElement("clipPath", {id: "clipImage"});
+	clipImage.appendChild(clipImageRect);
+	defs.appendChild(clipImage);
+
+	if (options.editable) {
+		const icons = {
+			"iconAdd": ["limegreen", "M4 0 h2 v4 h4 v2 h-4 v4 h-2 v-4 h-4 v-2 h4z"],
+			"iconEdit": ["royalblue", "M0 0 h10 v2 h-10z M0 4 h10 v2 h-10z M0 8 h10 v2 h-10z"],
+			"iconLeft": ["darkgray", "M6.75 0 L1.75 5 L6.75 10 L8.25 8.5 L4.75 5 L8.25 1.5z"],
+			"iconRight": ["darkgray", "M3.25 0 L8.25 5 L3.25 10 L1.75 8.5 L5.25 5 L1.75 1.5z"],
+			"iconRemove": ["red", "M1.5 0 L5 3.5 L8.5 0 L10 1.5 L6.5 5 L10 8.5 L8.5 10 L5 6.5 L1.5 10 L0 8.5 L3.5 5 L0 1.5z"],
+		};
+		Object.entries(icons).forEach(function([id, [color, d]]) {
+			let icon = makeElement("symbol", {id});
+			icon.appendChild(makeElement("rect", {x: 0, y: 0, width: 10, height: 10, rx: 1, ry: 1, fill: color}));
+			icon.appendChild(makeElement("path", {d, fill: "white", transform: "translate(2 2) scale(0.6)"}));
+			defs.appendChild(icon);
+		});
+	}
+
 	for (let node of nodes) {
 		new Node(node);
 	}
@@ -200,6 +223,9 @@ function Lignage(svg, nodes, options = {image: false}) {
 				elem.appendChild(a);
 			}
 			else elem.appendChild(text1);
+			while (text1.getBBox().width > width) {
+				text1.setAttribute("font-size", fontSize--);
+			}
 			let text2 = makeElement("text", {
 				class: "text",
 				x: width / 2,
@@ -223,8 +249,125 @@ function Lignage(svg, nodes, options = {image: false}) {
 				});
 				elem.appendChild(image);
 			}
-			while (text1.getBBox().width > width) {
-				text1.setAttribute("font-size", fontSize--);
+
+			if (options.editable) {
+				let buttons = makeElement("g", {class: "buttons", style: "display: none;"});
+				let addButton = makeElement("use", {href: "#iconAdd", transform: `translate(${(width - 22.5) / 2} ${height - 25}) scale(2.25)`});
+				buttons.appendChild(addButton);
+				let editButton = makeElement("use", {href: "#iconEdit", transform: `translate(2.5 2.5) scale(2.25)`});
+				buttons.appendChild(editButton);
+				let leftButton = makeElement("use", {href: "#iconLeft", transform: `translate(2.5 ${height - 25}) scale(2.25)`});
+				buttons.appendChild(leftButton);
+				let rightButton = makeElement("use", {href: "#iconRight", transform: `translate(${width - 25} ${height - 25}) scale(2.25)`});
+				buttons.appendChild(rightButton);
+				let removeButton = makeElement("use", {href: "#iconRemove", transform: `translate(${width - 25} 2.5) scale(2.25)`});
+				buttons.appendChild(removeButton);
+				elem.appendChild(buttons);
+
+				addButton.addEventListener("click", function() {
+					function generateID(name) {
+						let id = name.replaceAll(/ +(.)/g, (x,y) => y.toUpperCase());
+						let index;
+						if (id) {
+							id = id[0].toLowerCase() + id.slice(1);
+							if (!Node.TREE[id]) return id;
+							index = 2;
+						}
+						else {
+							id = "node";
+							index = 0;
+						}
+						while (Node.TREE[`${id}${index}`]) {
+							index++;
+						}
+						return `${id}${index}`;
+					}
+					let input = prompt("Name (Text)");
+					if (input !== null) {
+						let match = input.match(/([^(]*)\((.*)\)/);
+						let obj;
+						if (match) {
+							let id = generateID(match[1].trim());
+							obj = {id, name: match[1].trim(), text: match[2].trim()};
+						}
+						else {
+							let id = generateID(input.trim());
+							obj = {id, name: input.trim()};
+						}
+						if (node.isKin()) obj.spouse = node.id;
+						else obj.parent = node.id;
+						ret.add(obj);
+					}
+				});
+				editButton.addEventListener("click", function() {
+					let input = prompt("Name (Text)", (node.name || "") + (node.text ? ` (${node.text})` : ""));
+					if (input !== null) {
+						let match = input.match(/([^(]*)\((.*)\)/);
+						if (match) {
+							node.name = match[1].trim();
+							node.text = match[2].trim();
+						}
+						else {
+							node.name = input.trim();
+							delete node.text;
+						}
+						redrawTree();
+					}
+				});
+				leftButton.addEventListener("click", function() {
+					if (node.parents.length > 0) {
+						let siblings = node.parents[0].children;
+						let index = siblings.indexOf(node);
+						if (index > 0) {
+							node.parents[0].children = siblings.slice(0, index - 1).concat([node, siblings[index - 1]]).concat(siblings.slice(index + 1));
+							if (node.parents[1].isRemarried()) {
+								node.parents[1].children = node.parents[1].spouses[0].children.concat(node.parents[1].spouses[1].children);
+							}
+							else {
+								node.parents[1].children = node.parents[0].children;
+							}
+							redrawTree();
+						}
+					}
+					else if (!node.isKin() && node != node.spouses[0].spouses[0]) {
+						node.spouses[0].children = node.children.concat(node.spouses[0].spouses[0].children);
+						node.spouses[0].spouses = [node, node.spouses[0].spouses[0]];
+						redrawTree();
+					}
+				});
+				rightButton.addEventListener("click", function() {
+					if (node.parents.length > 0) {
+						let siblings = node.parents[0].children;
+						let index = siblings.indexOf(node);
+						if (index < siblings.length - 1) {
+							node.parents[0].children = siblings.slice(0, index).concat([siblings[index + 1], node]).concat(siblings.slice(index + 2));
+							if (node.parents[1].isRemarried()) {
+								node.parents[1].children = node.parents[1].spouses[0].children.concat(node.parents[1].spouses[1].children);
+							}
+							else {
+								node.parents[1].children = node.parents[0].children;
+							}
+							redrawTree();
+						}
+					}
+					else if (!node.isKin() && node.spouses[0].isRemarried() && node == node.spouses[0].spouses[0]) {
+						node.spouses[0].children = node.spouses[0].spouses[1].children.concat(node.children);
+						node.spouses[0].spouses = [node.spouses[0].spouses[1], node];
+						redrawTree();
+					}
+				});
+				removeButton.addEventListener("click", function() {
+					ret.remove(node.id);
+				});
+				elem.addEventListener("mouseover", function() {
+					buttons.style.display = "block";
+					addButton.style.display = (node.isRemarried()) ? "none" : "block";
+					leftButton.style.display = (node.parents.length > 0 && node.parents[0].children.indexOf(node) > 0 || !node.isKin() && node != node.spouses[0].spouses[0]) ? "block" : "none";
+					rightButton.style.display = (node.parents.length > 0 && node.parents[0].children.indexOf(node) < node.parents[0].children.length - 1 || !node.isKin() && node.spouses[0].isRemarried() && node == node.spouses[0].spouses[0]) ? "block" : "none";
+				});
+				elem.addEventListener("mouseout", function() {
+					buttons.style.display = "none";
+				});
 			}
 
 			if (recursive) {

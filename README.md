@@ -57,7 +57,8 @@ The following options can be used:
 - **spouseMargin**: horizontal spacing between spouses (default: 30)
 - **siblingMargin**: minimal horizontal spacing between siblings (default: 30)
 - **cousinMargin**: minimal horizontal spacing between cousins (default: 100)
-- **image**: boolean controlling the usage of images (default: false)
+- **image**: whether or not to display images (default: false)
+- **editable**: whether or not to allow on-the-fly edition (default: false)
 - **fontSize**: size of the font used (default: 16)
 
 ## Styling
