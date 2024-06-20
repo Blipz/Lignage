@@ -443,7 +443,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 
 	function serializeTree(node, recursive = true) {
 		let obj = {id: node.id};
-		let ret = [obj];
+		let ret = [[obj]];
 		for (let k of ["name", "text", "class", "url", "image"]) {
 			if (node[k]) obj[k] = node[k];
 		}
@@ -451,10 +451,15 @@ function Lignage(svg, nodes, options = {image: false}) {
 		if (node.isMarried() && !node.isKin()) obj.spouse = node.spouses[0].id;
 		if (recursive) {
 			for (let spouse of node.spouses) {
-				ret = ret.concat(serializeTree(spouse, false));
+				ret[0] = ret[0].concat(serializeTree(spouse, false)[0]);
 			}
 			for (let child of node.children) {
-				ret = ret.concat(serializeTree(child));
+				for (let [level, serializedNodes] of serializeTree(child).entries()) {
+					if (level + 1 < ret.length)
+						ret[level + 1] = ret[level + 1].concat(serializedNodes);
+					else
+						ret[level + 1] = serializedNodes;
+				}
 			}
 		}
 		return ret;
@@ -476,7 +481,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 	};
 
 	ret.exportJSON = function() {
-		const json = JSON.stringify(serializeTree(rootNode));
+		const json = JSON.stringify(serializeTree(rootNode).flat());
 		navigator.clipboard.writeText(json);
 	};
 
