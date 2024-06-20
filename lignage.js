@@ -237,7 +237,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 			});
 			text2.innerHTML = node.text || "";
 			elem.appendChild(text2);
-			if (options.image) {
+			if (options.image && node.image) {
 				let image = makeElement("image", {
 					preserveAspectRatio: "xMidYMid slice",
 					"clip-path": "url(#clipImage)",
@@ -608,6 +608,41 @@ function Lignage(svg, nodes, options = {image: false}) {
 		return ret;
 	}
 
+	function serializeSVG(callback) {
+		let clone = svg.cloneNode(svg);
+		for (let button of clone.querySelectorAll(".buttons")) {
+			button.remove();
+		}
+		let svgImages = clone.querySelectorAll(".node > image");
+		let remaining = svgImages.length;
+		if (remaining == 0) {
+			let xml = new XMLSerializer().serializeToString(clone);
+			callback("data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml));
+		}
+
+		for (let svgImage of svgImages) {
+			// Replace each image link by the corresponding base64 data
+			let img = new Image();
+			img.src = svgImage.getAttribute("href");
+			img.onload = function() {
+				let canvas = document.createElement("canvas");
+				canvas.width = img.width;
+				canvas.height = img.height;
+				canvas.getContext("2d").drawImage(img, 0, 0);
+				try {
+					svgImage.setAttribute("href", canvas.toDataURL("png", 1.0));
+				}
+				catch(e) {
+					// Possible CORS-related error
+				}
+				if (--remaining == 0) {
+					let xml = new XMLSerializer().serializeToString(clone);
+					callback("data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml));
+				}
+			};
+		}
+	}
+
 	let ret = {};
 	ret.get = function(id) {
 		return Node.get(id);
@@ -629,9 +664,7 @@ function Lignage(svg, nodes, options = {image: false}) {
 	};
 
 	ret.downloadPNG = function(filename) {
-		const xml = new XMLSerializer().serializeToString(svg);
 		const image = new Image();
-		image.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml);
 		image.style.visibility = "hidden";
 		document.body.appendChild(image);
 		image.onload = function() {
@@ -645,14 +678,18 @@ function Lignage(svg, nodes, options = {image: false}) {
 			a.click();
 			document.body.removeChild(image);
 		};
+		serializeSVG(function(src) {
+			image.src = src;
+		});
 	};
 
 	ret.downloadSVG = function(filename) {
-		const xml = new XMLSerializer().serializeToString(svg);
-		const a = document.createElement("a");
-		a.href = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml);
-		a.download = filename;
-		a.click();
+		serializeSVG(function(src) {
+			const a = document.createElement("a");
+			a.href = src;
+			a.download = filename;
+			a.click();
+		});
 	};
 
 	return ret;
