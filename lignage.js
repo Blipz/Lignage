@@ -59,7 +59,7 @@ function Lignage(svg, nodes, options = {}) {
 				let parent = Node.get(obj.parent);
 				this.parents = [parent, parent.spouses[0]];
 				parent.children.push(this);
-				if (parent == parent.spouses[0].spouses[0] && parent.spouses[0].isRemarried()) {
+				if (parent.spouses[0].isRemarried() && !parent.isSecondConsort()) {
 					parent.spouses[0].children = parent.children.concat(parent.spouses[0].spouses[1].children);
 				}
 				else {
@@ -83,6 +83,10 @@ function Lignage(svg, nodes, options = {}) {
 			Node.TREE[this.id] = this;
 		}
 
+		hasParents() {
+			return this.parents.length > 0;
+		}
+
 		hasChildren() {
 			return this.children.length > 0;
 		}
@@ -96,7 +100,11 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		isKin() {
-			return this.isRoot || this.parents.length != 0;
+			return this.isRoot || this.hasParents();
+		}
+
+		isSecondConsort() {
+			return this != this.spouses[0].spouses[0];
 		}
 
 		getDepth() {
@@ -116,7 +124,7 @@ function Lignage(svg, nodes, options = {}) {
 				return {x: this.x + (this.isRemarried() ? options.width + options.spouseMargin : 0), y: this.y};
 			}
 			if (this.spouses[0].isRemarried()) {
-				return {x: this.spouses[0].x + (this == this.spouses[0].spouses[0] ? 0 : (options.width + options.spouseMargin) * 2), y: this.spouses[0].y};
+				return {x: this.spouses[0].x + (this.isSecondConsort() ? (options.width + options.spouseMargin) * 2 : 0), y: this.spouses[0].y};
 			}
 			return {x: this.spouses[0].x + options.width + options.spouseMargin, y: this.spouses[0].y};
 		}
@@ -316,7 +324,7 @@ function Lignage(svg, nodes, options = {}) {
 					}
 				});
 				leftButton.addEventListener("click", function() {
-					if (node.parents.length > 0) {
+					if (node.hasParents()) {
 						let siblings = node.parents[0].children;
 						let index = siblings.indexOf(node);
 						if (index > 0) {
@@ -330,14 +338,14 @@ function Lignage(svg, nodes, options = {}) {
 							redrawTree();
 						}
 					}
-					else if (!node.isKin() && node != node.spouses[0].spouses[0]) {
+					else if (!node.isKin() && node.isSecondConsort()) {
 						node.spouses[0].children = node.children.concat(node.spouses[0].spouses[0].children);
 						node.spouses[0].spouses = [node, node.spouses[0].spouses[0]];
 						redrawTree();
 					}
 				});
 				rightButton.addEventListener("click", function() {
-					if (node.parents.length > 0) {
+					if (node.hasParents()) {
 						let siblings = node.parents[0].children;
 						let index = siblings.indexOf(node);
 						if (index < siblings.length - 1) {
@@ -351,7 +359,7 @@ function Lignage(svg, nodes, options = {}) {
 							redrawTree();
 						}
 					}
-					else if (!node.isKin() && node.spouses[0].isRemarried() && node == node.spouses[0].spouses[0]) {
+					else if (!node.isKin() && node.spouses[0].isRemarried() && !node.isSecondConsort()) {
 						node.spouses[0].children = node.spouses[0].spouses[1].children.concat(node.children);
 						node.spouses[0].spouses = [node.spouses[0].spouses[1], node];
 						redrawTree();
@@ -363,8 +371,9 @@ function Lignage(svg, nodes, options = {}) {
 				elem.addEventListener("mouseover", function() {
 					buttons.style.display = "block";
 					addButton.style.display = (node.isRemarried()) ? "none" : "block";
-					leftButton.style.display = (node.parents.length > 0 && node.parents[0].children.indexOf(node) > 0 || !node.isKin() && node != node.spouses[0].spouses[0]) ? "block" : "none";
-					rightButton.style.display = (node.parents.length > 0 && node.parents[0].children.indexOf(node) < node.parents[0].children.length - 1 || !node.isKin() && node.spouses[0].isRemarried() && node == node.spouses[0].spouses[0]) ? "block" : "none";
+					leftButton.style.display = (node.hasParents() && node.parents[0].children.indexOf(node) > 0 || !node.isKin() && node.isSecondConsort()) ? "block" : "none";
+					rightButton.style.display = (node.hasParents() && node.parents[0].children.indexOf(node) < node.parents[0].children.length - 1 ||
+												!node.isKin() && node.spouses[0].isRemarried() && !node.isSecondConsort()) ? "block" : "none";
 				});
 				elem.addEventListener("mouseout", function() {
 					buttons.style.display = "none";
@@ -395,14 +404,14 @@ function Lignage(svg, nodes, options = {}) {
 				return;
 			}
 
-			let x = node.spouses[0].x + options.width + options.spouseMargin / 2 + (node.spouses[0].spouses[0] != node ? options.width + options.spouseMargin : 0);
+			let x = node.spouses[0].x + options.width + options.spouseMargin / 2 + (node.isSecondConsort() ? options.width + options.spouseMargin : 0);
 			let y = node.spouses[0].y + options.height / 2;
 			container.append(makeElement("circle", {cx: x, cy: y, r: 5, fill: "black"}));
 			container.append(makeElement("path", {d: `M${x - options.spouseMargin / 2} ${y} h${options.spouseMargin}`, stroke: "black"}));
 
 			function computeDx(child) {
 				let dx = child.x - node.spouses[0].x - (options.width + options.spouseMargin) / 2;
-				if (node.spouses[0].spouses[0] != child.parents[0]) {
+				if (child.parents[0].isSecondConsort()) {
 					dx -= options.width + options.spouseMargin;
 				}
 				if (child.isRemarried()) {
@@ -414,7 +423,7 @@ function Lignage(svg, nodes, options = {}) {
 			for (let child of node.children) {
 				let dx = computeDx(child);
 				let fraction = 1/2;
-				if (node.spouses[0].spouses[0] != node) {
+				if (node.isSecondConsort()) {
 					let firstSpouse = node.spouses[0].spouses[0];
 					if (firstSpouse.hasChildren()) {
 						fraction = computeDx(node.children[0]) > 0 ? 1/3 : 2/3;
@@ -591,7 +600,7 @@ function Lignage(svg, nodes, options = {}) {
 		for (let k of ["name", "text", "class", "url", "image"]) {
 			if (node[k]) obj[k] = node[k];
 		}
-		if (node.parents.length > 0) obj.parent = node.parents[0].id;
+		if (node.hasParents()) obj.parent = node.parents[0].id;
 		if (node.isMarried() && !node.isKin()) obj.spouse = node.spouses[0].id;
 		if (recursive) {
 			for (let spouse of node.spouses) {
