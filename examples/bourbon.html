@@ -27,6 +27,9 @@
                     font-weight: bold;
                     font-size: 16px;
                 }
+                .dashed {
+                    stroke-dasharray: 10 5;
+                }
             </style>
         </svg>
         <script>
@@ -137,7 +140,11 @@
                 {id: "philippeOrleans3", name: "Philippe", parent: "heleneMecklembourgSchwerin", text: "1838-1894", url: "https://fr.wikipedia.org/wiki/Philippe_d%27Orl%C3%A9ans_(1838-1894)"},
                 {id: "robertOrleans", name: "Robert", parent: "heleneMecklembourgSchwerin", text: "1840-1910", url: "https://fr.wikipedia.org/wiki/Robert_d%27Orl%C3%A9ans_(1840-1910)"},
             ];
-            Lignage(document.getElementById("lignage"), nodes, {parentMargin: 50});
+            const links = [
+                {start: "louisXIV", end: "francoiseMarieBourbon", type: "descent", x: 1, y: 0.25, class: "dashed"},
+                {start: "marieThereseCharlotte", end: "louisAntoineArtois"},
+            ];
+            Lignage(document.getElementById("lignage"), nodes, {links});
         </script>
     </body>
 </html>

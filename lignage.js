@@ -27,6 +27,7 @@ function Lignage(svg, nodes, options = {}) {
 			for (let child of node.getChildren()) {
 				Node.remove(child.id);
 			}
+			options.links = options.links.filter(x => x.start != id && x.end != id);
 			delete Node.TREE[id];
 		}
 
@@ -50,7 +51,7 @@ function Lignage(svg, nodes, options = {}) {
 				throw Error(`Node '${obj.parent}' cannot have more than two spouses`);
 			}
 			if (obj.spouse && obj.parent) {
-				throw Error(`Cannot handle consanguine union between '${obj.id}' and '${obj.spouse}'`);
+				throw Error(`Cannot handle consanguine union between '${obj.id}' and '${obj.spouse}', use the 'links' option instead`);
 			}
 			this.id = obj.id;
 			this.name = obj.name;
@@ -184,6 +185,8 @@ function Lignage(svg, nodes, options = {}) {
 		if (options.siblingMargin === undefined) options.siblingMargin = 30;
 		if (options.cousinMargin === undefined) options.cousinMargin = 100;
 		if (options.fontSize === undefined) options.fontSize = 16;
+		if (options.exclude === undefined) options.exclude = [];
+		if (options.links === undefined) options.links = [];
 		const rect = makeElement("rect", {x: (options.width - 100) / 2, y: (options.height - 100) / 2, width: 100, height: 100, rx: 10, ry: 10});
 		clipImage.replaceChildren(rect);
 	}
@@ -221,7 +224,7 @@ function Lignage(svg, nodes, options = {}) {
 
 	const rootNode = Node.get(options.root || nodes[0].id);
 	rootNode.parents = [];
-	for (let exclude of (options.exclude || [])) {
+	for (let exclude of options.exclude) {
 		Node.remove(exclude);
 	}
 
@@ -439,6 +442,7 @@ function Lignage(svg, nodes, options = {}) {
 					let x1 = pos1.x + options.width / 2;
 					let y1 = pos1.y + options.height;
 					for (let child of node.children) {
+						if (linkReplace.includes(child.id)) continue;
 						let pos2 = child.getPosition();
 						let x2 = pos2.x + options.width / 2;
 						let y2 = pos2.y;
@@ -456,6 +460,8 @@ function Lignage(svg, nodes, options = {}) {
 				return;
 			}
 
+			if (linkReplace.includes(node.id)) return;
+
 			let pos1 = node.getPosition();
 			let pos2 = node.spouses[0].getPosition();
 			let x = (pos1.x + pos2.x + options.width) / 2;
@@ -466,10 +472,77 @@ function Lignage(svg, nodes, options = {}) {
 			let fraction = computeFraction(node.spouses[0]);
 			let dy = options.height / 2 + options.parentMargin * fraction;
 			for (let child of node.children) {
+				if (linkReplace.includes(child.id)) continue;
 				let pos3 = child.getPosition();
 				let link = makeElement("path", {d: `M${x} ${y} v${dy} H${pos3.x + options.width / 2} V${pos3.y}`, stroke: "black", fill: "none"});
 				container.append(link);
 			}
+		}
+
+		function drawExtraLinks(container) {
+			let replacements = [];
+
+			function getCoordinates(id, delta) {
+				if (typeof id == "object") {
+					let p1 = Node.get(id[0]).getPosition();
+					let p2 = Node.get(id[1]).getPosition();
+					return [(p1.x + p2.x) / 2, (p1.y + p2.y - options.height) / 2];
+				}
+				else {
+					let pos = Node.get(id).getPosition();
+					return [pos.x + (delta || 0), pos.y];
+				}
+			}
+
+			for (link of options.links) {
+				let x1, x2, y1, y2;
+				try {
+					[x1, y1] = getCoordinates(link.start, link.startDx);
+					[x2, y2] = getCoordinates(link.end, link.endDx);
+				}
+				catch(e) {
+					console.warn(e.message);
+					continue;
+				}
+				let dx = (x2 - x1) * (link.x === undefined ? 0.5 : link.x);
+				let dy = options.parentMargin * (link.y === undefined ? 0.5 : link.y);
+				let y3;
+				if (link.type == "union" || link.type === undefined) {
+					x1 += options.width / 2;
+					y1 += options.height;
+					x2 += options.width / 2;
+					y2 += options.height;
+					y3 = y2 + dy;
+				}
+				else if (link.type == "closeUnion") {
+					// This should be used only for same-level nodes that are next to each other
+					x1 += options.width;
+					y1 += options.height / 2;
+					y2 += options.height / 2;
+					dx = 0;
+					dy = 0;
+					y3 = y2;
+					container.append(makeElement("circle", {cx: (x1 + x2) / 2, cy: (y1 + y2) / 2, r: 5, fill: "black"}));
+				}
+				else if (link.type == "descent") {
+					x1 += options.width / 2;
+					y1 += options.height;
+					x2 += options.width / 2;
+					y3 = y2 - dy;
+					if (typeof link.start == "object") dy += options.height / 2;
+				}
+				else {
+					console.warn(`Unknown link type: '${link.type}'`);
+					continue;
+				}
+				let path = makeElement("path", {d: `M${x1} ${y1} v${dy} h${dx} V${y3} H${x2} V${y2}`, stroke: "black", fill: "none"});
+				if (link.class) path.classList.add(link.class);
+				container.append(path);
+
+				if (link.replace) replacements.push(link.end);
+			}
+
+			return replacements;
 		}
 
 		function getNodes(node, depth) {
@@ -611,6 +684,7 @@ function Lignage(svg, nodes, options = {}) {
 
 		let linkContainer = makeElement("g", {id: "links"});
 		svg.append(linkContainer);
+		let linkReplace = drawExtraLinks(linkContainer);
 		drawLinks(rootNode, linkContainer);
 
 		let bbox = nodeContainer.getBBox();

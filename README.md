@@ -51,6 +51,19 @@ The following options can be used:
 
 - **root**: identifier of the root node
 - **exclude**: list of identifiers for nodes to be excluded from the tree
+- **links**: list of additional links to be drawn, each link being an object with the following attributes:
+  - **start** (mandatory): identifier of the start node, or array of identifiers of two spouse nodes
+  - **end** (mandatory): identifier of the end node
+  - **type**: one of the following values (default: union)
+    - descent: for representing a parental link (start bottom -> end top)
+    - union: for representing a marriage link (start bottom -> end bottom)
+    - closeUnion: for representing a marriage link between adjacent nodes (start right -> end left)
+  - **startDx**: horizontal shift at the start of the link (default: 0)
+  - **endDx**: horizontal shift at the end of the link (default: 0)
+  - **x**: horizontal value to help drawing the link (default: 0.5)
+  - **y**: vertical value to help drawing the link (default: 0.5)
+  - **replace**: whether or not to omit the automated link joining the end node to the tree (default: false)
+  - **class**: DOM class used for styling
 - **width**: width of the box representing nodes (default: 120)
 - **height**: height of the box representing nodes (default depends on the value of the image flag)
 - **parentMargin**: vertical spacing between parent and children (default: 80)
@@ -63,7 +76,7 @@ The following options can be used:
 
 ## Styling
 
-Styling can be performed by appending a <style> tag to the SVG element, and by using the corresponding classes with the `class` node property.
+Styling can be performed by appending a `<style>` tag to the SVG element, and by using the corresponding classes with the `class` node/link property.
 
 For instance:
 
@@ -78,4 +91,36 @@ For instance:
         }
     </style>
 </svg>
+```
+
+## Handling consanguine unions
+
+The following section details some workarounds to handle consanguine unions.
+
+### General case
+
+In the general case, you can assign all the children to one of the spouses, without defining a spouse relationship between them.
+Then, manually add a link between the spouses using the `links` option.
+
+Example:
+
+```javascript
+const links = [
+    {start: "spouse1", end: "spouse2"}
+];
+```
+
+### Between siblings or cousins
+
+If the spouses are same-level nodes, an alternative way consists of omitting the parent relationship for one of the spouses.
+Then, manually add a link between the parentless spouse and the parents, using the `links` option.
+
+Note that this may result in links crossing each other (in the cousin case), or sibling order not being respected (in the case where spouses are non-adjacent siblings).
+
+Example:
+
+```javascript
+const links = [
+    {start: ["parent1", "parent2"], end: "child", type: "descent"}
+];
 ```
