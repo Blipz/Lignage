@@ -200,7 +200,7 @@ function Lignage(svg, nodes, options = {}) {
 	}
 
 	function drawTree() {
-		function drawNodes(node, container, recursive = true) {
+		function drawNodes(node, container) {
 			let {x, y} = node.getPosition();
 
 			let elem = makeElement("g", {id: node.id, class: "node", transform: `translate(${x} ${y})`});
@@ -380,9 +380,9 @@ function Lignage(svg, nodes, options = {}) {
 				});
 			}
 
-			if (recursive) {
+			if (node.isKin()) {
 				for (let spouse of node.spouses) {
-					drawNodes(spouse, container, false);
+					drawNodes(spouse, container);
 				}
 				for (let child of node.children) {
 					drawNodes(child, container);
@@ -390,13 +390,13 @@ function Lignage(svg, nodes, options = {}) {
 			}
 		}
 
-		function drawLinks(node, container, recursive = true) {
+		function drawLinks(node, container) {
 			// Draw links between spouses, and between parents and children
 			if (!node.isMarried()) return;
 
-			if (recursive) {
+			if (node.isKin()) {
 				for (let spouse of node.spouses) {
-					drawLinks(spouse, container, false);
+					drawLinks(spouse, container);
 				}
 				for (let child of node.children) {
 					drawLinks(child, container);
@@ -594,7 +594,7 @@ function Lignage(svg, nodes, options = {}) {
 
 	drawTree();
 
-	function serializeTree(node, recursive = true) {
+	function serializeTree(node) {
 		let obj = {id: node.id};
 		let ret = [[obj]];
 		for (let k of ["name", "text", "class", "url", "image"]) {
@@ -602,9 +602,9 @@ function Lignage(svg, nodes, options = {}) {
 		}
 		if (node.hasParents()) obj.parent = node.parents[0].id;
 		if (node.isMarried() && !node.isKin()) obj.spouse = node.spouses[0].id;
-		if (recursive) {
+		if (node.isKin()) {
 			for (let spouse of node.spouses) {
-				ret[0] = ret[0].concat(serializeTree(spouse, false)[0]);
+				ret[0] = ret[0].concat(serializeTree(spouse)[0]);
 			}
 			for (let child of node.children) {
 				for (let [level, serializedNodes] of serializeTree(child).entries()) {
