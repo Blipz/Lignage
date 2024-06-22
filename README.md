@@ -36,7 +36,7 @@ Each node can have the following properties:
 - **id** (mandatory): identifier
 - **name**: string that will be displayed
 - **spouse**: identifier of the spouse (only for non-descendents)
-- **parent**: identifier of the non-descendent parent
+- **parent**: identifier of the parent (if parent is a descendent, the node will be added outside of marriage)
 - **text**: additional string (typically used for birth/death dates)
 - **class**: DOM class used for styling
 - **url**: link to an external resource

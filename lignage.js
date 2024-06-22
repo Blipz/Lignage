@@ -17,11 +17,14 @@ function Lignage(svg, nodes, options = {}) {
 			}
 			for (let parentNode of node.parents) {
 				parentNode.children = parentNode.children.filter(x => x != node);
+				if (parentNode.isKin() && parentNode.children.length == 0) {
+					parentNode.spouses = parentNode.spouses.filter(x => x != parentNode);
+				}
 			}
 			for (let spouse of node.spouses) {
 				spouse.spouses = spouse.spouses.filter(x => x != node);
 			}
-			for (let child of node.children) {
+			for (let child of node.getChildren()) {
 				Node.remove(child.id);
 			}
 			delete Node.TREE[id];
@@ -40,11 +43,11 @@ function Lignage(svg, nodes, options = {}) {
 			if (obj.spouse && !Node.get(obj.spouse).isKin()) {
 				throw Error(`Cannot add spouse to non-kin node '${obj.spouse}'`);
 			}
-			if (obj.spouse && Node.get(obj.spouse).spouses.length == 2) {
+			if (obj.spouse && Node.get(obj.spouse).isRemarried()) {
 				throw Error(`Node '${obj.spouse}' cannot have more than two spouses`);
 			}
-			if (obj.parent && Node.get(obj.parent).isKin()) {
-				throw Error(`Cannot add child to kin node '${obj.parent}'`);
+			if (obj.parent && Node.get(obj.parent).isRemarried() && !Node.get(obj.parent).spouses.includes(Node.get(obj.parent))) {
+				throw Error(`Node '${obj.parent}' cannot have more than two spouses`);
 			}
 			if (obj.spouse && obj.parent) {
 				throw Error(`Cannot handle consanguine union between '${obj.id}' and '${obj.spouse}'`);
@@ -57,13 +60,18 @@ function Lignage(svg, nodes, options = {}) {
 			if (obj.image) this.image = obj.image;
 			if (obj.parent) {
 				let parent = Node.get(obj.parent);
-				this.parents = [parent, parent.spouses[0]];
 				parent.children.push(this);
-				if (parent.spouses[0].isRemarried() && !parent.isSecondConsort()) {
-					parent.spouses[0].children = parent.children.concat(parent.spouses[0].spouses[1].children);
+				if (parent.isKin()) {
+					this.parents = [parent];
+					if (!parent.spouses.includes(parent)) {
+						if (parent.hasChildren())
+							parent.spouses.push(parent);
+						else
+							parent.spouses.unshift(parent);
+					}
 				}
 				else {
-					parent.spouses[0].children.push(this);
+					this.parents = [parent, parent.spouses[0]];
 				}
 			}
 			else {
@@ -83,12 +91,24 @@ function Lignage(svg, nodes, options = {}) {
 			Node.TREE[this.id] = this;
 		}
 
+		getChildren() {
+			if (this.isKin()) {
+				let children = [];
+				if (this.isMarried())
+					children = children.concat(this.spouses[0].children);
+				if (this.isRemarried())
+					children = children.concat(this.spouses[1].children);
+				return children;
+			}
+			else return this.children;
+		}
+
 		hasParents() {
 			return this.parents.length > 0;
 		}
 
 		hasChildren() {
-			return this.children.length > 0;
+			return this.getChildren().length > 0;
 		}
 
 		isMarried() {
@@ -109,7 +129,7 @@ function Lignage(svg, nodes, options = {}) {
 
 		getDepth() {
 			let depth = 0;
-			for (let child of this.children) {
+			for (let child of this.getChildren()) {
 				let d = child.getDepth() + 1;
 				if (d > depth) depth = d;
 			}
@@ -120,23 +140,28 @@ function Lignage(svg, nodes, options = {}) {
 			if (!this.isMarried()) {
 				return {x: this.x, y: this.y};
 			}
-			if (this.isKin()) {
-				return {x: this.x + (this.isRemarried() ? options.width + options.spouseMargin : 0), y: this.y};
+			else if (this.isKin()) {
+				let index = (this.isRemarried() && this.spouses[0] != this) ? 1 : 0;
+				return {x: this.x + (options.width + options.spouseMargin) * index, y: this.y};
 			}
-			if (this.spouses[0].isRemarried()) {
-				return {x: this.spouses[0].x + (this.isSecondConsort() ? (options.width + options.spouseMargin) * 2 : 0), y: this.spouses[0].y};
+			else {
+				let index = 1;
+				if (this.spouses[0].isRemarried()) {
+					if (!this.isSecondConsort()) index = 0;
+					else if (this.spouses[0].spouses[0] != this.spouses[0]) index = 2;
+				}
+				return {x: this.spouses[0].x + (options.width + options.spouseMargin) * index, y: this.spouses[0].y};
 			}
-			return {x: this.spouses[0].x + options.width + options.spouseMargin, y: this.spouses[0].y};
 		}
 
 		getWidth() {
-			return options.width + (options.width + options.spouseMargin) * this.spouses.length;
+			return options.width + (options.width + options.spouseMargin) * this.spouses.filter(x => x != this).length;
 		}
 
 		translate(dx, dy) {
 			this.x += dx;
 			this.y += dy;
-			for (let child of this.children) {
+			for (let child of this.getChildren()) {
 				child.translate(dx, dy);
 			}
 		}
@@ -177,6 +202,7 @@ function Lignage(svg, nodes, options = {}) {
 		const icons = {
 			"iconAdd": ["limegreen", "M4 0 h2 v4 h4 v2 h-4 v4 h-2 v-4 h-4 v-2 h4z"],
 			"iconEdit": ["royalblue", "M0 0 h10 v2 h-10z M0 4 h10 v2 h-10z M0 8 h10 v2 h-10z"],
+			"iconJoin": ["purple", "M5 2 a4 4 0 0 0 0 8 4 4 0 0 0 0 -8 m0 1.5 a2.5 2.5 0 0 1 0 5 2.5 2.5 0 0 1 0 -5 M3 0 h4 v2 h-4z"],
 			"iconLeft": ["darkgray", "M6.75 0 L1.75 5 L6.75 10 L8.25 8.5 L4.75 5 L8.25 1.5z"],
 			"iconRight": ["darkgray", "M3.25 0 L8.25 5 L3.25 10 L1.75 8.5 L5.25 5 L1.75 1.5z"],
 			"iconRemove": ["red", "M1.5 0 L5 3.5 L8.5 0 L10 1.5 L6.5 5 L10 8.5 L8.5 10 L5 6.5 L1.5 10 L0 8.5 L3.5 5 L0 1.5z"],
@@ -265,15 +291,16 @@ function Lignage(svg, nodes, options = {}) {
 
 			if (options.editable) {
 				let buttons = makeElement("g", {class: "buttons", style: "display: none;"});
-				let addButton = makeElement("use", {href: "#iconAdd", transform: `translate(${(options.width - 22.5) / 2} ${options.height - 25}) scale(2.25)`});
+				let addButton = makeElement("use", {href: "#iconAdd", transform: `translate(${(options.width - (node.isKin() && !node.isRemarried() ? 0 : 22.5)) / 2} ${options.height - 25}) scale(2.25)`});
 				let editButton = makeElement("use", {href: "#iconEdit", transform: `translate(2.5 2.5) scale(2.25)`});
+				let joinButton = makeElement("use", {href: "#iconJoin", transform: `translate(${options.width / 2 - 22.5} ${options.height - 25}) scale(2.25)`});
 				let leftButton = makeElement("use", {href: "#iconLeft", transform: `translate(2.5 ${options.height - 25}) scale(2.25)`});
 				let rightButton = makeElement("use", {href: "#iconRight", transform: `translate(${options.width - 25} ${options.height - 25}) scale(2.25)`});
 				let removeButton = makeElement("use", {href: "#iconRemove", transform: `translate(${options.width - 25} 2.5) scale(2.25)`});
-				buttons.append(addButton, editButton, leftButton, rightButton, removeButton);
+				buttons.append(addButton, editButton, joinButton, leftButton, rightButton, removeButton);
 				elem.append(buttons);
 
-				addButton.addEventListener("click", function() {
+				function prepareAdd() {
 					function generateID(name) {
 						let id = name.replaceAll(/ +(.)/g, (x,y) => y.toUpperCase());
 						let index;
@@ -292,19 +319,22 @@ function Lignage(svg, nodes, options = {}) {
 						return `${id}${index}`;
 					}
 					let input = prompt("Name (Text)");
-					if (input !== null) {
-						let match = input.match(/([^(]*)\((.*)\)/);
-						let obj;
-						if (match) {
-							let id = generateID(match[1].trim());
-							obj = {id, name: match[1].trim(), text: match[2].trim()};
-						}
-						else {
-							let id = generateID(input.trim());
-							obj = {id, name: input.trim()};
-						}
-						if (node.isKin()) obj.spouse = node.id;
-						else obj.parent = node.id;
+					if (input === null) return null;
+
+					let match = input.match(/([^(]*)\((.*)\)/);
+					if (match) {
+						let id = generateID(match[1].trim());
+						return {id, name: match[1].trim(), text: match[2].trim()};
+					}
+					else {
+						let id = generateID(input.trim());
+						return {id, name: input.trim()};
+					}
+				}
+				addButton.addEventListener("click", function() {
+					let obj = prepareAdd();
+					if (obj !== null) {
+						obj.parent = node.id;
 						ret.add(obj);
 					}
 				});
@@ -323,23 +353,24 @@ function Lignage(svg, nodes, options = {}) {
 						redrawTree();
 					}
 				});
+				joinButton.addEventListener("click", function() {
+					let obj = prepareAdd();
+					if (obj !== null) {
+						obj.spouse = node.id;
+						ret.add(obj);
+					}
+				});
 				leftButton.addEventListener("click", function() {
 					if (node.hasParents()) {
 						let siblings = node.parents[0].children;
 						let index = siblings.indexOf(node);
 						if (index > 0) {
-							node.parents[0].children = siblings.slice(0, index - 1).concat([node, siblings[index - 1]]).concat(siblings.slice(index + 1));
-							if (node.parents[1].isRemarried()) {
-								node.parents[1].children = node.parents[1].spouses[0].children.concat(node.parents[1].spouses[1].children);
-							}
-							else {
-								node.parents[1].children = node.parents[0].children;
-							}
+							siblings[index] = siblings[index - 1];
+							siblings[index - 1] = node;
 							redrawTree();
 						}
 					}
 					else if (!node.isKin() && node.isSecondConsort()) {
-						node.spouses[0].children = node.children.concat(node.spouses[0].spouses[0].children);
 						node.spouses[0].spouses = [node, node.spouses[0].spouses[0]];
 						redrawTree();
 					}
@@ -349,18 +380,12 @@ function Lignage(svg, nodes, options = {}) {
 						let siblings = node.parents[0].children;
 						let index = siblings.indexOf(node);
 						if (index < siblings.length - 1) {
-							node.parents[0].children = siblings.slice(0, index).concat([siblings[index + 1], node]).concat(siblings.slice(index + 2));
-							if (node.parents[1].isRemarried()) {
-								node.parents[1].children = node.parents[1].spouses[0].children.concat(node.parents[1].spouses[1].children);
-							}
-							else {
-								node.parents[1].children = node.parents[0].children;
-							}
+							siblings[index] = siblings[index + 1];
+							siblings[index + 1] = node;
 							redrawTree();
 						}
 					}
 					else if (!node.isKin() && node.spouses[0].isRemarried() && !node.isSecondConsort()) {
-						node.spouses[0].children = node.spouses[0].spouses[1].children.concat(node.children);
 						node.spouses[0].spouses = [node.spouses[0].spouses[1], node];
 						redrawTree();
 					}
@@ -370,7 +395,8 @@ function Lignage(svg, nodes, options = {}) {
 				});
 				elem.addEventListener("mouseover", function() {
 					buttons.style.display = "block";
-					addButton.style.display = (node.isRemarried()) ? "none" : "block";
+					addButton.style.display = (node.isRemarried() && node.children.length == 0) ? "none" : "block";
+					joinButton.style.display = (node.isKin() && !node.isRemarried()) ? "block" : "none";
 					leftButton.style.display = (node.hasParents() && node.parents[0].children.indexOf(node) > 0 || !node.isKin() && node.isSecondConsort()) ? "block" : "none";
 					rightButton.style.display = (node.hasParents() && node.parents[0].children.indexOf(node) < node.parents[0].children.length - 1 ||
 												!node.isKin() && node.spouses[0].isRemarried() && !node.isSecondConsort()) ? "block" : "none";
@@ -382,60 +408,66 @@ function Lignage(svg, nodes, options = {}) {
 
 			if (node.isKin()) {
 				for (let spouse of node.spouses) {
-					drawNodes(spouse, container);
+					if (spouse != node) drawNodes(spouse, container);
 				}
-				for (let child of node.children) {
+				for (let child of node.getChildren()) {
 					drawNodes(child, container);
 				}
 			}
 		}
 
 		function drawLinks(node, container) {
-			// Draw links between spouses, and between parents and children
-			if (!node.isMarried()) return;
-
-			if (node.isKin()) {
-				for (let spouse of node.spouses) {
-					drawLinks(spouse, container);
+			function computeFraction(n) {
+				if (n.isRemarried() && n.spouses[0].hasChildren() && n.spouses[1].hasChildren()) {
+					let child1 = n.spouses[0].children.at(-1);
+					let child2 = n.spouses[1].children[0];
+					if ((child1.x + child1.getWidth() + child2.x) / 2 > n.x + n.getWidth() / 2) {
+						return node == n.spouses[1] ? 1/3 : 2/3;
+					}
+					else {
+						return node == n.spouses[1] ? 2/3 : 1/3;
+					}
 				}
-				for (let child of node.children) {
+				return 1/2;
+			}
+
+			// Draw links between spouses, and between parents and children
+			if (node.isKin()) {
+				if (node.children.length > 0) {
+					let fraction = computeFraction(node);
+					let pos1 = node.getPosition();
+					let x1 = pos1.x + options.width / 2;
+					let y1 = pos1.y + options.height;
+					for (let child of node.children) {
+						let pos2 = child.getPosition();
+						let x2 = pos2.x + options.width / 2;
+						let y2 = pos2.y;
+						let dy = (y2 - y1) * fraction;
+						let link = makeElement("path", {d: `M${x1} ${y1} v${dy} H${x2} V${y2}`, stroke: "black", fill: "none"});
+						container.append(link);
+					}
+				}
+				for (let spouse of node.spouses) {
+					if (spouse != node) drawLinks(spouse, container);
+				}
+				for (let child of node.getChildren()) {
 					drawLinks(child, container);
 				}
 				return;
 			}
 
-			let x = node.spouses[0].x + options.width + options.spouseMargin / 2 + (node.isSecondConsort() ? options.width + options.spouseMargin : 0);
-			let y = node.spouses[0].y + options.height / 2;
+			let pos1 = node.getPosition();
+			let pos2 = node.spouses[0].getPosition();
+			let x = (pos1.x + pos2.x + options.width) / 2;
+			let y = pos1.y + options.height / 2;
 			container.append(makeElement("circle", {cx: x, cy: y, r: 5, fill: "black"}));
 			container.append(makeElement("path", {d: `M${x - options.spouseMargin / 2} ${y} h${options.spouseMargin}`, stroke: "black"}));
 
-			function computeDx(child) {
-				let dx = child.x - node.spouses[0].x - (options.width + options.spouseMargin) / 2;
-				if (child.parents[0].isSecondConsort()) {
-					dx -= options.width + options.spouseMargin;
-				}
-				if (child.isRemarried()) {
-					dx += options.width + options.spouseMargin;
-				}
-				return dx;
-			}
-
+			let fraction = computeFraction(node.spouses[0]);
+			let dy = options.height / 2 + options.parentMargin * fraction;
 			for (let child of node.children) {
-				let dx = computeDx(child);
-				let fraction = 1/2;
-				if (node.isSecondConsort()) {
-					let firstSpouse = node.spouses[0].spouses[0];
-					if (firstSpouse.hasChildren()) {
-						fraction = computeDx(node.children[0]) > 0 ? 1/3 : 2/3;
-					}
-				}
-				else if (node.spouses[0].isRemarried()) {
-					let secondSpouse = node.spouses[0].spouses[1];
-					if (secondSpouse.hasChildren()) {
-						fraction = computeDx(secondSpouse.children[0]) > 0 ? 2/3 : 1/3;
-					}
-				}
-				let link = makeElement("path", {d: `M${x} ${y} v${options.height / 2 + options.parentMargin * fraction} h${dx} v${options.parentMargin * (1 - fraction)}`, stroke: "black", fill: "none"});
+				let pos3 = child.getPosition();
+				let link = makeElement("path", {d: `M${x} ${y} v${dy} H${pos3.x + options.width / 2} V${pos3.y}`, stroke: "black", fill: "none"});
 				container.append(link);
 			}
 		}
@@ -445,11 +477,11 @@ function Lignage(svg, nodes, options = {}) {
 				return [[node]];
 			}
 			else if (depth == 1) {
-				return node.hasChildren() ? [node.children] : [];
+				return node.hasChildren() ? [node.getChildren()] : [];
 			}
 			else {
 				let ret = [];
-				for (let child of node.children) {
+				for (let child of node.getChildren()) {
 					ret = ret.concat(getNodes(child, depth - 1));
 				}
 				return ret;
@@ -460,6 +492,7 @@ function Lignage(svg, nodes, options = {}) {
 			if (!node.hasChildren()) {
 				return null;
 			}
+			let children = node.getChildren();
 			let nodeWidth = node.getWidth();
 			let delta = 0;
 			if (node.isRemarried() && (!node.spouses[0].hasChildren() || !node.spouses[1].hasChildren())) {
@@ -470,9 +503,9 @@ function Lignage(svg, nodes, options = {}) {
 			}
 			// Align parent in regard to first and last child
 			function getChildX(index) {
-				return node.children[index].x + (node.children[index].isRemarried() ? options.width + options.spouseMargin : 0);
+				return children[index].x + (children[index].isRemarried() ? options.width + options.spouseMargin : 0);
 			}
-			return (getChildX(0) + getChildX(node.children.length - 1) + options.width) / 2 - (delta + nodeWidth / 2);
+			return (getChildX(0) + getChildX(children.length - 1) + options.width) / 2 - (delta + nodeWidth / 2);
 		}
 
 		function adjustPositions(depth) {
@@ -604,9 +637,10 @@ function Lignage(svg, nodes, options = {}) {
 		if (node.isMarried() && !node.isKin()) obj.spouse = node.spouses[0].id;
 		if (node.isKin()) {
 			for (let spouse of node.spouses) {
-				ret[0] = ret[0].concat(serializeTree(spouse)[0]);
+				if (spouse != node)
+					ret[0] = ret[0].concat(serializeTree(spouse)[0]);
 			}
-			for (let child of node.children) {
+			for (let child of node.getChildren()) {
 				for (let [level, serializedNodes] of serializeTree(child).entries()) {
 					if (level + 1 < ret.length)
 						ret[level + 1] = ret[level + 1].concat(serializedNodes);
