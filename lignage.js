@@ -159,9 +159,9 @@ function Lignage(svg, nodes, options = {}) {
 	svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
 
 	const defs = makeElement("defs");
-	svg.appendChild(defs);
+	svg.append(defs);
 	const clipImage = makeElement("clipPath", {id: "clipImage"});
-	defs.appendChild(clipImage);
+	defs.append(clipImage);
 
 	initializeOptions();
 
@@ -175,9 +175,9 @@ function Lignage(svg, nodes, options = {}) {
 		};
 		Object.entries(icons).forEach(function([id, [color, d]]) {
 			let icon = makeElement("symbol", {id});
-			icon.appendChild(makeElement("rect", {x: 0, y: 0, width: 10, height: 10, rx: 1, ry: 1, fill: color}));
-			icon.appendChild(makeElement("path", {d, fill: "white", transform: "translate(2 2) scale(0.6)"}));
-			defs.appendChild(icon);
+			icon.append(makeElement("rect", {x: 0, y: 0, width: 10, height: 10, rx: 1, ry: 1, fill: color}));
+			icon.append(makeElement("path", {d, fill: "white", transform: "translate(2 2) scale(0.6)"}));
+			defs.append(icon);
 		});
 	}
 
@@ -197,7 +197,7 @@ function Lignage(svg, nodes, options = {}) {
 
 			let elem = makeElement("g", {id: node.id, class: "node", transform: `translate(${x} ${y})`});
 			if (node.class) elem.classList.add(node.class);
-			container.appendChild(elem);
+			container.append(elem);
 
 			let rect = makeElement("rect", {
 				x: 0,
@@ -209,7 +209,7 @@ function Lignage(svg, nodes, options = {}) {
 				fill: "white",
 				stroke: "black"
 			});
-			elem.appendChild(rect);
+			elem.append(rect);
 			let fontSize = options.fontSize;
 			let text1 = makeElement("text", {
 				class: "name",
@@ -224,10 +224,10 @@ function Lignage(svg, nodes, options = {}) {
 			text1.innerHTML = node.name || "";
 			if (node.url) {
 				let a = makeElement("a", {href: node.url, target: "_blank"});
-				a.appendChild(text1);
-				elem.appendChild(a);
+				a.append(text1);
+				elem.append(a);
 			}
-			else elem.appendChild(text1);
+			else elem.append(text1);
 			while (text1.getBBox().width > options.width) {
 				text1.setAttribute("font-size", fontSize--);
 			}
@@ -241,7 +241,7 @@ function Lignage(svg, nodes, options = {}) {
 				cursor: "default"
 			});
 			text2.innerHTML = node.text || "";
-			elem.appendChild(text2);
+			elem.append(text2);
 			if (options.image && node.image) {
 				let image = makeElement("image", {
 					preserveAspectRatio: "xMidYMid slice",
@@ -252,22 +252,18 @@ function Lignage(svg, nodes, options = {}) {
 					width: 100,
 					height: 100
 				});
-				elem.appendChild(image);
+				elem.append(image);
 			}
 
 			if (options.editable) {
 				let buttons = makeElement("g", {class: "buttons", style: "display: none;"});
 				let addButton = makeElement("use", {href: "#iconAdd", transform: `translate(${(options.width - 22.5) / 2} ${options.height - 25}) scale(2.25)`});
-				buttons.appendChild(addButton);
 				let editButton = makeElement("use", {href: "#iconEdit", transform: `translate(2.5 2.5) scale(2.25)`});
-				buttons.appendChild(editButton);
 				let leftButton = makeElement("use", {href: "#iconLeft", transform: `translate(2.5 ${options.height - 25}) scale(2.25)`});
-				buttons.appendChild(leftButton);
 				let rightButton = makeElement("use", {href: "#iconRight", transform: `translate(${options.width - 25} ${options.height - 25}) scale(2.25)`});
-				buttons.appendChild(rightButton);
 				let removeButton = makeElement("use", {href: "#iconRemove", transform: `translate(${options.width - 25} 2.5) scale(2.25)`});
-				buttons.appendChild(removeButton);
-				elem.appendChild(buttons);
+				buttons.append(addButton, editButton, leftButton, rightButton, removeButton);
+				elem.append(buttons);
 
 				addButton.addEventListener("click", function() {
 					function generateID(name) {
@@ -431,7 +427,7 @@ function Lignage(svg, nodes, options = {}) {
 					}
 				}
 				let link = makeElement("path", {d: `M${x} ${y} v${options.height / 2 + options.parentMargin * fraction} h${dx} v${options.parentMargin * (1 - fraction)}`, stroke: "black", fill: "none"});
-				container.appendChild(link);
+				container.append(link);
 			}
 		}
 
@@ -568,11 +564,11 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		let nodeContainer = makeElement("g", {id: "nodes"});
-		svg.appendChild(nodeContainer);
+		svg.append(nodeContainer);
 		drawNodes(rootNode, nodeContainer);
 
 		let linkContainer = makeElement("g", {id: "links"});
-		svg.appendChild(linkContainer);
+		svg.append(linkContainer);
 		drawLinks(rootNode, linkContainer);
 
 		let bbox = nodeContainer.getBBox();
@@ -681,7 +677,7 @@ function Lignage(svg, nodes, options = {}) {
 	ret.downloadPNG = function(filename) {
 		const image = new Image();
 		image.style.visibility = "hidden";
-		document.body.appendChild(image);
+		document.body.append(image);
 		image.onload = function() {
 			const canvas = document.createElement("canvas");
 			canvas.width = image.clientWidth;
