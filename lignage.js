@@ -562,6 +562,7 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		function computePosition(node) {
+			// Align parent in regard to first and last child
 			if (!node.hasChildren()) {
 				return null;
 			}
@@ -569,16 +570,12 @@ function Lignage(svg, nodes, options = {}) {
 			let nodeWidth = node.getWidth();
 			let delta = 0;
 			if (node.isRemarried() && (!node.spouses[0].hasChildren() || !node.spouses[1].hasChildren())) {
-				// Double marriage (including one without children)
+				// Ignore the childless spouse for positioning
 				nodeWidth -= options.width + options.spouseMargin;
 				if (!node.spouses[0].hasChildren())
 					delta = options.width + options.spouseMargin;
 			}
-			// Align parent in regard to first and last child
-			function getChildX(index) {
-				return children[index].x + (children[index].isRemarried() ? options.width + options.spouseMargin : 0);
-			}
-			return (getChildX(0) + getChildX(children.length - 1) + options.width) / 2 - (delta + nodeWidth / 2);
+			return (children[0].getPosition().x + children.at(-1).getPosition().x + options.width) / 2 - (delta + nodeWidth / 2);
 		}
 
 		function adjustPositions(depth) {
@@ -589,64 +586,56 @@ function Lignage(svg, nodes, options = {}) {
 			let levelNodes = getNodes(rootNode, depth);
 
 			for (let [index, nodes] of levelNodes.entries()) {
-				for (let node of nodes) {
-					if (currentShift) node.translate(currentShift, 0);
+				if (currentShift) {
+					for (let node of nodes) node.translate(currentShift, 0);
 				}
 				let positions = nodes.map(computePosition);
 				let start = 0;
 				while (start < positions.length) {
 					let end = start;
-					let found = false;
+					let foundAnchor = false;
 					for (let i=start; i<positions.length; i++) {
 						if (positions[i] !== null) {
 							end = i;
-							found = true;
+							foundAnchor = true;
 							break;
 						}
 					}
-					if (!found) end = positions.length;
+					if (!foundAnchor) end = positions.length;
 					let widthSum = 0;
 					for (let i=start; i<end; i++) {
 						widthSum += nodes[i].getWidth();
 					}
 					let collisionShift = 0;
-					let margin;
+
 					// Collision check
-					if (start == end) {
-						if (positions[end] < basePos) {
-							collisionShift = basePos - positions[end];
+					let margin = (start == 0 && basePos == 0 || !foundAnchor) ? options.siblingMargin : (positions[end] - widthSum - basePos + options.siblingMargin) / (end - start + 1);
+					if (margin < options.siblingMargin) {
+						collisionShift = (options.siblingMargin - margin) * (end - start + 1);
+						margin = options.siblingMargin;
+					}
+					else if (start == 0) {
+						margin = options.siblingMargin;
+					}
+
+					if (start == 0 && foundAnchor) {
+						let shift = positions[end];
+						for (let i=end-1; i>=start; i--) {
+							shift -= nodes[i].getWidth() + margin;
+							nodes[i].x = shift + collisionShift;
+							nodes[i].y = y;
 						}
 					}
 					else {
-						margin = (start == 0 && basePos == 0 || end == positions.length) ? options.siblingMargin : (positions[end] - widthSum - basePos + options.siblingMargin) / (end - start + 1);
-						if (margin < options.siblingMargin) {
-							if (end < positions.length) {
-								collisionShift = (options.siblingMargin - margin) * (end - start + 1);
-							}
-							margin = options.siblingMargin;
-						}
-						else if (start == 0) {
-							margin = options.siblingMargin;
-						}
-
-						if (start == 0 && end < positions.length) {
-							let shift = positions[end];
-							for (let i=end-1; i>=start; i--) {
-								shift -= nodes[i].getWidth() + margin;
-								nodes[i].x = shift + collisionShift;
-								nodes[i].y = y;
-							}
-						}
-						else {
-							for (let i=start; i<end; i++) {
-								nodes[i].x = basePos + margin - options.siblingMargin;
-								nodes[i].y = y;
-								basePos += nodes[i].getWidth() + margin;
-							}
+						basePos += margin - options.siblingMargin;
+						for (let i=start; i<end; i++) {
+							nodes[i].x = basePos;
+							nodes[i].y = y;
+							basePos += nodes[i].getWidth() + margin;
 						}
 					}
 
-					if (end < positions.length) {
+					if (foundAnchor) {
 						nodes[end].x = positions[end];
 						nodes[end].y = y;
 						if (collisionShift) {
@@ -657,13 +646,16 @@ function Lignage(svg, nodes, options = {}) {
 						}
 						if (!anchored) {
 							anchored = true;
-							let delta = index == 0 ? null : levelNodes[index][0].x - options.width - options.cousinMargin - levelNodes[index - 1][levelNodes[index - 1].length - 1].x;
-							for (let i=0; i<index; i++) {
-								for (let node of levelNodes[i]) {
-									node.translate(delta, 0);
+
+							if (index > 0) {
+								let latestCousin = levelNodes[index - 1].at(-1);
+								let delta = levelNodes[index][0].x - options.cousinMargin - latestCousin.x - latestCousin.getWidth();
+								for (let i=0; i<index; i++) {
+									for (let node of levelNodes[i]) {
+										node.translate(delta, 0);
+									}
 								}
 							}
-
 						}
 						basePos = positions[end] + nodes[end].getWidth() + options.siblingMargin;
 					}
