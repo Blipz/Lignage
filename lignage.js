@@ -65,6 +65,7 @@ function Lignage(svg, nodes, options = {}) {
 				if (parent.isKin()) {
 					this.parents = [parent];
 					if (!parent.spouses.includes(parent)) {
+						// Single parents are represented as married to themselves
 						if (parent.hasChildren())
 							parent.spouses.push(parent);
 						else
@@ -93,6 +94,8 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		getChildren() {
+			/* Get all the node's children, whereas the children attribute
+			 * for a kin node only represents out-of-marriage children */
 			if (this.isKin()) {
 				let children = [];
 				if (this.isMarried())
@@ -125,6 +128,7 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		isSecondConsort() {
+			// This assumes a non-kin node
 			return this != this.spouses[0].spouses[0];
 		}
 
@@ -138,6 +142,9 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		getPosition() {
+			/* Compute the position of the node itself, whereas the x and y attributes
+			 * describe the position of the group (with spouses) to which the node belongs
+			 * and may not be defined for non-kin nodes */
 			if (!this.isMarried()) {
 				return {x: this.x, y: this.y};
 			}
@@ -156,6 +163,7 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		getWidth() {
+			/* Compute the width of the node group (only for kin nodes) */
 			return options.width + (options.width + options.spouseMargin) * this.spouses.filter(x => x != this).length;
 		}
 
@@ -310,6 +318,7 @@ function Lignage(svg, nodes, options = {}) {
 
 				function prepareAdd() {
 					function generateID(name) {
+						// Try a camel-case version of the name provided
 						let id = name.replaceAll(/ +(.)/g, (x,y) => y.toUpperCase());
 						let index;
 						if (id) {
@@ -426,6 +435,8 @@ function Lignage(svg, nodes, options = {}) {
 
 		function drawLinks(node, container) {
 			function computeFraction(n) {
+				// Return an appropriate fraction of the vertical spacing between parent and children nodes,
+				// so that links won't collide in a situation where half-siblings are involved
 				if (n.isRemarried() && n.spouses[0].hasChildren() && n.spouses[1].hasChildren()) {
 					let child1 = n.spouses[0].children.at(-1);
 					let child2 = n.spouses[1].children[0];
@@ -439,9 +450,9 @@ function Lignage(svg, nodes, options = {}) {
 				return 1/2;
 			}
 
-			// Draw links between spouses, and between parents and children
 			if (node.isKin()) {
 				if (node.children.length > 0) {
+					// Draw links between a single parent and their children
 					let fraction = computeFraction(node);
 					let pos1 = node.getPosition();
 					let x1 = pos1.x + options.width / 2;
@@ -467,6 +478,7 @@ function Lignage(svg, nodes, options = {}) {
 
 			if (linkReplace.includes(node.id)) return;
 
+			// Draw a link between spouses
 			let pos1 = node.getPosition();
 			let pos2 = node.spouses[0].getPosition();
 			let x = (pos1.x + pos2.x + options.width) / 2;
@@ -474,6 +486,7 @@ function Lignage(svg, nodes, options = {}) {
 			container.append(makeElement("circle", {cx: x, cy: y, r: 5, fill: "black"}));
 			container.append(makeElement("path", {d: `M${x - options.spouseMargin / 2} ${y} h${options.spouseMargin}`, stroke: "black"}));
 
+			// Draw links between parents and children
 			let fraction = computeFraction(node.spouses[0]);
 			let dy = options.height / 2 + options.parentMargin * fraction;
 			for (let child of node.children) {
@@ -499,6 +512,7 @@ function Lignage(svg, nodes, options = {}) {
 				}
 			}
 
+			/* Draw additional links that are not expressed by the tree structure */
 			for (link of options.links) {
 				let x1, x2, y1, y2;
 				try {
@@ -551,6 +565,7 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		function getNodes(node, depth) {
+			/* Return kin nodes at specified depth, grouped by kin parent node */
 			if (depth == 0) {
 				return [[node]];
 			}
@@ -584,6 +599,8 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		function adjustPositions(depth) {
+			/* Correctly position nodes at specified level, so that
+			 * margins are respected but no space is lost */
 			let y = depth * (options.height + options.parentMargin);
 			let basePos = 0;
 			let currentShift = 0;
@@ -599,6 +616,7 @@ function Lignage(svg, nodes, options = {}) {
 				while (start < positions.length) {
 					let end = start;
 					let foundAnchor = false;
+					// Iterate until we find the first anchored sibling (relative to their children)
 					for (let i=start; i<positions.length; i++) {
 						if (positions[i] !== null) {
 							end = i;
@@ -620,6 +638,7 @@ function Lignage(svg, nodes, options = {}) {
 						margin = options.siblingMargin;
 					}
 					else if (start == 0) {
+						// Always use siblingMargin, unless between two anchored siblings
 						margin = options.siblingMargin;
 					}
 
@@ -644,6 +663,7 @@ function Lignage(svg, nodes, options = {}) {
 						nodes[end].x = positions[end];
 						nodes[end].y = y;
 						if (collisionShift) {
+							// Move all next siblings to the right, with their descent
 							for (let i=end; i<positions.length; i++) {
 								nodes[i].translate(collisionShift, 0);
 								if (positions[i] !== null) positions[i] += collisionShift;
@@ -653,6 +673,7 @@ function Lignage(svg, nodes, options = {}) {
 							anchored = true;
 
 							if (index > 0) {
+								// Reposition previous unanchored cousins to avoid losing space
 								let latestCousin = levelNodes[index - 1].at(-1);
 								let delta = levelNodes[index][0].x - options.cousinMargin - latestCousin.x - latestCousin.getWidth();
 								for (let i=0; i<index; i++) {
