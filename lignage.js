@@ -187,8 +187,10 @@ function Lignage(svg, nodes, options = {}) {
 		if (options.fontSize === undefined) options.fontSize = 16;
 		if (options.exclude === undefined) options.exclude = [];
 		if (options.links === undefined) options.links = [];
-		const rect = makeElement("rect", {x: (options.width - 100) / 2, y: (options.height - 100) / 2, width: 100, height: 100, rx: 10, ry: 10});
-		clipImage.replaceChildren(rect);
+		const imageRect = makeElement("rect", {x: (options.width - 100) / 2, y: (options.height - 100) / 2, width: 100, height: 100, rx: 10, ry: 10});
+		clipImage.replaceChildren(imageRect);
+		const textRect = makeElement("rect", {x: 0, y: 0, width: options.width, height: options.height, rx: 10, ry: 10});
+		clipText.replaceChildren(textRect);
 	}
 
 	svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -197,7 +199,8 @@ function Lignage(svg, nodes, options = {}) {
 	const defs = makeElement("defs");
 	svg.append(defs);
 	const clipImage = makeElement("clipPath", {id: "clipImage"});
-	defs.append(clipImage);
+	const clipText = makeElement("clipPath", {id: "clipText"});
+	defs.append(clipImage, clipText);
 
 	initializeOptions();
 
@@ -253,6 +256,7 @@ function Lignage(svg, nodes, options = {}) {
 				x: options.width / 2,
 				y: 20,
 				fill: "black",
+				"clip-path": "url(#clipText)",
 				"font-size": fontSize,
 				"font-weight": "bold",
 				"text-anchor": "middle",
@@ -265,7 +269,7 @@ function Lignage(svg, nodes, options = {}) {
 				elem.append(a);
 			}
 			else elem.append(text1);
-			while (text1.getBBox().width > options.width) {
+			while (text1.getBBox().width > options.width && fontSize > 0) {
 				text1.setAttribute("font-size", fontSize--);
 			}
 			let text2 = makeElement("text", {
@@ -273,6 +277,7 @@ function Lignage(svg, nodes, options = {}) {
 				x: options.width / 2,
 				y: options.height - 10,
 				fill: "black",
+				"clip-path": "url(#clipText)",
 				"font-size": 14,
 				"text-anchor": "middle",
 				cursor: "default"
