@@ -65,12 +65,12 @@ The following options can be used:
   - **replace**: whether or not to omit the automated link joining the end node to the tree (default: false)
   - **class**: DOM class used for styling
 - **width**: width of the box representing nodes (default: 120)
-- **height**: height of the box representing nodes (default depends on the value of the image flag)
+- **height**: height of the box representing nodes (default depends on the value of the `images` flag)
 - **parentMargin**: vertical spacing between parent and children (default: 80)
 - **spouseMargin**: horizontal spacing between spouses (default: 30)
 - **siblingMargin**: minimal horizontal spacing between siblings (default: 30)
 - **cousinMargin**: minimal horizontal spacing between cousins (default: 100)
-- **image**: whether or not to display images (default: false)
+- **images**: whether or not to display images (default: false)
 - **editable**: whether or not to allow on-the-fly edition (default: false)
 - **fontSize**: size of the font used (default: 16)
 

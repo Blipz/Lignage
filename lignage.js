@@ -10,9 +10,9 @@ function Lignage(svg, nodes, options = {}) {
 			return ret;
 		}
 
-		static remove(id) {
+		static remove(id, force = false) {
 			let node = Node.get(id);
-			if (node.isRoot) {
+			if (node.isRoot && !force) {
 				throw Error(`Cannot remove root node '${id}'`);
 			}
 			for (let parentNode of node.parents) {
@@ -22,9 +22,14 @@ function Lignage(svg, nodes, options = {}) {
 				}
 			}
 			for (let spouse of node.spouses) {
-				spouse.spouses = spouse.spouses.filter(x => x != node);
+				if (!node.isKin()) {
+					spouse.spouses = spouse.spouses.filter(x => x != node);
+				}
+				else if (spouse != node) {
+					Node.remove(spouse.id);
+				}
 			}
-			for (let child of node.getChildren()) {
+			for (let child of node.children) {
 				Node.remove(child.id);
 			}
 			options.links = options.links.filter(x => x.start != id && x.end != id);
@@ -186,7 +191,8 @@ function Lignage(svg, nodes, options = {}) {
 	}
 
 	function initializeOptions() {
-		if (options.height === undefined) options.height = options.image? 160 : 50;
+		if (options.root === undefined) options.root = nodes[0].id;
+		if (options.height === undefined) options.height = options.images? 160 : 50;
 		if (options.width === undefined) options.width = 120;
 		if (options.parentMargin === undefined) options.parentMargin = 80;
 		if (options.spouseMargin === undefined) options.spouseMargin = 30;
@@ -195,10 +201,47 @@ function Lignage(svg, nodes, options = {}) {
 		if (options.fontSize === undefined) options.fontSize = 16;
 		if (options.exclude === undefined) options.exclude = [];
 		if (options.links === undefined) options.links = [];
-		const imageRect = makeElement("rect", {x: (options.width - 100) / 2, y: (options.height - 100) / 2, width: 100, height: 100, rx: 10, ry: 10});
-		clipImage.replaceChildren(imageRect);
+
+		const clipText = makeElement("clipPath", {id: "clipText"});
 		const textRect = makeElement("rect", {x: 0, y: 0, width: options.width, height: options.height, rx: 10, ry: 10});
-		clipText.replaceChildren(textRect);
+		clipText.append(textRect);
+		defs.replaceChildren(clipText);
+
+		if (options.images) {
+			const clipImage = makeElement("clipPath", {id: "clipImage"});
+			const imageRect = makeElement("rect", {x: (options.width - 100) / 2, y: (options.height - 100) / 2, width: 100, height: 100, rx: 10, ry: 10});
+			clipImage.append(imageRect);
+			defs.append(clipImage);
+		}
+		if (options.editable) {
+			const icons = {
+				"iconAdd": ["limegreen", "M4 0 h2 v4 h4 v2 h-4 v4 h-2 v-4 h-4 v-2 h4z"],
+				"iconEdit": ["royalblue", "M0 0 h10 v2 h-10z M0 4 h10 v2 h-10z M0 8 h10 v2 h-10z"],
+				"iconJoin": ["purple", "M5 2 a4 4 0 0 0 0 8 4 4 0 0 0 0 -8 m0 1.5 a2.5 2.5 0 0 1 0 5 2.5 2.5 0 0 1 0 -5 M3 0 h4 v2 h-4z"],
+				"iconLeft": ["darkgray", "M6.75 0 L1.75 5 L6.75 10 L8.25 8.5 L4.75 5 L8.25 1.5z"],
+				"iconRight": ["darkgray", "M3.25 0 L8.25 5 L3.25 10 L1.75 8.5 L5.25 5 L1.75 1.5z"],
+				"iconRemove": ["red", "M1.5 0 L5 3.5 L8.5 0 L10 1.5 L6.5 5 L10 8.5 L8.5 10 L5 6.5 L1.5 10 L0 8.5 L3.5 5 L0 1.5z"],
+			};
+			Object.entries(icons).forEach(function([id, [color, d]]) {
+				const icon = makeElement("symbol", {id});
+				icon.append(makeElement("rect", {x: 0, y: 0, width: 10, height: 10, rx: 1, ry: 1, fill: color}));
+				icon.append(makeElement("path", {d, fill: "white", transform: "translate(2 2) scale(0.6)"}));
+				defs.append(icon);
+			});
+		}
+	}
+
+	function redefineRoot() {
+		let node = Node.get(options.root);
+		if (node != rootNode) {
+			for (let parent of node.parents) {
+				parent.children = parent.children.filter(x => x != node);
+			}
+			node.parents = [];
+			node.isRoot = true;
+			Node.remove(rootNode.id, true);
+		}
+		rootNode = node;
 	}
 
 	svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -206,37 +249,33 @@ function Lignage(svg, nodes, options = {}) {
 
 	const defs = makeElement("defs");
 	svg.append(defs);
-	const clipImage = makeElement("clipPath", {id: "clipImage"});
-	const clipText = makeElement("clipPath", {id: "clipText"});
-	defs.append(clipImage, clipText);
 
 	initializeOptions();
 
-	if (options.editable) {
-		const icons = {
-			"iconAdd": ["limegreen", "M4 0 h2 v4 h4 v2 h-4 v4 h-2 v-4 h-4 v-2 h4z"],
-			"iconEdit": ["royalblue", "M0 0 h10 v2 h-10z M0 4 h10 v2 h-10z M0 8 h10 v2 h-10z"],
-			"iconJoin": ["purple", "M5 2 a4 4 0 0 0 0 8 4 4 0 0 0 0 -8 m0 1.5 a2.5 2.5 0 0 1 0 5 2.5 2.5 0 0 1 0 -5 M3 0 h4 v2 h-4z"],
-			"iconLeft": ["darkgray", "M6.75 0 L1.75 5 L6.75 10 L8.25 8.5 L4.75 5 L8.25 1.5z"],
-			"iconRight": ["darkgray", "M3.25 0 L8.25 5 L3.25 10 L1.75 8.5 L5.25 5 L1.75 1.5z"],
-			"iconRemove": ["red", "M1.5 0 L5 3.5 L8.5 0 L10 1.5 L6.5 5 L10 8.5 L8.5 10 L5 6.5 L1.5 10 L0 8.5 L3.5 5 L0 1.5z"],
-		};
-		Object.entries(icons).forEach(function([id, [color, d]]) {
-			let icon = makeElement("symbol", {id});
-			icon.append(makeElement("rect", {x: 0, y: 0, width: 10, height: 10, rx: 1, ry: 1, fill: color}));
-			icon.append(makeElement("path", {d, fill: "white", transform: "translate(2 2) scale(0.6)"}));
-			defs.append(icon);
-		});
-	}
-
 	for (let node of nodes) {
-		new Node(node);
+		try {
+			new Node(node);
+		}
+		catch(e) {
+			console.warn(e.message);
+		}
 	}
 
-	const rootNode = Node.get(options.root || nodes[0].id);
-	rootNode.parents = [];
 	for (let exclude of options.exclude) {
-		Node.remove(exclude);
+		try {
+			Node.remove(exclude);
+		}
+		catch(e) {
+			console.warn(e.message);
+		}
+	}
+
+	let rootNode = Node.get(nodes[0].id);
+	try {
+		redefineRoot();
+	}
+	catch(e) {
+		console.warn(e.message);
 	}
 
 	function drawTree() {
@@ -292,7 +331,7 @@ function Lignage(svg, nodes, options = {}) {
 			});
 			text2.innerHTML = node.text || "";
 			elem.append(text2);
-			if (options.image && node.image) {
+			if (options.images && node.image) {
 				let image = makeElement("image", {
 					preserveAspectRatio: "xMidYMid slice",
 					"clip-path": "url(#clipImage)",
@@ -796,13 +835,18 @@ function Lignage(svg, nodes, options = {}) {
 
 	ret.getOption = function(name) {
 		return options[name];
-	}
+	};
 
 	ret.setOption = function(name, value) {
 		options[name] = value;
-		initializeOptions();
+		if (name == "root") {
+			redefineRoot();
+		}
+		else {
+			initializeOptions();
+		}
 		redrawTree();
-	}
+	};
 
 	ret.exportJSON = function() {
 		const json = JSON.stringify(serializeTree(rootNode).flat());
