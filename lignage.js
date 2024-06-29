@@ -190,6 +190,10 @@ function Lignage(svg, nodes, options = {}) {
 		return elem;
 	}
 
+	function round(x) {
+		return Math.round(x * 10) / 10;
+	}
+
 	function initializeOptions() {
 		if (options.root === undefined) options.root = nodes[0].id;
 		if (options.height === undefined) options.height = options.images? 160 : 50;
@@ -282,7 +286,7 @@ function Lignage(svg, nodes, options = {}) {
 		function drawNodes(node, container) {
 			let {x, y} = node.getPosition();
 
-			let elem = makeElement("g", {id: node.id, class: "node", transform: `translate(${x} ${y})`});
+			let elem = makeElement("g", {id: node.id, class: "node", transform: `translate(${round(x)} ${round(y)})`});
 			if (node.class) elem.classList.add(node.class);
 			container.append(elem);
 
@@ -502,7 +506,7 @@ function Lignage(svg, nodes, options = {}) {
 						let x2 = pos2.x + options.width / 2;
 						let y2 = pos2.y;
 						let dy = (y2 - y1) * fraction;
-						let link = makeElement("path", {d: `M${x1} ${y1} v${dy} H${x2} V${y2}`, stroke: "black", fill: "none"});
+						let link = makeElement("path", {d: `M${round(x1)} ${round(y1)} v${round(dy)} H${round(x2)} V${round(y2)}`, stroke: "black", fill: "none"});
 						container.append(link);
 					}
 				}
@@ -522,8 +526,8 @@ function Lignage(svg, nodes, options = {}) {
 			let pos2 = node.spouses[0].getPosition();
 			let x = (pos1.x + pos2.x + options.width) / 2;
 			let y = pos1.y + options.height / 2;
-			container.append(makeElement("circle", {cx: x, cy: y, r: 5, fill: "black"}));
-			container.append(makeElement("path", {d: `M${x - options.spouseMargin / 2} ${y} h${options.spouseMargin}`, stroke: "black"}));
+			container.append(makeElement("circle", {cx: round(x), cy: round(y), r: 5, fill: "black"}));
+			container.append(makeElement("path", {d: `M${round(x - options.spouseMargin / 2)} ${round(y)} h${round(options.spouseMargin)}`, stroke: "black"}));
 
 			// Draw links between parents and children
 			let fraction = computeFraction(node.spouses[0]);
@@ -531,7 +535,7 @@ function Lignage(svg, nodes, options = {}) {
 			for (let child of node.children) {
 				if (linkReplace.includes(child.id)) continue;
 				let pos3 = child.getPosition();
-				let link = makeElement("path", {d: `M${x} ${y} v${dy} H${pos3.x + options.width / 2} V${pos3.y}`, stroke: "black", fill: "none"});
+				let link = makeElement("path", {d: `M${round(x)} ${round(y)} v${round(dy)} H${round(pos3.x + options.width / 2)} V${round(pos3.y)}`, stroke: "black", fill: "none"});
 				container.append(link);
 			}
 		}
@@ -580,7 +584,7 @@ function Lignage(svg, nodes, options = {}) {
 					dx = 0;
 					dy = 0;
 					y3 = y2;
-					container.append(makeElement("circle", {cx: (x1 + x2) / 2, cy: (y1 + y2) / 2, r: 5, fill: "black"}));
+					container.append(makeElement("circle", {cx: round((x1 + x2) / 2), cy: round((y1 + y2) / 2), r: 5, fill: "black"}));
 				}
 				else if (link.type == "descent") {
 					x1 += options.width / 2;
@@ -593,7 +597,7 @@ function Lignage(svg, nodes, options = {}) {
 					console.warn(`Unknown link type: '${link.type}'`);
 					continue;
 				}
-				let path = makeElement("path", {d: `M${x1} ${y1} v${dy} h${dx} V${y3} H${x2} V${y2}`, stroke: "black", fill: "none"});
+				let path = makeElement("path", {d: `M${round(x1)} ${round(y1)} v${round(dy)} h${round(dx)} V${round(y3)} H${round(x2)} V${round(y2)}`, stroke: "black", fill: "none"});
 				if (link.class) path.classList.add(link.class);
 				container.append(path);
 
@@ -744,10 +748,11 @@ function Lignage(svg, nodes, options = {}) {
 		let linkReplace = drawExtraLinks(linkContainer);
 		drawLinks(rootNode, linkContainer);
 
-		let bbox = nodeContainer.getBBox();
-		svg.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
-		svg.setAttribute("width", bbox.width);
-		svg.setAttribute("height", bbox.height);
+		let padding = 5;
+		let bbox = svg.getBBox();
+		svg.setAttribute("viewBox", `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + 2 * padding} ${bbox.height + 2 * padding}`);
+		svg.setAttribute("width", bbox.width + 2 * padding);
+		svg.setAttribute("height", bbox.height + 2 * padding);
 	}
 
 	function redrawTree() {
