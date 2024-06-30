@@ -96,6 +96,7 @@ For instance:
 ## Handling consanguine unions
 
 The following section details some workarounds to handle consanguine unions.
+See the [Lagid dynasty](examples/lagids.html) for a concrete use case.
 
 ### General case
 

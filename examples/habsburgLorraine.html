@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>House of Habsburg-Lorraine</title>
+        <script src="../lignage.js"></script>
+        <style>
+            #lignage {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="lignage">
+            <style>
+                .kaiser rect {
+                    fill: darkgray;
+                }
+                .kaiser text {
+                    fill: white;
+                }
+                .dashed {
+                    stroke-dasharray: 10 5;
+                }
+            </style>
+        </svg>
+        <script>
+            const nodes = [
+                {id: "franzI", name: "FRANZ I", text: "1708-1765", class: "kaiser", url: "https://de.wikipedia.org/wiki/Franz_I._Stephan_(HRR)"},
+                {id: "mariaTheresia1", name: "MARIA THERESIA", text: "1717-1780", spouse: "franzI", class: "kaiser", url: "https://de.wikipedia.org/wiki/Maria_Theresia"},
+                {id: "mariaAnna1", name: "Maria Anna", text: "1738-1789", parent: "mariaTheresia1"},
+                {id: "josephII", name: "JOSEPH II", text: "1741-1790", parent: "mariaTheresia1", class: "kaiser", url: "https://de.wikipedia.org/wiki/Joseph_II."},
+                {id: "mariaChristina", name: "Maria Christina", text: "1742-1798", parent: "mariaTheresia1"},
+                {id: "albertSachsenTeschen", name: "Albert v. Sachsen-Teschen", text: "1738-1822", spouse: "mariaChristina"},
+                {id: "mariaElisabeth", name: "Maria Elisabeth", text: "1743-1808", parent: "mariaTheresia1"},
+                {id: "karlJoseph", name: "Karl Joseph", text: "1745-1761", parent: "mariaTheresia1"},
+                {id: "mariaAmalia", name: "Maria Amalia", text: "1746-1804", parent: "mariaTheresia1"},
+                {id: "ferdinandIParma", name: "Ferdinand I of Parma", text: "1751-1802", spouse: "mariaAmalia"},
+                {id: "leopoldII", name: "LEOPOLD II", text: "1747-1792", parent: "mariaTheresia1", class: "kaiser", url: "https://de.wikipedia.org/wiki/Leopold_II._(HRR)"},
+                {id: "mariaLuisaSpain", name: "Maria Luisa of Spain", text: "1745-1792", spouse: "leopoldII"},
+                {id: "johannaGabriela", name: "Johanna Gabriela", text: "1750-1762", parent: "mariaTheresia1"},
+                {id: "mariaJosepha", name: "Maria Josepha", text: "1751-1767", parent: "mariaTheresia1"},
+                {id: "mariaKarolina", name: "Maria Karolina", text: "1752-1814", parent: "mariaTheresia1"},
+                {id: "ferdinandISicily", name: "Ferdinand I of Sicily", text: "1751-1825", spouse: "mariaKarolina"},
+                {id: "ferdinandKarl", name: "Ferdinand Karl", text: "1754-1806", parent: "mariaTheresia1"},
+                {id: "mariaBeatriceEste", name: "Maria Beatrice d'Este", text: "1750-1829", spouse: "ferdinandKarl"},
+                {id: "mariaAntonia", name: "Maria Antonia", text: "1755-1793", parent: "mariaTheresia1"},
+                {id: "louisXVI", name: "Louis XVI", text: "1754-1793", spouse: "mariaAntonia"},
+                {id: "maximilianFranz", name: "Maximilian Franz", text: "1756-1801", parent: "mariaTheresia1"},
+                {id: "mariaTheresia2", name: "Maria Theresia", text: "1767-1827", parent: "mariaLuisaSpain"},
+                {id: "franzII", name: "FRANZ II", text: "1768-1835", parent: "mariaLuisaSpain", class: "kaiser", url: "https://de.wikipedia.org/wiki/Franz_II._(HRR)"},
+                {id: "mariaTheresaSicily", name: "Maria Theresa of Sicily", text: "1772-1807", spouse: "franzII"},
+                {id: "ferdinandIII", name: "Ferdinand III", text: "1769-1824", parent: "mariaLuisaSpain"},
+                {id: "luisaSicily", name: "Luisa of Sicily", text: "1773-1802", spouse: "ferdinandIII"},
+                {id: "mariaAnna2", name: "Maria Anna", text: "1770-1809", parent: "mariaLuisaSpain"},
+                {id: "karl", name: "Karl", text: "1771-1847", parent: "mariaLuisaSpain"},
+                {id: "alexanderLeopold", name: "Alexander Leopold", text: "1772-1795", parent: "mariaLuisaSpain"},
+                {id: "joseph", name: "Joseph", text: "1776-1847", parent: "mariaLuisaSpain"},
+                {id: "mariaDorotheaWurttemberg", name: "Maria Dorothea v. Württemberg", text: "1797-1855", spouse: "joseph"},
+                {id: "mariaKlementine1", name: "Maria Klementine", text: "1777-1801", parent: "mariaLuisaSpain"},
+                {id: "francescoISicily", name: "Francesco I of Sicily", text: "1777-1830", spouse: "mariaKlementine1"},
+                {id: "antonViktor", name: "Anton Viktor", text: "1779-1835", parent: "mariaLuisaSpain"},
+                {id: "johann", name: "Johann", text: "1782-1859", parent: "mariaLuisaSpain"},
+                {id: "annaPlochl", name: "Anna Plochl", text: "1804-1885", spouse: "johann"},
+                {id: "rainer", name: "Rainer", text: "1783-1853", parent: "mariaLuisaSpain"},
+                {id: "elisabethSavoy", name: "Elisabeth of Savoy", text: "1800-1856", spouse: "rainer"},
+                {id: "ludwig", name: "Ludwig", text: "1784-1864", parent: "mariaLuisaSpain"},
+                {id: "rudolf1", name: "Rudolf", text: "1788-1831", parent: "mariaLuisaSpain"},
+                {id: "mariaLudovica", name: "Maria Ludovica", text: "1791-1847", parent: "mariaTheresaSicily"},
+                {id: "napoleonI", name: "Napoléon I", text: "1769-1821", spouse: "mariaLudovica"},
+                {id: "ferdinandI", name: "FERDINAND I", text: "1793-1875", parent: "mariaTheresaSicily", class: "kaiser", url: "https://de.wikipedia.org/wiki/Ferdinand_I._(Österreich)"},
+                {id: "mariaLeopoldine", name: "Maria Leopoldine", text: "1797-1826", parent: "mariaTheresaSicily"},
+                {id: "pedroIBrazil", name: "Pedro I of Brazil", text: "1798-1834", spouse: "mariaLeopoldine"},
+                {id: "mariaKlementine2", name: "Maria Klementine", text: "1798-1881", parent: "mariaTheresaSicily"},
+                {id: "karolineFerdinande", name: "Karoline Ferdinande", text: "1801-1832", parent: "mariaTheresaSicily"},
+                {id: "franzKarl", name: "Franz Karl", text: "1802-1878", parent: "mariaTheresaSicily"},
+                {id: "sophieFriederikeBayern", name: "Sophie Friederike v. Bayern", text: "1805-1872", spouse: "franzKarl"},
+                {id: "mariaAnna3", name: "Maria Anna", text: "1804-1858", parent: "mariaTheresaSicily"},
+                {id: "franzJosephI", name: "FRANZ JOSEPH I", text: "1830-1916", parent: "sophieFriederikeBayern", class: "kaiser", url: "https://de.wikipedia.org/wiki/Franz_Joseph_I."},
+                {id: "elisabethBayern", name: "Elisabeth von Bayern", text: "1837-1898", spouse: "franzJosephI"},
+                {id: "maximilianI", name: "Maximilian I", text: "1832-1867", parent: "sophieFriederikeBayern"},
+                {id: "karlLudwig", name: "Karl Ludwig", text: "1833-1896", parent: "sophieFriederikeBayern"},
+                {id: "mariaAnnunziataSicily", name: "Maria Annunziata of Sicily", text: "1843-1871", spouse: "karlLudwig"},
+                {id: "mariaTheresaPortugal", name: "Maria Theresa of Portugal", text: "1855-1944", spouse: "karlLudwig"},
+                {id: "ludwigViktor", name: "Ludwig Viktor", text: "1842-1919", parent: "sophieFriederikeBayern"},
+                {id: "rudolf2", name: "Rudolf", text: "1858-1889", parent: "elisabethBayern"},
+                {id: "franzFerdinand", name: "Franz Ferdinand", text: "1863-1914", parent: "mariaAnnunziataSicily"},
+                {id: "ottoFranzJoseph", name: "Otto Franz Joseph", text: "1865-1906", parent: "mariaAnnunziataSicily"},
+                {id: "mariaJosephaSachsen", name: "Maria Josepha von Sachsen", text: "1867-1944", spouse: "ottoFranzJoseph"},
+                {id: "ferdinandKarl2", name: "Ferdinand Karl", text: "1868-1915", parent: "mariaAnnunziataSicily"},
+                {id: "margareteSophie", name: "Margarete Sophie", text: "1870-1902", parent: "mariaAnnunziataSicily"},
+                {id: "mariaAnnunziata", name: "Maria Annunziata", text: "1876-1961", parent: "mariaTheresaPortugal"},
+                {id: "elisabethAmalie", name: "Elisabeth Amalie", text: "1878-1960", parent: "mariaTheresaPortugal"},
+                {id: "karlI", name: "KARL I", text: "1887-1922", parent: "mariaJosephaSachsen", class: "kaiser", url: "https://de.wikipedia.org/wiki/Karl_I._(Österreich-Ungarn)"},
+                {id: "zitaBourbonParma", name: "Zita of Bourbon-Parma", text: "1892-1989", spouse: "karlI"},
+                {id: "maximilianEugen", name: "Maximilian Eugen", text: "1895-1952", parent: "mariaJosephaSachsen"},
+                {id: "otto", name: "Otto", text: "1912-2011", parent: "zitaBourbonParma"},
+                {id: "adelheid", name: "Adelheid", text: "1914-1971", parent: "zitaBourbonParma"},
+                {id: "robert", name: "Robert", text: "1915-1996", parent: "zitaBourbonParma"},
+                {id: "felix", name: "Felix", text: "1916-2011", parent: "zitaBourbonParma"},
+                {id: "carlLudwig", name: "Carl Ludwig", text: "1918-2007", parent: "zitaBourbonParma"},
+                {id: "rudolf3", name: "Rudolf", text: "1919-2010", parent: "zitaBourbonParma"},
+                {id: "charlotte", name: "Charlotte", text: "1921-1989", parent: "zitaBourbonParma"},
+                {id: "elisabeth", name: "Elisabeth", text: "1922-1993", parent: "zitaBourbonParma"},
+            ];
+            const links = [
+                {start: ["mariaKarolina", "ferdinandISicily"], end: "mariaTheresaSicily", type: "descent", x: 1, y: 0.25, class: "dashed"},
+                {start: ["mariaKarolina", "ferdinandISicily"], end: "luisaSicily", type: "descent", x: 1, y: 0.25, class: "dashed"},
+                {start: ["mariaKarolina", "ferdinandISicily"], end: "francescoISicily", type: "descent", x: 1, y: 0.25, class: "dashed"},
+            ];
+            Lignage(document.getElementById("lignage"), nodes, {links, exclude: ["albertSachsenTeschen", "ferdinandIParma", "mariaBeatriceEste", "louisXVI", "luisaSicily", "mariaDorotheaWurttemberg", "francescoISicily", "annaPlochl", "elisabethSavoy", "napoleonI", "pedroIBrazil"]});
+        </script>
+    </body>
+</html>

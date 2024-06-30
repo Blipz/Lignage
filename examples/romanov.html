@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>House of Romanov</title>
+        <script src="../lignage.js"></script>
+        <style>
+            #lignage {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="lignage">
+            <style>
+                .czar rect {
+                    fill: green;
+                }
+                .czar text {
+                    fill: white;
+                }
+            </style>
+        </svg>
+        <script>
+            const nodes = [
+                {id: "mikhailI", name: "MIKHAIL I", text: "1596-1645", class: "czar", url: "https://ru.wikipedia.org/wiki/Михаил_Фёдорович"},
+                {id: "mariaDolgorukova", name: "Maria Dolgorukova", text: "1601-1625", spouse: "mikhailI"},
+                {id: "evdokiaStreshnieva", name: "Evdokia Streshnieva", text: "1608-1645", spouse: "mikhailI"},
+                {id: "irina", name: "Irina", text: "1627-1679", parent: "evdokiaStreshnieva"},
+                {id: "alekseiI", name: "ALEKSEI I", text: "1629-1676", parent: "evdokiaStreshnieva", class: "czar", url: "https://ru.wikipedia.org/wiki/Алексей_Михайлович"},
+                {id: "mariaMiloslavskaya", name: "Maria Miloslavskaya", text: "1624-1669", spouse: "alekseiI"},
+                {id: "nataliaNaryshkina", name: "Natalia Naryshkina", text: "1651-1694", spouse: "alekseiI"},
+                {id: "anna1", name: "Anna", text: "1630-1692", parent: "evdokiaStreshnieva"},
+                {id: "ivan", name: "Ivan", text: "1633-1639", parent: "evdokiaStreshnieva"},
+                {id: "sofia1", name: "Sofia", text: "1634-1636", parent: "evdokiaStreshnieva"},
+                {id: "tatiana1", name: "Tatiana", text: "1636-1706", parent: "evdokiaStreshnieva"},
+                {id: "dmitri", name: "Dmitri", text: "1648-1649", parent: "mariaMiloslavskaya"},
+                {id: "ievdokia", name: "Ievdokia", text: "1650-1712", parent: "mariaMiloslavskaya"},
+                {id: "marfa", name: "Marfa", text: "1652-1707", parent: "mariaMiloslavskaya"},
+                {id: "aleksei1", name: "Aleksei", text: "1654-1670", parent: "mariaMiloslavskaya"},
+                {id: "sofia2", name: "Sofia", text: "1657-1704", parent: "mariaMiloslavskaya"},
+                {id: "ekaterina1", name: "Ekaterina", text: "1658-1718", parent: "mariaMiloslavskaya"},
+                {id: "maria1", name: "Maria", text: "1660-1723", parent: "mariaMiloslavskaya"},
+                {id: "fyodorIII", name: "FYODOR III", text: "1661-1682", parent: "mariaMiloslavskaya", class: "czar", url: "https://ru.wikipedia.org/wiki/Фёдор_III_Алексеевич"},
+                {id: "agafiaGrushetskaya", name: "Agafia Grushetskaya", text: "1663-1681", spouse: "fyodorIII"},
+                {id: "marfaApraksina", name: "Marfa Apraksina", text: "1664-1716", spouse: "fyodorIII"},
+                {id: "feodosia", name: "Feodosia", text: "1662-1713", parent: "mariaMiloslavskaya"},
+                {id: "simeon", name: "Simeon", text: "1665-1669", parent: "mariaMiloslavskaya"},
+                {id: "ivanV", name: "IVAN V", text: "1666-1696", parent: "mariaMiloslavskaya", class: "czar", url: "https://ru.wikipedia.org/wiki/Иван_V"},
+                {id: "praskoviaSaltykova", name: "Praskovia Saltykova", text: "1664-1723", spouse: "ivanV"},
+                {id: "pyotrI", name: "PYOTR I", text: "1672-1725", parent: "nataliaNaryshkina", class: "czar", url: "https://ru.wikipedia.org/wiki/Пётр_I"},
+                {id: "evdokiaLopukhina", name: "Evdokia Lopukhina", text: "1669-1731", spouse: "pyotrI"},
+                {id: "ekaterinaI", name: "EKATERINA I", text: "1684-1727", spouse: "pyotrI", class: "czar", url: "https://ru.wikipedia.org/wiki/Екатерина_I"},
+                {id: "natalia1", name: "Natalia", text: "1673-1716", parent: "nataliaNaryshkina"},
+                {id: "ekaterina2", name: "Ekaterina", text: "1691-1733", parent: "praskoviaSaltykova"},
+                {id: "karlLeopoldMecklenburgSchwerin", name: "Karl Leopold v. Meckl.-S.", text: "1678-1747", spouse: "ekaterina2"},
+                {id: "annaI", name: "ANNA I", text: "1693-1740", parent: "praskoviaSaltykova", class: "czar", url: "https://ru.wikipedia.org/wiki/Анна_Иоанновна"},
+                {id: "praskovia", name: "Praskovia", text: "1694-1731", parent: "praskoviaSaltykova"},
+                {id: "aleksei2", name: "Aleksei", text: "1690-1718", parent: "evdokiaLopukhina"},
+                {id: "charlotteChristineBraunschweigWolfenbuttel", name: "Charlotte v. Braunschweig", text: "1694-1715", spouse: "aleksei2"},
+                {id: "anna2", name: "Anna", text: "1708-1728", parent: "ekaterinaI"},
+                {id: "elizavetaI", name: "ELIZAVETA I", text: "1709-1762", parent: "ekaterinaI", class: "czar", url: "https://ru.wikipedia.org/wiki/Елизавета_Петровна"},
+                {id: "pyotr1", name: "Pyotr", text: "1715-1719", parent: "ekaterinaI"},
+                {id: "natalia2", name: "Natalia", text: "1718-1725", parent: "ekaterinaI"},
+                {id: "anna3", name: "Anna", text: "1718-1746", parent: "karlLeopoldMecklenburgSchwerin"},
+                {id: "antonUlrichBraunschweigLuneburg", name: "Anton Ulrich v. Braunschweig", text: "1714-1774", spouse: "anna3"},
+                {id: "natalia3", name: "Natalia", text: "1714-1728", parent: "charlotteChristineBraunschweigWolfenbuttel"},
+                {id: "pyotrII", name: "PYOTR II", text: "1715-1730", parent: "charlotteChristineBraunschweigWolfenbuttel", class: "czar", url: "https://ru.wikipedia.org/wiki/Пётр_II"},
+                {id: "karlFriedrichHolsteinGottorp", name: "Karl Friedrich v. Holstein-G.", text: "1700-1739", spouse: "anna2"},
+                {id: "pyotrIII", name: "PYOTR III", text: "1728-1762", parent: "karlFriedrichHolsteinGottorp", class: "czar", url: "https://ru.wikipedia.org/wiki/Пётр_III"},
+                {id: "ekaterinaII", name: "EKATERINA II", text: "1729-1796", spouse: "pyotrIII", class: "czar", url: "https://ru.wikipedia.org/wiki/Екатерина_II"},
+                {id: "ivanVI", name: "IVAN VI", text: "1740-1764", parent: "antonUlrichBraunschweigLuneburg", class: "czar", url: "https://ru.wikipedia.org/wiki/Иван_VI"},
+                {id: "ekaterina3", name: "Ekaterina", text: "1741-1807", parent: "antonUlrichBraunschweigLuneburg"},
+                {id: "elizaveta", name: "Elizaveta", text: "1743-1782", parent: "antonUlrichBraunschweigLuneburg"},
+                {id: "pyotr2", name: "Pyotr", text: "1745-1798", parent: "antonUlrichBraunschweigLuneburg"},
+                {id: "aleksei3", name: "Aleksei", text: "1746-1787", parent: "antonUlrichBraunschweigLuneburg"},
+                {id: "pavelI", name: "PAVEL I", text: "1754-1801", parent: "ekaterinaII", class: "czar", url: "https://ru.wikipedia.org/wiki/Павел_I"},
+                {id: "wilhelmineLuiseHessenDarmstadt", name: "Wilhelmine v. Hessen-D.", text: "1755-1776", spouse: "pavelI"},
+                {id: "sophieDorotheeWurttemberg", name: "Sophie D. v. Württemberg", text: "1759-1828", spouse: "pavelI"},
+                {id: "aleksandrI", name: "ALEKSANDR I", text: "1777-1825", parent: "sophieDorotheeWurttemberg", class: "czar", url: "https://ru.wikipedia.org/wiki/Александр_I"},
+                {id: "luiseBaden", name: "Luise von Baden", text: "1779-1826", spouse: "aleksandrI"},
+                {id: "konstantin1", name: "Konstantin", text: "1779-1831", parent: "sophieDorotheeWurttemberg"},
+                {id: "aleksandra1", name: "Aleksandra", text: "1783-1801", parent: "sophieDorotheeWurttemberg"},
+                {id: "elena", name: "Elena", text: "1784-1803", parent: "sophieDorotheeWurttemberg"},
+                {id: "maria2", name: "Maria", text: "1786-1859", parent: "sophieDorotheeWurttemberg"},
+                {id: "ekaterina4", name: "Ekaterina", text: "1788-1819", parent: "sophieDorotheeWurttemberg"},
+                {id: "olga1", name: "Olga", text: "1792-1795", parent: "sophieDorotheeWurttemberg"},
+                {id: "anna4", name: "Anna", text: "1795-1865", parent: "sophieDorotheeWurttemberg"},
+                {id: "nikolaiI", name: "NIKOLAI I", text: "1796-1855", parent: "sophieDorotheeWurttemberg", class: "czar", url: "https://ru.wikipedia.org/wiki/Николай_I"},
+                {id: "charlotteHohenzollern", name: "Charlotte v. Hohenzollern", text: "1798-1860", spouse: "nikolaiI"},
+                {id: "mikhail1", name: "Mikhail", text: "1798-1849", parent: "sophieDorotheeWurttemberg"},
+                {id: "aleksandrII", name: "ALEKSANDR II", text: "1818-1881", parent: "charlotteHohenzollern", class: "czar", url: "https://ru.wikipedia.org/wiki/Александр_II"},
+                {id: "marieHessenDarmstadt", name: "Marie v. Hessen-D.", text: "1824-1880", spouse: "aleksandrII"},
+                {id: "ekaterinaDolgorukova", name: "Ekaterina Dolgorukova", text: "1847-1922", spouse: "aleksandrII"},
+                {id: "maria3", name: "Maria", text: "1819-1876", parent: "charlotteHohenzollern"},
+                {id: "olga2", name: "Olga", text: "1822-1892", parent: "charlotteHohenzollern"},
+                {id: "aleksandra2", name: "Aleksandra", text: "1825-1844", parent: "charlotteHohenzollern"},
+                {id: "konstantin2", name: "Konstantin", text: "1827-1892", parent: "charlotteHohenzollern"},
+                {id: "nikolai1", name: "Nikolai", text: "1831-1891", parent: "charlotteHohenzollern"},
+                {id: "mikhail2", name: "Mikhail", text: "1832-1909", parent: "charlotteHohenzollern"},
+                {id: "aleksandra3", name: "Aleksandra", text: "1842-1849", parent: "marieHessenDarmstadt"},
+                {id: "nikolai2", name: "Nikolai", text: "1843-1865", parent: "marieHessenDarmstadt"},
+                {id: "aleksandrIII", name: "ALEKSANDR III", text: "1845-1894", parent: "marieHessenDarmstadt", class: "czar", url: "https://ru.wikipedia.org/wiki/Александр_III"},
+                {id: "dagmarDanmark", name: "Dagmar af Danmark", text: "1847-1928", spouse: "aleksandrIII"},
+                {id: "vladimir", name: "Vladimir", text: "1847-1909", parent: "marieHessenDarmstadt"},
+                {id: "aleksei4", name: "Aleksei", text: "1850-1908", parent: "marieHessenDarmstadt"},
+                {id: "maria4", name: "Maria", text: "1853-1920", parent: "marieHessenDarmstadt"},
+                {id: "sergei", name: "Sergei", text: "1857-1905", parent: "marieHessenDarmstadt"},
+                {id: "pavel", name: "Pavel", text: "1860-1919", parent: "marieHessenDarmstadt"},
+                {id: "georgii1", name: "Georgii", text: "1872-1913", parent: "ekaterinaDolgorukova"},
+                {id: "olga3", name: "Olga", text: "1873-1925", parent: "ekaterinaDolgorukova"},
+                {id: "ekaterina5", name: "Ekaterina", text: "1878-1959", parent: "ekaterinaDolgorukova"},
+                {id: "nikolaiII", name: "NIKOLAI II", text: "1868-1918", parent: "dagmarDanmark", class: "czar", url: "https://ru.wikipedia.org/wiki/Николай_II"},
+                {id: "alixHessenDarmstadt", name: "Alix v. Hessen-D.", text: "1872-1918", spouse: "nikolaiII"},
+                {id: "aleksandr", name: "Aleksandr", text: "1869-1870", parent: "dagmarDanmark"},
+                {id: "georgii2", name: "Georgii", text: "1871-1899", parent: "dagmarDanmark"},
+                {id: "ksenia", name: "Ksenia", text: "1875-1960", parent: "dagmarDanmark"},
+                {id: "mikhail3", name: "Mikhail", text: "1878-1918", parent: "dagmarDanmark"},
+                {id: "olga5", name: "Olga", text: "1882-1960", parent: "dagmarDanmark"},
+                {id: "olga6", name: "Olga", text: "1895-1918", parent: "alixHessenDarmstadt"},
+                {id: "tatiana2", name: "Tatiana", text: "1897-1918", parent: "alixHessenDarmstadt"},
+                {id: "maria5", name: "Maria", text: "1899-1918", parent: "alixHessenDarmstadt"},
+                {id: "anastasia", name: "Anastasia", text: "1901-1918", parent: "alixHessenDarmstadt"},
+                {id: "aleksei5", name: "Aleksei", text: "1904-1918", parent: "alixHessenDarmstadt"},
+            ];
+            Lignage(document.getElementById("lignage"), nodes, {exclude: ["dmitri", "ievdokia", "marfa", "aleksei1", "ekaterina1", "maria1", "feodosia", "simeon"]});
+        </script>
+    </body>
+</html>

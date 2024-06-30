@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>House of Plantagenêt</title>
+        <script src="../lignage.js"></script>
+        <style>
+            #lignage {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="lignage">
+            <style>
+                .royal rect {
+                    fill: red;
+                }
+                .royal text {
+                    fill: white;
+                }
+                .cadetBranch rect {
+                    fill: lightsalmon;
+                }
+                .cadetBranch text {
+                    fill: white;
+                    font-weight: bold;
+                    font-size: 16px;
+                }
+                .dashed {
+                    stroke-dasharray: 10 5;
+                }
+            </style>
+        </svg>
+        <script>
+            const nodes = [
+                {id: "matilda1", name: "Matilda", text: "1102-1167"},
+                {id: "geoffreyV", name: "Geoffrey V of Anjou", text: "1113-1151", spouse: "matilda1"},
+                {id: "henryTheLion", name: "Henry the Lion", text: "1129-1195", spouse: "matilda1"},
+                {id: "henryII", name: "HENRY II", text: "1133-1189", parent: "geoffreyV", class: "royal", url: "https://en.wikipedia.org/wiki/Henry_II_of_England"},
+                {id: "eleanorAquitaine", name: "Eleanor of Aquitaine", text: "1122-1204", spouse: "henryII"},
+                {id: "geoffreyVI", name: "Geoffrey VI", text: "1134-1158", parent: "geoffreyV"},
+                {id: "williamFitzEmpress", name: "William", text: "1136-1164", parent: "geoffreyV"},
+                {id: "houseWelf", name: "HOUSE OF", text: "WELF", parent: "henryTheLion", class: "cadetBranch"},
+                {id: "williamIX", name: "William IX", text: "1153-1156", parent: "eleanorAquitaine"},
+                {id: "henryTheYoungKing", name: "Henry", text: "1155-1183", parent: "eleanorAquitaine"},
+                {id: "margaretFrance1", name: "Margaret of France", text: "1157-1197", spouse: "henryTheYoungKing"},
+                {id: "richardI", name: "RICHARD I", text: "1157-1199", parent: "eleanorAquitaine", class: "royal", url: "https://en.wikipedia.org/wiki/Richard_I_of_England"},
+                {id: "berengariaNavarre", name: "Berengaria of Navarre", text: "1165-1230", spouse: "richardI"},
+                {id: "johnI", name: "JOHN I", text: "1166-1216", parent: "eleanorAquitaine", class: "royal", url: "https://en.wikipedia.org/wiki/John,_King_of_England"},
+                {id: "isabellaAngouleme", name: "Isabella of Angoulême", text: "1188-1246", spouse: "johnI"},
+                {id: "isabelGloucester", name: "Isabel of Gloucester", text: "1173-1217", spouse: "johnI"},
+                {id: "geoffreyII", name: "Geoffrey II", text: "1158-1186", parent: "eleanorAquitaine"},
+                {id: "constanceBritanny", name: "Constance of Britanny", text: "1161-1201", spouse: "geoffreyII"},
+                {id: "eleanor1", name: "Eleanor", text: "1162-1214", parent: "eleanorAquitaine"},
+                {id: "alfonsoVIIICastile", name: "Alfonso VIII of Castile", text: "1155-1214", spouse: "eleanor1"},
+                {id: "joan1", name: "Joan", text: "1165-1199", parent: "eleanorAquitaine"},
+                {id: "williamIISicily", name: "William II of Sicily", text: "1155-1189", spouse: "joan1"},
+                {id: "raymondVIToulouse", name: "Raymond VI of Toulouse", text: "1156-1222", spouse: "joan1"},
+                {id: "henryIII", name: "HENRY III", text: "1207-1272", parent: "isabellaAngouleme", class: "royal", url: "https://en.wikipedia.org/wiki/Henry_III_of_England"},
+                {id: "eleanorProvence", name: "Eleanor of Provence", text: "1223-1291", spouse: "henryIII"},
+                {id: "richard1", name: "Richard", text: "1209-1272", parent: "isabellaAngouleme"},
+                {id: "isabelMarshal", name: "Isabel Marshal", text: "1200-1240", spouse: "richard1"},
+                {id: "sanchiaProvence", name: "Sanchia of Provence", text: "1228-1261", spouse: "richard1"},
+                {id: "joan2", name: "Joan", text: "1210-1238", parent: "isabellaAngouleme"},
+                {id: "alexanderIIScotland", name: "Alexander II of Scotland", text: "1198-1249", spouse: "joan2"},
+                {id: "isabella1", name: "Isabella", text: "1214-1241", parent: "isabellaAngouleme"},
+                {id: "frederickIIHRE", name: "Frederick II of the HRE", text: "1194-1250", spouse: "isabella1"},
+                {id: "eleanor3", name: "Eleanor", text: "1215-1275", parent: "isabellaAngouleme"},
+                {id: "simonMontfort", name: "Simon de Montfort", text: "1208-1265", spouse: "eleanor3"},
+                {id: "williamMarshal", name: "William Marshal", text: "1190-1231", spouse: "eleanor3"},
+                {id: "eleanor2", name: "Eleanor", text: "1184-1241", parent: "constanceBritanny"},
+                {id: "matilda2", name: "Matilda", text: "1185-1189", parent: "constanceBritanny"},
+                {id: "arthurI", name: "Arthur I", text: "1187-1203", parent: "constanceBritanny"},
+                {id: "houseBurgundy", name: "HOUSE OF", text: "BURGUNDY", parent: "alfonsoVIIICastile", class: "cadetBranch"},
+                {id: "bohemond", name: "Bohemond", parent: "williamIISicily"},
+                {id: "countsRouergue", name: "COUNTS OF", text: "ROUERGUE", parent: "raymondVIToulouse", class: "cadetBranch"},
+                {id: "edwardI", name: "EDWARD I", text: "1239-1307", parent: "eleanorProvence", class: "royal", url: "https://en.wikipedia.org/wiki/Edward_I_of_England"},
+                {id: "eleanorCastile", name: "Eleanor of Castile", text: "1241-1290", spouse: "edwardI"},
+                {id: "margaretFrance2", name: "Margaret of France", text: "1279-1318", spouse: "edwardI"},
+                {id: "katherine1", name: "Katherine", text: "1253-1257", parent: "eleanorProvence"},
+                {id: "edmundCrouchback", name: "Edmund", text: "1245-1296", parent: "eleanorProvence"},
+                {id: "avelineForz", name: "Aveline de Forz", text: "1259-1274", spouse: "edmundCrouchback"},
+                {id: "blancheArtois", name: "Blanche of Artois", text: "1248-1302", spouse: "edmundCrouchback"},
+                {id: "beatrice", name: "Beatrice", text: "1242-1275", parent: "eleanorProvence"},
+                {id: "johnIIBritanny", name: "John II of Britanny", text: "1239-1305", spouse: "beatrice"},
+                {id: "margaret1", name: "Margaret", text: "1240-1275", parent: "eleanorProvence"},
+                {id: "alexanderIIIScotland", name: "Alexander III of Scotland", text: "1241-1286", spouse: "margaret1"},
+                {id: "henry1", name: "Henry", text: "1235-1271", parent: "isabelMarshal"},
+                {id: "edmund1", name: "Edmund", text: "1249-1300", parent: "sanchiaProvence"},
+                {id: "houseHohenstaufen", name: "HOUSE OF", text: "HOHENSTAUFEN", parent: "frederickIIHRE", class: "cadetBranch"},
+                {id: "henry2", name: "Henry", text: "1238-1265", parent: "simonMontfort"},
+                {id: "simonVI", name: "Simon VI", text: "1240-1271", parent: "simonMontfort"},
+                {id: "amaury", name: "Amaury", text: "1242-1301", parent: "simonMontfort"},
+                {id: "richard2", name: "Richard", text: "1252-1266", parent: "simonMontfort"},
+                {id: "joanna", name: "Joanna", text: "1248-1251", parent: "simonMontfort"},
+                {id: "guy", name: "Guy", text: "1244-1288", parent: "simonMontfort"},
+                {id: "margheritaAldobrandesca", name: "Margherita Aldobrandesca", spouse: "guy"},
+                {id: "eleanor4", name: "Eleanor", text: "1252-1282", parent: "simonMontfort"},
+                {id: "llywelynIIWales", name: "Llywelyn II of Wales", text: "1223-1282", spouse: "eleanor4"},
+                {id: "katherine2", name: "Katherine", text: "1261-1264", parent: "eleanorCastile"},
+                {id: "joan3", name: "Joan", text: "1265", parent: "eleanorCastile"},
+                {id: "john1", name: "John", text: "1266-1271", parent: "eleanorCastile"},
+                {id: "henry3", name: "Henry", text: "1267-1274", parent: "eleanorCastile"},
+                {id: "eleanor5", name: "Eleanor", text: "1269-1298", parent: "eleanorCastile"},
+                {id: "henryIIIBar", name: "Henry III of Bar", text: "1259-1302", spouse: "eleanor5"},
+                {id: "joan4", name: "Joan", text: "1272-1307", parent: "eleanorCastile"},
+                {id: "gilbertClare", name: "Gilbert de Clare", text: "1243-1295", spouse: "joan4"},
+                {id: "ralphMonthermer", name: "Ralph de Monthermer", text: "1270-1325", spouse: "joan4"},
+                {id: "alphonso", name: "Alphonso", text: "1273-1284", parent: "eleanorCastile"},
+                {id: "margaret2", name: "Margaret", text: "1275-1333", parent: "eleanorCastile"},
+                {id: "johnIIBrabant", name: "John II of Brabant", text: "1275-1312", spouse: "margaret2"},
+                {id: "berengaria", name: "Berengaria", text: "1276-1278", parent: "eleanorCastile"},
+                {id: "mary1", name: "Mary", text: "1279-1332", parent: "eleanorCastile"},
+                {id: "elizabeth", name: "Elizabeth", text: "1282-1316", parent: "eleanorCastile"},
+                {id: "johnIHolland", name: "John I of Holland", text: "1284-1299", spouse: "elizabeth"},
+                {id: "humphreyBohun", name: "Humphrey de Bohun", text: "1276-1322", spouse: "elizabeth"},
+                {id: "edwardII", name: "EDWARD II", text: "1284-1327", parent: "eleanorCastile", class: "royal", url: "https://en.wikipedia.org/wiki/Edward_II_of_England"},
+                {id: "isabellaFrance", name: "Isabella of France", text: "1295-1358", spouse: "edwardII"},
+                {id: "thomas1", name: "Thomas", text: "1300-1338", parent: "margaretFrance2"},
+                {id: "aliceHayles", name: "Alice Hayles", spouse: "thomas1"},
+                {id: "maryBraose", name: "Mary Braose", spouse: "thomas1"},
+                {id: "edmund2", name: "Edmund", text: "1301-1330", parent: "margaretFrance2"},
+                {id: "margaretWake", name: "Margaret Wake", text: "1297-1349", spouse: "edmund2"},
+                {id: "eleanor6", name: "Eleanor", text: "1306-1310", parent: "margaretFrance2"},
+                {id: "houseDreux", name: "HOUSE OF", text: "DREUX", parent: "johnIIBritanny", class: "cadetBranch"},
+                {id: "houseDunkeld", name: "HOUSE OF", text: "DUNKELD", parent: "alexanderIIIScotland", class: "cadetBranch"},
+                {id: "edwardIII", name: "EDWARD III", text: "1312-1377", parent: "isabellaFrance", class: "royal", url: "https://en.wikipedia.org/wiki/Edward_III_of_England"},
+                {id: "philippaHainault", name: "Philippa of Hainault", text: "1314-1369", spouse: "edwardIII"},
+                {id: "john2", name: "John", text: "1316-1336", parent: "isabellaFrance"},
+                {id: "eleanor7", name: "Eleanor", text: "1318-1355", parent: "isabellaFrance"},
+                {id: "reginaldIIGuelders", name: "Reginald II of Guelders", text: "1295-1343", spouse: "eleanor7"},
+                {id: "joan5", name: "Joan", text: "1321-1362", parent: "isabellaFrance"},
+                {id: "davidIIScotland", name: "David II of Scotland", text: "1324-1371", spouse: "joan5"},
+                {id: "edwardBlackPrince", name: "Edward", text: "1330-1376", parent: "philippaHainault"},
+                {id: "joanKent", name: "Joan of Kent", text: "1328-1385", spouse: "edwardBlackPrince"},
+                {id: "isabella2", name: "Isabella", text: "1332-1382", parent: "philippaHainault"},
+                {id: "enguerrandVIICoucy", name: "Enguerrand VII de Coucy", text: "1340-1397", spouse: "isabella2"},
+                {id: "joan6", name: "Joan", text: "1335-1348", parent: "philippaHainault"},
+                {id: "william1", name: "William", text: "1337", parent: "philippaHainault"},
+                {id: "lionel", name: "Lionel", text: "1338-1368", parent: "philippaHainault"},
+                {id: "elizabethBurgh", name: "Elizabeth de Burgh", text: "1332-1363", spouse: "lionel"},
+                {id: "jolanthaVisconti", name: "Jolantha Visconti", text: "1354-1386", spouse: "lionel"},
+                {id: "john3", name: "John", text: "1340-1399", parent: "philippaHainault"},
+                {id: "blancheLancaster", name: "Blanche of Lancaster", text: "1347-1368", spouse: "john3"},
+                {id: "constanceCastile", name: "Constance of Castile", text: "1354-1394", spouse: "john3"},
+                {id: "edmund3", name: "Edmund", text: "1341-1402", parent: "philippaHainault"},
+                {id: "isabellaCastile", name: "Isabella of Castile", text: "1355-1392", spouse: "edmund3"},
+                {id: "mary2", name: "Mary", text: "1344-1362", parent: "philippaHainault"},
+                {id: "johnIVBritanny", name: "John IV of Britanny", text: "1339-1399", spouse: "mary2"},
+                {id: "margaret3", name: "Margaret", text: "1346-1361", parent: "philippaHainault"},
+                {id: "johnHastings", name: "John Hastings", text: "1347-1375", spouse: "margaret3"},
+                {id: "william2", name: "William", text: "1348", parent: "philippaHainault"},
+                {id: "thomas2", name: "Thomas", text: "1355-1397", parent: "philippaHainault"},
+                {id: "eleanorBohun", name: "Eleanor de Bohun", text: "1366-1399", spouse: "thomas2"},
+                {id: "edward1", name: "Edward", text: "1365-1370", parent: "joanKent"},
+                {id: "richardII", name: "RICHARD II", text: "1367-1400", parent: "joanKent", class: "royal", url: "https://en.wikipedia.org/wiki/Richard_II_of_England"},
+                {id: "anneBohemia", name: "Anne of Bohemia", text: "1366-1394", spouse: "richardII"},
+                {id: "isabellaValois", name: "Isabella of Valois", text: "1389-1409", spouse: "richardII"},
+                {id: "philippa", name: "Philippa", text: "1355-1382", parent: "elizabethBurgh"},
+                {id: "edmundMortimer", name: "Edmund Mortimer", text: "1352-1381", spouse: "philippa"},
+                {id: "houseLancaster", name: "HOUSE OF", text: "LANCASTER", parent: "blancheLancaster", class: "cadetBranch"},
+                {id: "john4", name: "John", text: "1374-1375", parent: "constanceCastile"},
+                {id: "catherine", name: "Catherine", text: "1373-1418", parent: "constanceCastile"},
+                {id: "henryIIICastile", name: "Henry III of Castile", text: "1379-1406", spouse: "catherine"},
+                {id: "edward2", name: "Edward", text: "1373-1415", parent: "isabellaCastile"},
+                {id: "richard3", name: "Richard", text: "1375-1415", parent: "isabellaCastile"},
+                {id: "roger", name: "Roger", text: "1374-1398", parent: "edmundMortimer"},
+                {id: "alianoreHolland", name: "Alianore Holland", text: "1373-1405", spouse: "roger"},
+                {id: "houseTrastamara", name: "HOUSE OF", text: "TRASTAMÁRA", parent: "henryIIICastile", class: "cadetBranch"},
+                {id: "anne", name: "Anne", text: "1390-1411", parent: "alianoreHolland"},
+                {id: "houseYork", name: "HOUSE OF", text: "YORK", parent: "anne", class: "cadetBranch"},
+            ];
+            const links = [
+                {start: ["joan2", "alexanderIIScotland"], end: "alexanderIIIScotland", type: "descent", x: 1, y: 0.25},
+                {start: ["edmund2", "margaretWake"], end: "joanKent", type: "descent", x: 1, y: 0.25, class: "dashed"},
+                {start: "richard3", end: "anne", x: 0},
+            ];
+            Lignage(document.getElementById("lignage"), nodes, {links, exclude: ["constanceBritanny", "williamIISicily", "isabelMarshal", "sanchiaProvence", "simonMontfort", "williamMarshal", "katherine2", "joan3", "john1", "henry3", "henryIIIBar", "gilbertClare", "ralphMonthermer", "johnIIBrabant", "berengaria", "johnIHolland", "humphreyBohun", "aliceHayles", "maryBraose", "eleanor6", "reginaldIIGuelders", "davidIIScotland", "enguerrandVIICoucy", "william1", "johnIVBritanny", "johnHastings", "william2", "eleanorBohun"]});
+        </script>
+    </body>
+</html>

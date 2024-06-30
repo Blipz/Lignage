@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Constantinian dynasty</title>
+        <script src="../lignage.js"></script>
+        <style>
+            #lignage {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="lignage">
+            <style>
+                .augustus rect {
+                    fill: purple;
+                }
+                .caesar rect {
+                    fill: violet;
+                }
+                .augustus text, .caesar text {
+                    fill: white;
+                }
+                .dashed {
+                    stroke-dasharray: 10 5;
+                }
+            </style>
+        </svg>
+        <script>
+            const nodes = [
+                {id: "constantiusI", name: "CONSTANTIUS I CHLORUS", text: "305-306", class: "augustus", url: "https://la.wikipedia.org/wiki/Constantius_Chlorus"},
+                {id: "helena1", name: "Helena", text: "† 329", spouse: "constantiusI", url: "https://la.wikipedia.org/wiki/Helena_(sancta)"},
+                {id: "theodora", name: "Theodora", text: "† ca 330", spouse: "constantiusI", url: "https://la.wikipedia.org/wiki/Flavia_Maximiana_Theodora"},
+                {id: "constantinusI", name: "CONSTANTINUS I", text: "306-337", parent: "helena1", class: "augustus", url: "https://la.wikipedia.org/wiki/Constantinus_I"},
+                {id: "minervina", name: "Minervina", spouse: "constantinusI", url: "https://la.wikipedia.org/wiki/Minervina"},
+                {id: "fausta", name: "Fausta", text: "† 326", spouse: "constantinusI", url: "https://la.wikipedia.org/wiki/Fausta_(filia_Maximiani)"},
+                {id: "constantia1", name: "Constantia", text: "† 330", parent: "theodora", url: "https://la.wikipedia.org/wiki/Flavia_Iulia_Constantia"},
+                {id: "licinius", name: "LICINIUS", text: "308-324", spouse: "constantia1", class: "augustus", url: "https://la.wikipedia.org/wiki/Licinius_(imperator)"},
+                {id: "flaviusDalmatius1", name: "Flavius Dalmatius", text: "† 337", parent: "theodora", url: "https://la.wikipedia.org/wiki/Flavius_Iulius_Dalmatius"},
+                {id: "hannibalianus1", name: "Hannibalianus", text: "† 337", parent: "theodora"},
+                {id: "juliusConstantius", name: "Julius Constantius", text: "† 337", parent: "theodora", url: "https://la.wikipedia.org/wiki/Flavius_Iulius_Constantius"},
+                {id: "eutropia", name: "Eutropia", text: "† 350", parent: "theodora", url: "https://la.wikipedia.org/wiki/Eutropia_(filia_Constantii_I)"},
+                {id: "viriusNepotianus", name: "Virius Nepotianus", spouse: "eutropia", url: "https://la.wikipedia.org/wiki/Virius_Nepotianus_(consul_336)"},
+                {id: "galla", name: "Galla", spouse: "juliusConstantius", url: "https://la.wikipedia.org/wiki/Galla_(uxor_Flavii_Constantii)"},
+                {id: "basilina", name: "Basilina", text: "† ca 331", spouse: "juliusConstantius", url: "https://la.wikipedia.org/wiki/Basilina"},
+                {id: "anastasia", name: "Anastasia", parent: "theodora", url: "https://la.wikipedia.org/wiki/Anastasia_(filia_Constantii_I)"},
+                {id: "bassianus", name: "Bassianus", text: "† 316", spouse: "anastasia", class: "caesar"},
+                {id: "crispus", name: "Crispus", text: "† 326", parent: "minervina", class: "caesar", url: "https://la.wikipedia.org/wiki/Flavius_Iulius_Crispus"},
+                {id: "constantinusII", name: "CONSTANTINUS II", text: "337-340", parent: "fausta", class: "augustus", url: "https://la.wikipedia.org/wiki/Constantinus_II"},
+                {id: "constantiusII", name: "CONSTANTIUS II", text: "337-361", parent: "fausta", class: "augustus", url: "https://la.wikipedia.org/wiki/Constantius_II"},
+                {id: "eusebia", name: "Eusebia", text: "† 360", spouse: "constantiusII", url: "https://la.wikipedia.org/wiki/Eusebia_(imperatrix)"},
+                {id: "faustina", name: "Faustina", spouse: "constantiusII", url: "https://la.wikipedia.org/wiki/Faustina_(imperatrix)"},
+                {id: "constansI", name: "CONSTANS I", text: "337-350", parent: "fausta", class: "augustus", url: "https://la.wikipedia.org/wiki/Constans"},
+                {id: "constantina", name: "Constantina", text: "† 354", parent: "fausta", url: "https://la.wikipedia.org/wiki/Constantina_(imperatrix)"},
+                {id: "helena2", name: "Helena", text: "† ca 360", parent: "fausta", url: "https://la.wikipedia.org/wiki/Helena_(filia_Constantini_I)"},
+                {id: "licinianus", name: "Licinianus", text: "† 326", parent: "licinius", class: "caesar", url: "https://la.wikipedia.org/wiki/Valerius_Licinianus_Licinius"},
+                {id: "nepotianus", name: "Nepotianus", text: "† 350", parent: "viriusNepotianus", url: "https://la.wikipedia.org/wiki/Flavius_Popilius_Virius_Nepotianus"},
+                {id: "hannibalianus2", name: "Hannibalianus", text: "† 337", parent: "flaviusDalmatius1", url: "https://la.wikipedia.org/wiki/Hannibalianus"},
+                {id: "flaviusDalmatius2", name: "Flavius Dalmatius", text: "† 337", parent: "flaviusDalmatius1", class: "caesar", url: "https://la.wikipedia.org/wiki/Dalmatius"},
+                {id: "unknownSon1", text: "† 337", parent: "galla"},
+                {id: "constantia2", name: "Constantia", text: "† ca 350", parent: "galla"},
+                {id: "constantiusGallus", name: "Constantius Gallus", text: "† 354", parent: "galla", class: "caesar", url: "https://la.wikipedia.org/wiki/Constantius_Gallus"},
+                {id: "julianus", name: "JULIANUS", text: "361-363", parent: "basilina", class: "augustus", url: "https://la.wikipedia.org/wiki/Flavius_Claudius_Iulianus"},
+                {id: "constantia3", name: "Constantia", text: "† 383", parent: "faustina", url: "https://la.wikipedia.org/wiki/Constantia_(imperatrix)"},
+                {id: "gratianus", name: "GRATIANUS", text: "367-383", spouse: "constantia3", class: "augustus", url: "https://la.wikipedia.org/wiki/Gratianus"},
+                {id: "unknownSon2", text: "† 357", parent: "julianus"},
+            ];
+            const links = [
+                {start: "constantiusII", end: "constantia2", y: 0.6, class: "dashed"},
+                {start: "constantina", end: "hannibalianus2", y: 0.4, class: "dashed"},
+                {start: "constantina", end: "constantiusGallus", y: 0.4, class: "dashed"},
+                {start: "helena2", end: "julianus", y: 0.2},
+            ];
+            Lignage(document.getElementById("lignage"), nodes, {links, cousinMargin: 30});
+        </script>
+    </body>
+</html>
