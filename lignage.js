@@ -10,30 +10,29 @@ function Lignage(svg, nodes, options = {}) {
 			return ret;
 		}
 
-		static remove(id, force = false) {
-			let node = Node.get(id);
-			if (node.isRoot && !force) {
-				throw Error(`Cannot remove root node '${id}'`);
+		remove(force = false) {
+			if (this.isRoot && !force) {
+				throw Error(`Cannot remove root node '${this.id}'`);
 			}
-			for (let parentNode of node.parents) {
-				parentNode.children = parentNode.children.filter(x => x != node);
-				if (parentNode.isKin() && parentNode.children.length == 0) {
-					parentNode.spouses = parentNode.spouses.filter(x => x != parentNode);
+			for (let parent of this.parents) {
+				parent.children = parent.children.filter(x => x != this);
+				if (parent.isKin() && parent.children.length == 0) {
+					parent.spouses = parent.spouses.filter(x => x != parent);
 				}
 			}
-			for (let spouse of node.spouses) {
-				if (!node.isKin()) {
-					spouse.spouses = spouse.spouses.filter(x => x != node);
+			for (let spouse of this.spouses) {
+				if (!this.isKin()) {
+					spouse.spouses = spouse.spouses.filter(x => x != this);
 				}
-				else if (spouse != node) {
-					Node.remove(spouse.id);
+				else if (spouse != this) {
+					spouse.remove();
 				}
 			}
-			for (let child of node.children) {
-				Node.remove(child.id);
+			for (let child of this.children) {
+				child.remove();
 			}
-			options.links = options.links.filter(x => x.start != id && x.end != id);
-			delete Node.TREE[id];
+			options.links = options.links.filter(x => x.start != this.id && x.end != this.id);
+			delete Node.TREE[this.id];
 		}
 
 		constructor(obj) {
@@ -103,10 +102,8 @@ function Lignage(svg, nodes, options = {}) {
 			 * for a kin node only represents out-of-marriage children */
 			if (this.isKin()) {
 				let children = [];
-				if (this.isMarried())
-					children = children.concat(this.spouses[0].children);
-				if (this.isRemarried())
-					children = children.concat(this.spouses[1].children);
+				for (let spouse of this.spouses)
+					children = children.concat(spouse.children);
 				return children;
 			}
 			else return this.children;
@@ -181,12 +178,13 @@ function Lignage(svg, nodes, options = {}) {
 		}
 	}
 
-	function makeElement(name, attr = {}) {
+	function makeElement(name, attr = {}, ...children) {
 		const ns = "http://www.w3.org/2000/svg";
 		const elem = document.createElementNS(ns, name);
 		Object.entries(attr).forEach(function([k, v]) {
 			elem.setAttribute(k, v);
 		});
+		elem.append(...children);
 		return elem;
 	}
 
@@ -206,16 +204,12 @@ function Lignage(svg, nodes, options = {}) {
 		if (options.exclude === undefined) options.exclude = [];
 		if (options.links === undefined) options.links = [];
 
-		const clipText = makeElement("clipPath", {id: "clipText"});
 		const textRect = makeElement("rect", {x: 0, y: 0, width: options.width, height: options.height, rx: 10, ry: 10});
-		clipText.append(textRect);
-		defs.replaceChildren(clipText);
+		defs.replaceChildren(makeElement("clipPath", {id: "clipText"}, textRect));
 
 		if (options.images) {
-			const clipImage = makeElement("clipPath", {id: "clipImage"});
 			const imageRect = makeElement("rect", {x: (options.width - 100) / 2, y: (options.height - 100) / 2, width: 100, height: 100, rx: 10, ry: 10});
-			clipImage.append(imageRect);
-			defs.append(clipImage);
+			defs.append(makeElement("clipPath", {id: "clipImage"}, imageRect));
 		}
 		if (options.editable) {
 			const icons = {
@@ -243,7 +237,7 @@ function Lignage(svg, nodes, options = {}) {
 			}
 			node.parents = [];
 			node.isRoot = true;
-			Node.remove(rootNode.id, true);
+			rootNode.remove(true);
 		}
 		rootNode = node;
 	}
@@ -267,7 +261,7 @@ function Lignage(svg, nodes, options = {}) {
 
 	for (let exclude of options.exclude) {
 		try {
-			Node.remove(exclude);
+			Node.get(exclude).remove();
 		}
 		catch(e) {
 			console.warn(e.message);
@@ -290,7 +284,7 @@ function Lignage(svg, nodes, options = {}) {
 			if (node.class) elem.classList.add(node.class);
 			container.append(elem);
 
-			let rect = makeElement("rect", {
+			elem.append(makeElement("rect", {
 				x: 0,
 				y: 0,
 				rx: 7,
@@ -299,31 +293,23 @@ function Lignage(svg, nodes, options = {}) {
 				width: options.width,
 				fill: "white",
 				stroke: "black"
-			});
-			elem.append(rect);
-			let fontSize = options.fontSize;
-			let text1 = makeElement("text", {
+			}));
+			let text = makeElement("text", {
 				class: "name",
 				x: options.width / 2,
 				y: 20,
 				fill: "black",
 				"clip-path": "url(#clipText)",
-				"font-size": fontSize,
+				"font-size": options.fontSize,
 				"font-weight": "bold",
 				"text-anchor": "middle",
 				cursor: node.url ? "pointer" : "default"
-			});
-			text1.innerHTML = node.name || "";
-			if (node.url) {
-				let a = makeElement("a", {href: node.url, target: "_blank"});
-				a.append(text1);
-				elem.append(a);
+			}, node.name || "");
+			elem.append(node.url ? makeElement("a", {href: node.url, target: "_blank"}, text) : text);
+			for (let size = options.fontSize; text.getBBox().width > options.width && size > 0; size--) {
+				text.setAttribute("font-size", size);
 			}
-			else elem.append(text1);
-			while (text1.getBBox().width > options.width && fontSize > 0) {
-				text1.setAttribute("font-size", fontSize--);
-			}
-			let text2 = makeElement("text", {
+			elem.append(makeElement("text", {
 				class: "text",
 				x: options.width / 2,
 				y: options.height - 10,
@@ -332,11 +318,10 @@ function Lignage(svg, nodes, options = {}) {
 				"font-size": 14,
 				"text-anchor": "middle",
 				cursor: "default"
-			});
-			text2.innerHTML = node.text || "";
-			elem.append(text2);
+			}, node.text || ""));
+
 			if (options.images && node.image) {
-				let image = makeElement("image", {
+				elem.append(makeElement("image", {
 					preserveAspectRatio: "xMidYMid slice",
 					"clip-path": "url(#clipImage)",
 					href: node.image,
@@ -344,8 +329,7 @@ function Lignage(svg, nodes, options = {}) {
 					y: (options.height - 100) / 2,
 					width: 100,
 					height: 100
-				});
-				elem.append(image);
+				}));
 			}
 
 			if (options.editable) {
@@ -431,7 +415,7 @@ function Lignage(svg, nodes, options = {}) {
 						}
 					}
 					else if (!node.isKin() && node.isSecondConsort()) {
-						node.spouses[0].spouses = [node, node.spouses[0].spouses[0]];
+						node.spouses[0].spouses.reverse();
 						redrawTree();
 					}
 				});
@@ -446,7 +430,7 @@ function Lignage(svg, nodes, options = {}) {
 						}
 					}
 					else if (!node.isKin() && node.spouses[0].isRemarried() && !node.isSecondConsort()) {
-						node.spouses[0].spouses = [node.spouses[0].spouses[1], node];
+						node.spouses[0].spouses.reverse();
 						redrawTree();
 					}
 				});
@@ -506,8 +490,7 @@ function Lignage(svg, nodes, options = {}) {
 						let x2 = pos2.x + options.width / 2;
 						let y2 = pos2.y;
 						let dy = (y2 - y1) * fraction;
-						let link = makeElement("path", {d: `M${round(x1)} ${round(y1)} v${round(dy)} H${round(x2)} V${round(y2)}`, stroke: "black", fill: "none"});
-						container.append(link);
+						container.append(makeElement("path", {d: `M${round(x1)} ${round(y1)} v${round(dy)} H${round(x2)} V${round(y2)}`, stroke: "black", fill: "none"}));
 					}
 				}
 				for (let spouse of node.spouses) {
@@ -535,8 +518,7 @@ function Lignage(svg, nodes, options = {}) {
 			for (let child of node.children) {
 				if (linkReplace.includes(child.id)) continue;
 				let pos3 = child.getPosition();
-				let link = makeElement("path", {d: `M${round(x)} ${round(y)} v${round(dy)} H${round(pos3.x + options.width / 2)} V${round(pos3.y)}`, stroke: "black", fill: "none"});
-				container.append(link);
+				container.append(makeElement("path", {d: `M${round(x)} ${round(y)} v${round(dy)} H${round(pos3.x + options.width / 2)} V${round(pos3.y)}`, stroke: "black", fill: "none"}));
 			}
 		}
 
@@ -756,8 +738,8 @@ function Lignage(svg, nodes, options = {}) {
 	}
 
 	function redrawTree() {
-		document.getElementById("nodes").remove();
-		document.getElementById("links").remove();
+		svg.getElementById("nodes").remove();
+		svg.getElementById("links").remove();
 		drawTree();
 	}
 
@@ -834,7 +816,7 @@ function Lignage(svg, nodes, options = {}) {
 	};
 
 	ret.remove = function(id) {
-		Node.remove(id);
+		Node.get(id).remove();
 		redrawTree();
 	};
 
