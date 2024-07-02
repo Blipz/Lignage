@@ -1,7 +1,8 @@
 # Lignage
 
-Lignage is a JavaScript tool aimed at generating family trees, with an ancestor as a root.
-All descendents of this ancestor, as well as all their spouses, will be displayed.
+Lignage is a JavaScript tool aimed at generating family trees.
+It is designed as a top-down approach, starting with an ancestor as a root,
+and displaying descendents of this ancestor, as well as their spouses.
 
 ![Bourbon dynasty](examples/bourbon.png)
 
@@ -10,6 +11,8 @@ All descendents of this ancestor, as well as all their spouses, will be displaye
 - The tree must be an acyclic graph (i.e. no consanguinity)
 - The tree must be rooted (i.e. no ancestry for non-descendents)
 - Descendents can have at most two spouses
+
+See below for means to mitigate some of these limitations.
 
 ## Usage
 
@@ -20,9 +23,9 @@ All descendents of this ancestor, as well as all their spouses, will be displaye
 
 <script>
     const nodes = [
-        {id: "johnDoe", "name": "John Doe"},
-        {id: "janeDoe", "name": "Jane Doe", spouse: "johnDoe"},
-        {id: "babyDoe", "name": "Baby Doe", parent: "janeDoe"}
+        {id: "johnDoe", name: "John Doe"},
+        {id: "janeDoe", name: "Jane Doe", spouse: "johnDoe"},
+        {id: "babyDoe", name: "Baby Doe", parent: "janeDoe"}
     ];
     const options = {};
     Lignage(document.getElementById("lignage"), nodes, options);
@@ -41,6 +44,9 @@ Each node can have the following properties:
 - **class**: DOM class used for styling
 - **url**: link to an external resource
 - **image**: link to an external image
+- **levelSkips**: number of levels (i.e. generations) to skip for a descendent node (default: 0)
+- **placeLeft**: whether or not to place a non-descendent node to the left of their spouse (default: false)
+- **virtual**: whether or not to consider this node as virtual, hiding it with all of its links (default: false)
 
 Note that the order of nodes matters, as children need to be defined after their parent,
 and non-descendent spouses after their spouse.
@@ -123,5 +129,20 @@ Example:
 ```javascript
 const links = [
     {start: ["parent1", "parent2"], end: "child", type: "descent"}
+];
+```
+
+## Handling more than one root node
+
+In order to simulate multiple root nodes, and thus add ancestors for some non-descendent nodes, a virtual root node linked to these nodes can be defined.
+This means that consanguine unions will appear as soon as any two of these subtrees join (see the section above).
+
+Example:
+```javascript
+const nodes = [
+    {id: "realRoot", virtual: true},
+    {id: "fakeRoot1", parent: "realRoot},
+    {id: "fakeRoot2", parent: "realRoot},
+    {id: "fakeRoot3", parent: "realRoot}
 ];
 ```
