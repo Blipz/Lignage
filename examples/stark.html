@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>House Stark</title>
+        <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
+        <script src="../lignage.js"></script>
+        <style>
+            #lignage {
+                width: calc(100% - 200px);
+                height: 100%;
+            }
+            .options {
+                width: 200px;
+                float: left;
+            }
+            .option-group {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            input[type=number] {
+                width: 50px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="options">
+            <div class="option-group">
+                <button id="btn-json">JSON</button>
+                <button id="btn-png">PNG</button>
+                <button id="btn-svg">SVG</button>
+            </div>
+            <div class="option-group">
+                <input type="checkbox" name="editable" checked/>editable
+                <input type="checkbox" name="images" checked/>images
+            </div>
+            <div class="option-group">width: <input type="number" name="width" value="140" min="100" max="500"/></div>
+            <div class="option-group">height: <input type="number" name="height" value="160" min="160" max="500"/></div>
+            <div class="option-group">fontSize: <input type="number" name="fontSize" value="20" min="1" max="100"/></div>
+            <div class="option-group">parentMargin: <input type="number" name="parentMargin" value="80" min="0" max="500"/></div>
+            <div class="option-group">spouseMargin: <input type="number" name="spouseMargin" value="30" min="0" max="500"/></div>
+            <div class="option-group">siblingMargin: <input type="number" name="siblingMargin" value="30" min="0" max="500"/></div>
+            <div class="option-group">cousinMargin: <input type="number" name="cousinMargin" value="100" min="0" max="500"/></div>
+        </div>
+        <svg id="lignage">
+            <style>
+                .node rect {
+                    fill: black;
+                }
+                .node text {
+                    fill: white;
+                }
+                .dashed {
+                    stroke-dasharray: 4 2;
+                }
+            </style>
+        </svg>
+        <script>
+            const nodes = [
+                {id: "root", virtual: true},
+                {id: "rickard", name: "Rickard Stark", text: "Burnt After Pleading", parent: "root", url: "https://awoiaf.westeros.org/index.php/Rickard_Stark"},
+                {id: "lyarra", name: "Lyarra Stark", text: "My Cousin Ricky", spouse: "rickard", url: "https://awoiaf.westeros.org/index.php/Lyarra_Stark"},
+                {id: "hoster", name: "Hoster Tully", text: "The Codfather", parent: "root", url: "https://awoiaf.westeros.org/index.php/Hoster_Tully"},
+                {id: "minisa", name: "Minisa Whent", text: "The Departed", spouse: "hoster", url: "https://awoiaf.westeros.org/index.php/Minisa_Whent"},
+                {id: "brandon", name: "Brandon", text: "There Will Be Blood", parent: "lyarra", url: "https://awoiaf.westeros.org/index.php/Brandon_Stark"},
+                {id: "eddard", name: "Eddard", text: "The Wolf of Hot Seat", parent: "lyarra", url: "https://awoiaf.westeros.org/index.php/Eddard_Stark", image: "https://awoiaf.westeros.org/images/1/1c/Sean_Bean_as_Eddard_Stark.png"},
+                {id: "lyanna", name: "Lyanna", text: "Gone Girl", parent: "lyarra", url: "https://awoiaf.westeros.org/index.php/Lyanna_Stark", image: "https://awoiaf.westeros.org/images/9/90/Aisling_Franciosi_as_Lyanna_Stark.jpg"},
+                {id: "robertBaratheon", name: "Robert Baratheon", text: "Age of To Borrow", spouse: "lyanna", url: "https://awoiaf.westeros.org/index.php/Robert_I_Baratheon", image: "https://awoiaf.westeros.org/images/2/21/Robert_Baratheon.PNG"},
+                {id: "benjen", name: "Benjen", text: "Man in Black", parent: "lyarra", url: "https://awoiaf.westeros.org/index.php/Benjen_Stark", image: "https://awoiaf.westeros.org/images/a/ad/Benjen_Stark.PNG"},
+                {id: "catelyn", name: "Catelyn", text: "My Fair Lady", spouse: "eddard", url: "https://awoiaf.westeros.org/index.php/Catelyn_Stark", image: "https://awoiaf.westeros.org/images/3/31/Catelyn_Tully.PNG"},
+                {id: "lysa", name: "Lysa", text: "Paranoid Activity", parent: "minisa", url: "https://awoiaf.westeros.org/index.php/Lysa_Arryn", image: "https://awoiaf.westeros.org/images/f/fb/Lysa_and_Robert_Arryn.png"},
+                {id: "jonArryn", name: "Jon Arryn", text: "Gone with the Wine", spouse: "lysa", url: "https://awoiaf.westeros.org/index.php/Jon_Arryn"},
+                {id: "edmure", name: "Edmure", text: "Sulky", parent: "minisa", url: "https://awoiaf.westeros.org/index.php/Edmure_Tully", image: "https://awoiaf.westeros.org/images/d/dd/Edmure_Tully_Tobias.png"},
+                {id: "robb", name: "Robb", text: "Heir", parent: "catelyn", url: "https://awoiaf.westeros.org/index.php/Robb_Stark", image: "https://awoiaf.westeros.org/images/7/78/Robb_Stark.PNG"},
+                {id: "sansa", name: "Sansa", text: "Lady Bird", parent: "catelyn", url: "https://awoiaf.westeros.org/index.php/Sansa_Stark", image: "https://awoiaf.westeros.org/images/f/f6/Sansa_Stark_portrait_HBO.jpg"},
+                {id: "arya", name: "Arya", text: "Dances with Wolves", parent: "catelyn", url: "https://awoiaf.westeros.org/index.php/Arya_Stark", image: "https://awoiaf.westeros.org/images/4/49/Arya_Stark.png"},
+                {id: "bran", name: "Bran", text: "Downfall", parent: "catelyn", url: "https://awoiaf.westeros.org/index.php/Bran_Stark", image: "https://awoiaf.westeros.org/images/9/91/Bran_Stark.PNG"},
+                {id: "rickon", name: "Rickon", text: "When Teary Met Shaggy", parent: "catelyn", url: "https://awoiaf.westeros.org/index.php/Rickon_Stark", image: "https://awoiaf.westeros.org/images/0/0e/Rickon_Stark.PNG"},
+                {id: "jon", name: "Jon", text: "Inglourious Basterd", parent: "eddard", url: "https://awoiaf.westeros.org/index.php/Jon_Snow", image: "https://awoiaf.westeros.org/images/e/e1/Jon_HBO.jpg"},
+                {id: "robin", name: "Robin", text: "Milk", parent: "jonArryn", url: "https://awoiaf.westeros.org/index.php/Robert_Arryn", image: "https://awoiaf.westeros.org/images/c/c6/488507-robert_arryn_large.jpg"},
+            ];
+            const links = [
+                {start: ["hoster", "minisa"], end: "catelyn", type: "descent", x: 1, y: 0.25, class: "dashed"},
+                {start: "brandon", end: "catelyn", type: "closeUnion"},
+            ];
+            const lignage = Lignage(document.getElementById("lignage"), nodes, {links, width: 140, fontSize: 20, images: true, editable: true});
+            document.querySelector("#btn-json").addEventListener("click", function() {
+                lignage.exportJSON();
+            });
+            document.querySelector("#btn-png").addEventListener("click", function() {
+                lignage.downloadPNG("lignage.png");
+            });
+            document.querySelector("#btn-svg").addEventListener("click", function() {
+                lignage.downloadSVG("lignage.svg");
+            });
+            for (let option of ["width", "height", "fontSize", "parentMargin", "spouseMargin", "siblingMargin", "cousinMargin"]) {
+                document.querySelector(`input[name=${option}]`).addEventListener("change", function(e) {
+                    lignage.setOption(option, Number(e.target.value));
+                });
+            }
+            document.querySelector("input[name=editable]").addEventListener("change", function(e) {
+                lignage.setOption("editable", e.target.checked);
+            });
+            document.querySelector("input[name=images]").addEventListener("change", function(e) {
+                document.querySelector("input[name=height]").value = e.target.checked ? 160 : 50;
+                document.querySelector("input[name=height]").min = e.target.checked ? 160 : 50;
+                lignage.setOption("images", e.target.checked);
+                lignage.setOption("height", undefined);
+            });
+        </script>
+    </body>
+</html>

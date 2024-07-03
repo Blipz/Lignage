@@ -6,6 +6,17 @@ and displaying descendents of this ancestor, as well as their spouses.
 
 ![Bourbon dynasty](examples/bourbon.png)
 
+## Gallery
+
+[<img title="Lagid dynasty" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Ptolemaic_eagle.png" width="100" height="100">](https://blipz.github.io/Lignage/examples/lagids.html)
+[<img title="Constantinian dynasty" src="https://upload.wikimedia.org/wikipedia/commons/0/01/Constantine_I_RIC_VI_824_%28obverse%29.jpeg" width="100" height="100">](https://blipz.github.io/Lignage/examples/constantinians.html)
+[<img title="House of Plantagenêt" src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Royal_arms_of_England.svg" width="100" height="100">](https://blipz.github.io/Lignage/examples/plantagenet.html)
+[<img title="House of Bourbon" src="https://upload.wikimedia.org/wikipedia/commons/b/bc/Grand_Royal_Coat_of_Arms_of_France.svg" width="100" height="100">](https://blipz.github.io/Lignage/examples/bourbon.html)
+[<img title="Yamato dynasty" src="https://upload.wikimedia.org/wikipedia/commons/3/37/Imperial_Seal_of_Japan.svg" width="100" height="100">](https://blipz.github.io/Lignage/examples/yamato.html)
+[<img title="House of Romanov" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/House_of_Romanoff.jpg" width="100" height="100">](https://blipz.github.io/Lignage/examples/romanov.html)
+[<img title="House of Habsburg-Lorraine" src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Genealogical_arms_House_of_Habsburg-Lorraine_1806.svg" width="100" height="100">](https://blipz.github.io/Lignage/examples/habsburgLorraine.html)
+[<img title="House Stark" src="https://oyster.ignimgs.com/mediawiki/apis.ign.com/game-of-thrones/9/9b/Stark_Sigil.jpg" width="100" height="100">](https://blipz.github.io/Lignage/examples/stark.html)
+
 ## Limitations
 
 - The tree must be an acyclic graph (i.e. no consanguinity)
@@ -80,6 +91,33 @@ The following options can be used:
 - **editable**: whether or not to allow on-the-fly edition (default: false)
 - **fontSize**: size of the font used (default: 16)
 
+## API
+
+The following section details the API provided by the Lignage object in order to interact with the tree.
+See the [Stark family](examples/stark.html) for a concrete use case.
+
+### Tree manipulation
+
+- **add(nodeData)**: adds a new node to the tree (nodeData is the same object described above)
+- **get(nodeId)**: gets the node identified by the ID
+- **remove(nodeId)**: removes the node (and all its descendents) from the tree, as well as its spouse(s) if it is a descendent node
+
+### Option tuning
+
+- **getOption(name)**: returns the value of the option
+- **setOption(name, value)**: sets the option to the value provided.
+
+Note that `setOption` has no effect on the `exclude` option. Call `remove` instead.
+
+### Export
+
+- **downloadPNG(filename)**: downloads the tree in PNG format
+- **downloadSVG(filename)**: downloads the tree in SVG format
+- **exportJSON()**: copies the JSON node data to the clipboard
+
+Note that the generated PNG or SVG might not contain images defined by the node `image` property, due to the same origin policy.
+Therefore, a web server hosting the page and the images should be set up if this is needed.
+
 ## Styling
 
 Styling can be performed by appending a `<style>` tag to the SVG element, and by using the corresponding classes with the `class` node/link property.
@@ -146,3 +184,5 @@ const nodes = [
     {id: "fakeRoot3", parent: "realRoot}
 ];
 ```
+
+See the [Stark family](examples/stark.html) for a concrete use case.
