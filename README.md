@@ -10,11 +10,11 @@ and displaying descendents of this ancestor, as well as their spouses.
 
 [<img title="Lagid dynasty" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Ptolemaic_eagle.png" width="100" height="100">](https://blipz.github.io/Lignage/examples/lagids.html)
 [<img title="Constantinian dynasty" src="https://upload.wikimedia.org/wikipedia/commons/0/01/Constantine_I_RIC_VI_824_%28obverse%29.jpeg" width="100" height="100">](https://blipz.github.io/Lignage/examples/constantinians.html)
-[<img title="House of Plantagenêt" src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Royal_arms_of_England.svg" width="100" height="100">](https://blipz.github.io/Lignage/examples/plantagenet.html)
-[<img title="House of Bourbon" src="https://upload.wikimedia.org/wikipedia/commons/b/bc/Grand_Royal_Coat_of_Arms_of_France.svg" width="100" height="100">](https://blipz.github.io/Lignage/examples/bourbon.html)
+[<img title="House of Plantagenêt" src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Royal_arms_of_England.svg" width="auto" height="100">](https://blipz.github.io/Lignage/examples/plantagenet.html)
+[<img title="House of Bourbon" src="https://upload.wikimedia.org/wikipedia/commons/5/57/Arms_of_France_%28France_Moderne%29.svg" width="auto" height="100">](https://blipz.github.io/Lignage/examples/bourbon.html)
 [<img title="Yamato dynasty" src="https://upload.wikimedia.org/wikipedia/commons/3/37/Imperial_Seal_of_Japan.svg" width="100" height="100">](https://blipz.github.io/Lignage/examples/yamato.html)
-[<img title="House of Romanov" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/House_of_Romanoff.jpg" width="100" height="100">](https://blipz.github.io/Lignage/examples/romanov.html)
-[<img title="House of Habsburg-Lorraine" src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Genealogical_arms_House_of_Habsburg-Lorraine_1806.svg" width="100" height="100">](https://blipz.github.io/Lignage/examples/habsburgLorraine.html)
+[<img title="House of Romanov" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/House_of_Romanoff.jpg" width="auto" height="100">](https://blipz.github.io/Lignage/examples/romanov.html)
+[<img title="House of Habsburg-Lorraine" src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Genealogical_arms_House_of_Habsburg-Lorraine_1806.svg" width="auto" height="100">](https://blipz.github.io/Lignage/examples/habsburgLorraine.html)
 [<img title="House Stark" src="https://oyster.ignimgs.com/mediawiki/apis.ign.com/game-of-thrones/9/9b/Stark_Sigil.jpg" width="100" height="100">](https://blipz.github.io/Lignage/examples/stark.html)
 
 ## Limitations
@@ -179,9 +179,9 @@ Example:
 ```javascript
 const nodes = [
     {id: "realRoot", virtual: true},
-    {id: "fakeRoot1", parent: "realRoot},
-    {id: "fakeRoot2", parent: "realRoot},
-    {id: "fakeRoot3", parent: "realRoot}
+    {id: "fakeRoot1", parent: "realRoot"},
+    {id: "fakeRoot2", parent: "realRoot"},
+    {id: "fakeRoot3", parent: "realRoot"}
 ];
 ```
 
