@@ -8,13 +8,19 @@ and displaying descendents of this ancestor, as well as their spouses.
 
 ## Gallery
 
+Historical:
+
 [<img title="Lagid dynasty" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Ptolemaic_eagle.png" width="100" height="100">](https://blipz.github.io/Lignage/examples/lagids.html)
 [<img title="Constantinian dynasty" src="https://upload.wikimedia.org/wikipedia/commons/0/01/Constantine_I_RIC_VI_824_%28obverse%29.jpeg" width="100" height="100">](https://blipz.github.io/Lignage/examples/constantinians.html)
 [<img title="House of Plantagenêt" src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Royal_arms_of_England.svg" width="auto" height="100">](https://blipz.github.io/Lignage/examples/plantagenet.html)
+[<img title="Ottoman dynasty" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Coat_of_arms_of_the_Ottoman_Empire_%281882%E2%80%931922%29.svg/502px-Coat_of_arms_of_the_Ottoman_Empire_%281882%E2%80%931922%29.svg.png" width="auto" height="100">](https://blipz.github.io/Lignage/examples/ottomans.html)
 [<img title="House of Bourbon" src="https://upload.wikimedia.org/wikipedia/commons/5/57/Arms_of_France_%28France_Moderne%29.svg" width="auto" height="100">](https://blipz.github.io/Lignage/examples/bourbon.html)
 [<img title="Yamato dynasty" src="https://upload.wikimedia.org/wikipedia/commons/3/37/Imperial_Seal_of_Japan.svg" width="100" height="100">](https://blipz.github.io/Lignage/examples/yamato.html)
 [<img title="House of Romanov" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/House_of_Romanoff.jpg" width="auto" height="100">](https://blipz.github.io/Lignage/examples/romanov.html)
 [<img title="House of Habsburg-Lorraine" src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Genealogical_arms_House_of_Habsburg-Lorraine_1806.svg" width="auto" height="100">](https://blipz.github.io/Lignage/examples/habsburgLorraine.html)
+
+Fantasy:
+
 [<img title="House Stark" src="https://oyster.ignimgs.com/mediawiki/apis.ign.com/game-of-thrones/9/9b/Stark_Sigil.jpg" width="100" height="100">](https://blipz.github.io/Lignage/examples/stark.html)
 
 ## Limitations
@@ -55,6 +61,7 @@ Each node can have the following properties:
 - **class**: DOM class used for styling
 - **url**: link to an external resource
 - **image**: link to an external image
+- **align**: how a descendent node is aligned in regard to its children, can be "left", "center" or "right" (default: the `align` option)
 - **levelSkips**: number of levels (i.e. generations) to skip for a descendent node (default: 0)
 - **placeLeft**: whether or not to place a non-descendent node to the left of their spouse (default: false)
 - **virtual**: whether or not to consider this node as virtual, hiding it with all of its links (default: false)
@@ -90,6 +97,7 @@ The following options can be used:
 - **images**: whether or not to display images (default: false)
 - **editable**: whether or not to allow on-the-fly edition (default: false)
 - **fontSize**: size of the font used (default: 16)
+- **align**: default value for the `align` node property, can be "left", "center" or "right" (default: "center")
 
 ## API
 

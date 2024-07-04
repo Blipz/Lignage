@@ -40,6 +40,11 @@
             <div class="option-group">spouseMargin: <input type="number" name="spouseMargin" value="30" min="0" max="500"/></div>
             <div class="option-group">siblingMargin: <input type="number" name="siblingMargin" value="30" min="0" max="500"/></div>
             <div class="option-group">cousinMargin: <input type="number" name="cousinMargin" value="100" min="0" max="500"/></div>
+            <div class="option-group">align: <select name="align">
+                <option value="left">left</option>
+                <option value="center" selected>center</option>
+                <option value="right">right</option>
+            </select></div>
         </div>
         <svg id="lignage">
             <style>
@@ -105,6 +110,9 @@
                 document.querySelector("input[name=height]").min = e.target.checked ? 160 : 50;
                 lignage.setOption("images", e.target.checked);
                 lignage.setOption("height", undefined);
+            });
+            document.querySelector("select[name=align]").addEventListener("change", function(e) {
+                lignage.setOption("align", e.target.value);
             });
         </script>
     </body>

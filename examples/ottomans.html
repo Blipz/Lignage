@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Ottoman dynasty</title>
+        <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
+        <script src="../lignage.js"></script>
+        <style>
+            #lignage {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="lignage">
+            <style>
+                .padishah rect {
+                    fill: turquoise;
+                }
+                .padishah text {
+                    fill: white;
+                }
+            </style>
+        </svg>
+        <script>
+            const nodes = [
+                {id: "osmanGazi", name: "OSMAN GAZİ", text: "ca 1254-1324", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/Osman_Gazi"},
+                {id: "malhunHatun", name: "Malhun Hatun", spouse: "osmanGazi"},
+                {id: "orhanGazi", name: "ORHAN GAZİ", text: "† 1362", parent: "malhunHatun", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/Orhan_Gazi"},
+                {id: "nilüferHatun", name: "Nilüfer Hatun", spouse: "orhanGazi"},
+                {id: "muradI", name: "MURAD I", text: "1326-1389", parent: "nilüferHatun", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/I._Murad"},
+                {id: "gulcicekHatun", name: "Gülçiçek Hatun", spouse: "muradI"},
+                {id: "bayezidI", name: "BAYEZİD I", text: "1360-1403", parent: "gulcicekHatun", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/I._Bayezid"},
+                {id: "devletHatun", name: "Devlet Hatun", spouse: "bayezidI"},
+                {id: "isaCelebi", name: "İsa Çelebi", text: "† 1403", parent: "bayezidI", url: "https://tr.wikipedia.org/wiki/İsa_Çelebi"},
+                {id: "suleymanCelebi", name: "Süleyman Çelebi", text: "† 1411", parent: "bayezidI", url: "https://tr.wikipedia.org/wiki/Süleyman_Çelebi_(emir)"},
+                {id: "musaCelebi", name: "Musa Çelebi", text: "† 1413", parent: "bayezidI", url: "https://tr.wikipedia.org/wiki/Musa Çelebi"},
+                {id: "mehmedI", name: "MEHMED I", text: "1386-1421", parent: "devletHatun", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/I._Mehmed"},
+                {id: "emineHatun", name: "Emine Hatun", spouse: "mehmedI"},
+                {id: "muradII", name: "MURAD II", text: "1404-1451", parent: "emineHatun", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/II._Murad"},
+                {id: "humaHatun", name: "Hüma Hatun", spouse: "muradII"},
+                {id: "mehmedII", name: "MEHMED II", text: "1432-1481", parent: "humaHatun", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/II._Mehmed"},
+                {id: "gulbaharHatun1", name: "Gülbahar Hatun", spouse: "mehmedII"},
+                {id: "bayezidII", name: "BAYEZİD II", text: "1448-1512", parent: "gulbaharHatun1", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/II._Bayezid"},
+                {id: "gulbaharHatun2", name: "Gülbahar Hatun", spouse: "bayezidII"},
+                {id: "selimI", name: "SELİM I", text: "1466-1520", parent: "gulbaharHatun2", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/I._Selim"},
+                {id: "ayseHafsaSultan", name: "Ayşe Hafsa Sultan", spouse: "selimI"},
+                {id: "suleymanI", name: "SÜLEYMAN I", text: "1494-1566", parent: "ayseHafsaSultan", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/I._Süleyman"},
+                {id: "hurremSultan", name: "Hürrem Sultan", spouse: "suleymanI"},
+                {id: "selimII", name: "SELİM II", text: "1524-1574", parent: "hurremSultan", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/II._Selim"},
+                {id: "nurbanuSultan", name: "Nurbanu Sultan", spouse: "selimII"},
+                {id: "muradIII", name: "MURAD III", text: "1546-1595", parent: "nurbanuSultan", class: "padishah", align: "right", url: "https://tr.wikipedia.org/wiki/III._Murad"},
+                {id: "safiyeSultan", name: "Safiye Sultan", spouse: "muradIII"},
+                {id: "mehmedIII", name: "MEHMED III", text: "1566-1603", parent: "safiyeSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/III._Mehmed"},
+                {id: "handanSultan", name: "Handan Sultan", spouse: "mehmedIII"},
+                {id: "halimeSultan", name: "Halime Sultan", spouse: "mehmedIII"},
+                {id: "ahmedI", name: "AHMED I", text: "1590-1617", parent: "handanSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/I._Ahmed"},
+                {id: "mahfiruzHatun", name: "Mahfiruz Hatun", spouse: "ahmedI"},
+                {id: "kosemSultan", name: "Kösem Sultan", spouse: "ahmedI"},
+                {id: "mustafaI", name: "MUSTAFA I", text: "1591-1639", parent: "halimeSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/I._Mustafa"},
+                {id: "osmanII", name: "OSMAN II", text: "1604-1622", parent: "mahfiruzHatun", class: "padishah", url: "https://tr.wikipedia.org/wiki/II._Osman"},
+                {id: "muradIV", name: "MURAD IV", text: "1612-1640", parent: "kosemSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/IV._Murad"},
+                {id: "ibrahim", name: "İBRAHİM", text: "1615-1648", parent: "kosemSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/İbrahim_(padişah)"},
+                {id: "mehmedIV", name: "MEHMED IV", text: "1642-1693", parent: "ibrahim", class: "padishah", url: "https://tr.wikipedia.org/wiki/IV._Mehmed"},
+                {id: "gulnusSultan", name: "Gülnuş Sultan", spouse: "mehmedIV"},
+                {id: "suleymanII", name: "SÜLEYMAN II", text: "1642-1691", parent: "ibrahim", class: "padishah", url: "https://tr.wikipedia.org/wiki/II._Süleyman_(Osmanlı_padişahı)"},
+                {id: "ahmedII", name: "AHMED II", text: "1643-1695", parent: "ibrahim", class: "padishah", url: "https://tr.wikipedia.org/wiki/II._Ahmed"},
+                {id: "mustafaII", name: "MUSTAFA II", text: "1664-1703", parent: "gulnusSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/II._Mustafa"},
+                {id: "salihaSultan", name: "Saliha Sultan", spouse: "mustafaII"},
+                {id: "sehsuvarSultan", name: "Şehsuvar Sultan", spouse: "mustafaII"},
+                {id: "ahmedIII", name: "AHMED III", text: "1673-1736", parent: "gulnusSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/III._Ahmed"},
+                {id: "mihrisahKadin", name: "Mihrişah Kadın", spouse: "ahmedIII"},
+                {id: "sermiKadin", name: "Şermi Kadın", spouse: "ahmedIII"},
+                {id: "mahmudI", name: "MAHMUD I", text: "1696-1754", parent: "salihaSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/I._Mahmud"},
+                {id: "osmanIII", name: "OSMAN III", text: "1699-1757", parent: "sehsuvarSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/III._Osman"},
+                {id: "mustafaIII", name: "MUSTAFA III", text: "1717-1774", parent: "mihrisahKadin", class: "padishah", url: "https://tr.wikipedia.org/wiki/III._Mustafa"},
+                {id: "mihrisahSultan", name: "Mihrişah Sultan", spouse: "mustafaIII"},
+                {id: "abdulhamidI", name: "ABDÜLHAMİD I", text: "1725-1789", parent: "sermiKadin", class: "padishah", url: "https://tr.wikipedia.org/wiki/I._Abdülhamid"},
+                {id: "sineperverSultan", name: "Sineperver Sultan", spouse: "abdulhamidI"},
+                {id: "naksidilSultan", name: "Nakşidil Sultan", spouse: "abdulhamidI"},
+                {id: "selimIII", name: "SELİM III", text: "1761-1808", parent: "mihrisahSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/III._Selim"},
+                {id: "mustafaIV", name: "MUSTAFA IV", text: "1779-1808", parent: "sineperverSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/IV._Mustafa"},
+                {id: "mahmudII", name: "MAHMUD II", text: "1785-1839", parent: "naksidilSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/II._Mahmud"},
+                {id: "bezmialemSultan", name: "Bezmiâlem Sultan", spouse: "mahmudII"},
+                {id: "pertevniyalSultan", name: "Pertevniyal Sultan", spouse: "mahmudII"},
+                {id: "abdulmecidI", name: "ABDÜLMECİD I", text: "1823-1861", parent: "bezmialemSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/Abdülmecid"},
+                {id: "abdulaziz", name: "ABDÜLAZİZ", text: "1830-1876", parent: "pertevniyalSultan", class: "padishah", url: "https://tr.wikipedia.org/wiki/Abdülaziz"},
+                {id: "hayranidilKadin", name: "Hayranidil Kadın", spouse: "abdulaziz"},
+                {id: "muradV", name: "MURAD V", text: "1840-1904", parent: "abdulmecidI", class: "padishah", url: "https://tr.wikipedia.org/wiki/V._Murad"},
+                {id: "abdulhamidII", name: "ABDÜLHAMİD II", text: "1842-1918", parent: "abdulmecidI", class: "padishah", url: "https://tr.wikipedia.org/wiki/II._Abdülhamid"},
+                {id: "mehmedV", name: "MEHMED V", text: "1844-1918", parent: "abdulmecidI", class: "padishah", url: "https://tr.wikipedia.org/wiki/V._Mehmed"},
+                {id: "mehmedVI", name: "MEHMED VI", text: "1861-1926", parent: "abdulmecidI", class: "padishah", url: "https://tr.wikipedia.org/wiki/VI._Mehmed"},
+                {id: "abdulmecidII", name: "Abdülmecid II", text: "1868-1944", parent: "hayranidilKadin", url: "https://tr.wikipedia.org/wiki/Abdülmecid_Efendi"},
+            ]
+            Lignage(document.getElementById("lignage"), nodes, {parentMargin: 50});
+        </script>
+    </body>
+</html>

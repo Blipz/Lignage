@@ -159,6 +159,7 @@ function Lignage(svg, nodes, options = {}) {
 				this.spouses = [Node.get(obj.spouse)];
 				Node.get(obj.spouse).spouses.push(this);
 			}
+			if (obj.align) this.align = obj.align;
 			this.levelSkips = obj.levelSkips || 0;
 			this.placeLeft = obj.placeLeft || false;
 			this.virtual = obj.virtual || false;
@@ -229,6 +230,7 @@ function Lignage(svg, nodes, options = {}) {
 		if (options.fontSize === undefined) options.fontSize = 16;
 		if (options.exclude === undefined) options.exclude = [];
 		if (options.links === undefined) options.links = [];
+		if (options.align === undefined) options.align = "center";
 
 		const textRect = makeElement("rect", {x: 0, y: 0, width: options.width, height: options.height, rx: 10, ry: 10});
 		defs.replaceChildren(makeElement("clipPath", {id: "clipText"}, textRect));
@@ -663,21 +665,30 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		function computePosition(node) {
-			// Align parent in regard to first and last child
+			// Align parent in regard to their children
 			if (!node.hasChildren()) {
 				return null;
 			}
 			let children = node.getChildren();
 			let nodeWidth = node.getWidth();
-			let delta = 0;
-			if (node.isRemarried() && (!node.spouses[0].hasChildren() || !node.spouses[1].hasChildren()) ||
-				node.isMarried() && !node.spouses[0].hasChildren() && node.children.length > 0) {
-				// Ignore the childless spouse for positioning
-				nodeWidth -= options.width + options.spouseMargin;
-				if (node.isRemarried() && !node.spouses[0].hasChildren() || !node.isRemarried() && node.spouses[0].placeLeft)
-					delta = options.width + options.spouseMargin;
+			let align = node.align || options.align;
+			if (align == "left") {
+				return children[0].x;
 			}
-			return (children[0].getPosition().x + children.at(-1).getPosition().x + options.width) / 2 - (delta + nodeWidth / 2);
+			else if (align == "right") {
+				return children.at(-1).x + children.at(-1).getWidth() - nodeWidth;
+			}
+			else {
+				let delta = 0;
+				if (node.isRemarried() && (!node.spouses[0].hasChildren() || !node.spouses[1].hasChildren()) ||
+					node.isMarried() && !node.spouses[0].hasChildren() && node.children.length > 0) {
+					// Ignore the childless spouse for positioning
+					nodeWidth -= options.width + options.spouseMargin;
+					if (node.isRemarried() && !node.spouses[0].hasChildren() || !node.isRemarried() && node.spouses[0].placeLeft)
+						delta = options.width + options.spouseMargin;
+				}
+				return (children[0].getPosition().x + children.at(-1).getPosition().x + options.width) / 2 - (delta + nodeWidth / 2);
+			}
 		}
 
 		function adjustPositions(depth) {
@@ -809,7 +820,7 @@ function Lignage(svg, nodes, options = {}) {
 	function serializeTree(node) {
 		let obj = {id: node.id};
 		let ret = [[obj]];
-		for (let k of ["name", "text", "class", "url", "image", "levelSkips", "placeLeft", "virtual"]) {
+		for (let k of ["name", "text", "class", "url", "image", "align", "levelSkips", "placeLeft", "virtual"]) {
 			if (node[k]) obj[k] = node[k];
 		}
 		if (node.hasParents()) obj.parent = node.parents[0].id;
