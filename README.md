@@ -62,8 +62,8 @@ Each node can have the following properties:
 - **url**: link to an external resource
 - **image**: link to an external image
 - **align**: how a descendent node is aligned in regard to its children, can be "left", "center" or "right" (default: the `align` option)
-- **levelSkips**: number of levels (i.e. generations) to skip for a descendent node (default: 0)
-- **placeLeft**: whether or not to place a non-descendent node to the left of their spouse (default: false)
+- **skips**: number of levels (i.e. generations) to skip for a descendent node (default: 0)
+- **before**: whether or not to place a non-descendent node before their spouse (default: false)
 - **virtual**: whether or not to consider this node as virtual, hiding it with all of its links (default: false)
 
 Note that the order of nodes matters, as children need to be defined after their parent,
@@ -98,6 +98,7 @@ The following options can be used:
 - **editable**: whether or not to allow on-the-fly edition (default: false)
 - **fontSize**: size of the font used (default: 16)
 - **align**: default value for the `align` node property, can be "left", "center" or "right" (default: "center")
+- **orient**: orientation of the tree, can be "top", "bottom", "left" or "right" (default: "top")
 
 ## API
 

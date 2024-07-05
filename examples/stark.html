@@ -5,6 +5,12 @@
         <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
         <script src="../lignage.js"></script>
         <style>
+            html {
+                height: 100%;
+            }
+            body {
+                height: calc(100% - 16px);
+            }
             #lignage {
                 width: calc(100% - 200px);
                 height: 100%;
@@ -43,6 +49,12 @@
             <div class="option-group">align: <select name="align">
                 <option value="left">left</option>
                 <option value="center" selected>center</option>
+                <option value="right">right</option>
+            </select></div>
+            <div class="option-group">orient: <select name="orient">
+                <option value="top">top</option>
+                <option value="bottom">bottom</option>
+                <option value="left">left</option>
                 <option value="right">right</option>
             </select></div>
         </div>
@@ -97,11 +109,11 @@
             document.querySelector("#btn-svg").addEventListener("click", function() {
                 lignage.downloadSVG("lignage.svg");
             });
-            for (let option of ["width", "height", "fontSize", "parentMargin", "spouseMargin", "siblingMargin", "cousinMargin"]) {
-                document.querySelector(`input[name=${option}]`).addEventListener("change", function(e) {
-                    lignage.setOption(option, Number(e.target.value));
+            document.querySelectorAll(`input[type=number]`).forEach(function(input) {
+                input.addEventListener("change", function(e) {
+                    lignage.setOption(input.getAttribute("name"), Number(e.target.value));
                 });
-            }
+            });
             document.querySelector("input[name=editable]").addEventListener("change", function(e) {
                 lignage.setOption("editable", e.target.checked);
             });
@@ -111,8 +123,10 @@
                 lignage.setOption("images", e.target.checked);
                 lignage.setOption("height", undefined);
             });
-            document.querySelector("select[name=align]").addEventListener("change", function(e) {
-                lignage.setOption("align", e.target.value);
+            document.querySelectorAll("select").forEach(function(select) {
+                select.addEventListener("change", function(e) {
+                    lignage.setOption(select.getAttribute("name"), e.target.value);
+                });
             });
         </script>
     </body>
