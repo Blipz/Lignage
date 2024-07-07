@@ -593,21 +593,30 @@ function Lignage(svg, nodes, options = {}) {
 			function computeFraction(n) {
 				// Return an appropriate fraction of the vertical spacing between parent and children nodes,
 				// so that links won't collide in a situation where half-siblings are involved
-				let child1, child2, isBefore;
+				let child1, child2, isBefore, max1, min2;
 				if (n.isRemarried() && n.spouses[0].hasChildren() && n.spouses[1].hasChildren()) {
 					child1 = n.spouses[0].children.at(-1);
 					child2 = n.spouses[1].children[0];
 					isBefore = node == n.spouses[0];
+					max1 = n.getX() + n.getSize() / 2;
+					min2 = max1;
 				}
 				else if (n.isMarried() && n.spouses[0].hasChildren() && n.children.length > 0) {
 					child1 = n.spouses[0].before ? n.spouses[0].children.at(-1) : n.children.at(-1);
 					child2 = n.spouses[0].before ? n.children[0] : n.spouses[0].children[0];
 					isBefore = node == n && !n.spouses[0].before || node != n && n.spouses[0].before;
+					max1 = n.getX() + getWidth();
+					min2 = max1 + options.spouseMargin;
 				}
 				else {
 					return 1/2;
 				}
-				if ((child1.getX() + child1.getSize() + child2.getX()) / 2 > n.getX() + n.getSize() / 2) {
+				let x1 = child1.getCoord()[0] + getWidth() / 2;
+				let x2 = child2.getCoord()[0] + getWidth() / 2;
+				if (x1 <= max1 && x2 >= min2) {
+					return 1/2;
+				}
+				if (x1 > max1) {
 					return isBefore ? 2/3 : 1/3;
 				}
 				else {
