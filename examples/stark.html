@@ -41,7 +41,7 @@
             </div>
             <div class="option-group">width: <input type="number" name="width" value="140" min="100" max="500"/></div>
             <div class="option-group">height: <input type="number" name="height" value="160" min="160" max="500"/></div>
-            <div class="option-group">fontSize: <input type="number" name="fontSize" value="20" min="1" max="100"/></div>
+            <div class="option-group">fontSize: <input type="number" name="fontSize" value="16" min="1" max="100"/></div>
             <div class="option-group">parentMargin: <input type="number" name="parentMargin" value="80" min="0" max="500"/></div>
             <div class="option-group">spouseMargin: <input type="number" name="spouseMargin" value="30" min="0" max="500"/></div>
             <div class="option-group">siblingMargin: <input type="number" name="siblingMargin" value="30" min="0" max="500"/></div>
@@ -99,7 +99,8 @@
                 {start: ["hoster", "minisa"], end: "catelyn", type: "descent", x: 1, y: 0.25, class: "dashed"},
                 {start: "brandon", end: "catelyn", type: "closeUnion"},
             ];
-            const lignage = Lignage(document.getElementById("lignage"), nodes, {links, width: 140, fontSize: 20, images: true, editable: true});
+            const fonts = [{family: "Game of Thrones", url: "https://db.onlinewebfonts.com/t/97c4b25dc74e0ab045154e75a8fdd69d.woff2"}];
+            const lignage = Lignage(document.getElementById("lignage"), nodes, {links, fonts, width: 140, fontFamily: "Game of Thrones", fontVariant: "small-caps", images: true, editable: true});
             document.querySelector("#btn-json").addEventListener("click", function() {
                 lignage.exportJSON();
             });

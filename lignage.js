@@ -248,7 +248,7 @@ function Lignage(svg, nodes, options = {}) {
 		const ns = "http://www.w3.org/2000/svg";
 		const elem = document.createElementNS(ns, name);
 		Object.entries(attr).forEach(function([k, v]) {
-			elem.setAttribute(k, v);
+			if (v !== undefined) elem.setAttribute(k, v);
 		});
 		elem.append(...children);
 		return elem;
@@ -283,8 +283,10 @@ function Lignage(svg, nodes, options = {}) {
 		if (options.siblingMargin === undefined) options.siblingMargin = 30;
 		if (options.cousinMargin === undefined) options.cousinMargin = 100;
 		if (options.fontSize === undefined) options.fontSize = 16;
+		if (options.fontWeight === undefined) options.fontWeight = "bold";
 		if (options.exclude === undefined) options.exclude = [];
 		if (options.links === undefined) options.links = [];
+		if (options.fonts === undefined) options.fonts = [];
 		if (options.align === undefined) options.align = "center";
 		if (options.orient === undefined) options.orient = "top";
 
@@ -313,6 +315,21 @@ function Lignage(svg, nodes, options = {}) {
 				defs.append(icon);
 			});
 		}
+		let fonts = options.fonts;
+		for (let family of [options.fontFamily, options.title?.fontFamily]) {
+			let url = DEFAULT_FONTS[family];
+			if (url) {
+				fonts.push({family, url});
+			}
+		}
+		if (!fontsReady && fonts.length > 0) {
+			embedFonts(fonts).then(function() {
+				fontsReady = true;
+				drawTree();
+			});
+			return false;
+		}
+		return true;
 	}
 
 	function redefineRoot() {
@@ -328,38 +345,51 @@ function Lignage(svg, nodes, options = {}) {
 		rootNode = node;
 	}
 
+	const DEFAULT_FONTS = {
+		Ballet: "https://fonts.gstatic.com/s/ballet/v27/QGYvz_MYZA-HM4NJtEtq.woff2",
+		Cinzel: "https://fonts.gstatic.com/s/cinzel/v23/8vIJ7ww63mVu7gt79mT7.woff2",
+	};
+
 	svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 	svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
 
 	const defs = makeElement("defs");
 	svg.append(defs);
 
-	initializeOptions();
+	let rootNode;
+	let fontsReady = false;
+	fontsReady = initializeOptions();
+	initializeTree();
+	if (fontsReady) {
+		drawTree();
+	}
 
-	for (let node of nodes) {
+	function initializeTree() {
+		for (let node of nodes) {
+			try {
+				new Node(node);
+			}
+			catch(e) {
+				console.warn(e.message);
+			}
+		}
+
+		for (let exclude of options.exclude) {
+			try {
+				Node.get(exclude).remove();
+			}
+			catch(e) {
+				console.warn(e.message);
+			}
+		}
+
+		rootNode = Node.get(nodes[0].id);
 		try {
-			new Node(node);
+			redefineRoot();
 		}
 		catch(e) {
 			console.warn(e.message);
 		}
-	}
-
-	for (let exclude of options.exclude) {
-		try {
-			Node.get(exclude).remove();
-		}
-		catch(e) {
-			console.warn(e.message);
-		}
-	}
-
-	let rootNode = Node.get(nodes[0].id);
-	try {
-		redefineRoot();
-	}
-	catch(e) {
-		console.warn(e.message);
 	}
 
 	function drawTree() {
@@ -380,21 +410,23 @@ function Lignage(svg, nodes, options = {}) {
 				fill: "white",
 				stroke: "black"
 			}));
+
 			let text = makeElement("text", {
 				class: "name",
 				x: options.width / 2,
-				y: 20,
+				y: 15,
 				fill: "black",
 				"clip-path": "url(#clipText)",
+				"dominant-baseline": "central",
+				"font-family": options.fontFamily,
 				"font-size": options.fontSize,
-				"font-weight": "bold",
+				"font-variant": options.fontVariant,
+				"font-weight": options.fontWeight,
 				"text-anchor": "middle",
 				cursor: node.url ? "pointer" : "default"
 			}, node.name || "");
 			elem.append(node.url ? makeElement("a", {href: node.url, target: "_blank"}, text) : text);
-			for (let size = options.fontSize; text.getBBox().width > options.width && size > 0; size--) {
-				text.setAttribute("font-size", size);
-			}
+
 			elem.append(makeElement("text", {
 				class: "text",
 				x: options.width / 2,
@@ -916,15 +948,53 @@ function Lignage(svg, nodes, options = {}) {
 		svg.setAttribute("viewBox", `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + 2 * padding} ${bbox.height + 2 * padding}`);
 		svg.setAttribute("width", bbox.width + 2 * padding);
 		svg.setAttribute("height", bbox.height + 2 * padding);
+
+		// Cannot do this earlier: svg must have viewBox to the right value so that the calculations are consistent
+		svg.querySelectorAll(".name").forEach(function(text) {
+			for (let size = options.fontSize; text.getBBox().width > options.width && size > 0; size--) {
+				text.setAttribute("font-size", size);
+			}
+		});
+
+		if (options.title) {
+			svg.append(makeElement("text", {
+				id: "title",
+				x: bbox.x + (options.title.x || 0),
+				y: bbox.y + (options.title.y || 0),
+				fill: "black",
+				"dominant-baseline": "hanging",
+				"font-family": options.title.fontFamily,
+				"font-size": options.title.fontSize || 30,
+				"font-variant": options.title.fontVariant,
+				"font-weight": options.title.fontWeight,
+				cursor: "default"
+			}, options.title.text));
+		}
+
+		if (options.emblem) {
+			svg.append(makeElement("image", {
+				id: "emblem",
+				href: options.emblem.url,
+				x: 0,
+				y: 0,
+				transform: `translate(${bbox.x + (options.emblem.x || 0)} ${bbox.y + (options.emblem.y || 0)}) scale(${options.emblem.scale || 1})`
+			}));
+		}
+	}
+
+	function removeTree() {
+		svg.getElementById("nodes").remove();
+		svg.getElementById("links").remove();
+		let title = svg.getElementById("title");
+		if (title) title.remove();
+		let emblem = svg.getElementById("emblem")
+		if (emblem) emblem.remove();
 	}
 
 	function redrawTree() {
-		svg.getElementById("nodes").remove();
-		svg.getElementById("links").remove();
+		removeTree();
 		drawTree();
 	}
-
-	drawTree();
 
 	function serializeTree(node) {
 		let obj = {id: node.id};
@@ -951,11 +1021,11 @@ function Lignage(svg, nodes, options = {}) {
 	}
 
 	function serializeSVG(callback) {
-		let clone = svg.cloneNode(svg);
+		let clone = svg.cloneNode(true);
 		for (let button of clone.querySelectorAll(".buttons")) {
 			button.remove();
 		}
-		let svgImages = clone.querySelectorAll(".node > image");
+		let svgImages = clone.querySelectorAll("image");
 		let remaining = svgImages.length;
 		if (remaining == 0) {
 			let xml = new XMLSerializer().serializeToString(clone);
@@ -985,6 +1055,37 @@ function Lignage(svg, nodes, options = {}) {
 		}
 	}
 
+	function readBlobAsDataURL(blob) {
+		return new Promise(function (resolve, reject) {
+			const reader = new FileReader();
+			reader.onloadend = () => resolve(reader.result);
+			reader.onerror = reject;
+			reader.readAsDataURL(blob);
+		});
+	}
+
+	async function loadFontsAsDataURI(fonts) {
+		const promises = fonts.map(async ({family, url}) => {
+			const resp = await fetch(url);
+			const blob = await resp.blob();
+			const dataURL = await readBlobAsDataURL(blob);
+			return {family, src: `url('${dataURL}')`};
+		});
+		return await Promise.all(promises);
+	}
+
+	async function embedFonts(fonts) {
+		let dataURLfonts = await loadFontsAsDataURI(fonts);
+
+		let style = document.createElement("style");
+		style.setAttribute("id", "fonts");
+		style.innerHTML = dataURLfonts.map(({family, src}) => {
+			return `@font-face {font-family: "${family}"; src: ${src};}`;
+		}).join("\n");
+
+		svg.append(style);
+	}
+
 	let ret = {};
 	ret.get = function(id) {
 		return Node.get(id);
@@ -1008,11 +1109,13 @@ function Lignage(svg, nodes, options = {}) {
 		options[name] = value;
 		if (name == "root") {
 			redefineRoot();
+			redrawTree();
 		}
 		else {
+			removeTree();
 			initializeOptions();
+			if (fontsReady) drawTree();
 		}
-		redrawTree();
 	};
 
 	ret.exportJSON = function() {

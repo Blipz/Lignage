@@ -106,7 +106,8 @@
                 {start: "kleopatraVII", end: "ptolemaiosXIII", startDx: -5, y: 0.17, class: "dashed"},
                 {start: "kleopatraVII", end: "ptolemaiosXIV", startDx: 5, y: 0.17, class: "dashed"},
             ];
-            Lignage(document.getElementById("lignage"), nodes, {links, orient: "left", parentMargin: 50, cousinMargin: 30});
+            const title = {text: "Lagid dynasty", x: 1100, y: 600, fontFamily: "Cinzel", fontSize: 50};
+            Lignage(document.getElementById("lignage"), nodes, {links, title, orient: "left", parentMargin: 50, cousinMargin: 30});
         </script>
     </body>
 </html>

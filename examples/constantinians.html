@@ -73,7 +73,8 @@
                 {start: "constantina", end: "constantiusGallus", y: 0.4, class: "dashed"},
                 {start: "helena2", end: "julianus", y: 0.2},
             ];
-            Lignage(document.getElementById("lignage"), nodes, {links, cousinMargin: 30});
+            const title = {text: "Constantinian dynasty", fontFamily: "Cinzel", fontSize: 50};
+            Lignage(document.getElementById("lignage"), nodes, {links, title, cousinMargin: 30});
         </script>
     </body>
 </html>

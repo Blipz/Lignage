@@ -96,9 +96,28 @@ The following options can be used:
 - **cousinMargin**: minimal horizontal spacing between cousins (default: 100)
 - **images**: whether or not to display images (default: false)
 - **editable**: whether or not to allow on-the-fly edition (default: false)
-- **fontSize**: size of the font used (default: 16)
+- **fontFamily**: family of the font used for the node name (default: the browser default font)
+- **fontSize**: size of the font used for the node name (default: 16)
+- **fontVariant**: variant of the font used for the node name (default: "normal")
+- **fontWeight**: weight of the font used for the node name (default: "bold")
 - **align**: default value for the `align` node property, can be "left", "center" or "right" (default: "center")
 - **orient**: orientation of the tree, can be "top", "bottom", "left" or "right" (default: "top")
+- **fonts**: list of external fonts to load, each font being an object with the following attributes:
+  - **family**: family of the font
+  - **url**: link to an external font file
+- **title**: object representing a title associated to the tree, with the following attributes:
+  - **text** (mandatory): text to write
+  - **fontFamily**: family of the font used (default: the browser default font)
+  - **fontSize**: size of the font used (default: the browser default size)
+  - **fontVariant**: variant of the font used (default: "normal")
+  - **fontWeight**: weight of the font used (default: "normal")
+  - **x**: horizontal position of the title (default: 0)
+  - **y**: vertical position of the title (default: 0)
+- **emblem**: object representing an emblem associated to the tree, with the following attributes:
+  - **url** (mandatory): link to an external image
+  - **scale**: scaling factor for the image (default: 1)
+  - **x**: horizontal position of the image (default: 0)
+  - **y**: vertical position of the image (default: 0)
 
 ## API
 
