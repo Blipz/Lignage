@@ -6,6 +6,7 @@ function Lignage(svg, nodes, options = {}) {
 			this.children = [];
 			this.x = 0;
 			this.y = 0;
+			this.skips = 0;
 			this.isRoot = false;
 		}
 
@@ -237,9 +238,14 @@ function Lignage(svg, nodes, options = {}) {
 			}
 			else if (level == 1) {
 				this.children = [node];
+				this.x = node.x;
+				this.y = node.y;
 			}
 			else {
-				this.children = [new PseudoNode(node, level - 1)];
+				let child = new PseudoNode(node, level - 1);
+				this.children = [child];
+				this.x = child.x;
+				this.y = child.y;
 			}
 		}
 	}
@@ -636,9 +642,12 @@ function Lignage(svg, nodes, options = {}) {
 					for (let child of node.children) {
 						if (child.virtual || linkReplace.includes(child.id)) continue;
 						let [x2, y2] = child.getCoord();
+						let dy = options.parentMargin * fraction;
 						x2 += getWidth() / 2;
-						if (reversed()) y2 += getHeight();
-						let dy = (y2 - y1) * fraction;
+						if (reversed()) {
+							y2 += getHeight();
+							dy = -dy;
+						}
 						if (!rotated()) {
 							container.append(makeElement("path", {d: `M${round(x1)} ${round(y1)} v${round(dy)} H${round(x2)} V${round(y2)}`, stroke: "black", fill: "none"}));
 						}
@@ -892,22 +901,19 @@ function Lignage(svg, nodes, options = {}) {
 						let shift = positions[end];
 						for (let i=end-1; i>=start; i--) {
 							shift -= nodes[i].getSize() + margin;
-							nodes[i].setCoord(shift + collisionShift, adjusted[nodes[i].id] ? null : y);
-							adjusted[nodes[i].id] = true;
+							nodes[i].setCoord(shift + collisionShift, y);
 						}
 					}
 					else {
 						basePos += margin - options.siblingMargin;
 						for (let i=start; i<end; i++) {
-							nodes[i].setCoord(basePos, adjusted[nodes[i].id] ? null : y);
-							adjusted[nodes[i].id] = true;
+							nodes[i].setCoord(basePos, y);
 							basePos += nodes[i].getSize() + margin;
 						}
 					}
 
 					if (foundAnchor) {
-						nodes[end].setCoord(positions[end], adjusted[nodes[end].id] ? null : y);
-						adjusted[nodes[end].id] = true;
+						nodes[end].setCoord(positions[end], y);
 						if (collisionShift) {
 							// Move all next siblings to the right, with their descent
 							for (let i=end; i<positions.length; i++) {
@@ -938,7 +944,6 @@ function Lignage(svg, nodes, options = {}) {
 			}
 		}
 
-		let adjusted = {};
 		for (let depth=rootNode.getDepth(); depth>=0; depth--) {
 			adjustPositions(depth);
 		}
