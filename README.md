@@ -21,7 +21,12 @@ Historical:
 
 Fantasy:
 
+[<img title="Greek pantheon" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Oracle_of_Delphi%2C_red-figure_kylix%2C_440-430_BC%2C_Kodros_Painter%2C_Berlin_F_2538%2C_141668.jpg/353px-Oracle_of_Delphi%2C_red-figure_kylix%2C_440-430_BC%2C_Kodros_Painter%2C_Berlin_F_2538%2C_141668.jpg" width="100" height="100">](https://blipz.github.io/Lignage/examples/greekPantheon.html)
 [<img title="House Stark" src="https://oyster.ignimgs.com/mediawiki/apis.ign.com/game-of-thrones/9/9b/Stark_Sigil.jpg" width="100" height="100">](https://blipz.github.io/Lignage/examples/stark.html)
+[<img title="Farseer dynasty" src="examples/farseer.png" width="100" height="100">](https://blipz.github.io/Lignage/examples/farseer.html)
+[<img title="House Ducatore-Bromael" src="examples/ducatoreBromael.png" width="100" height="100">](https://blipz.github.io/Lignage/examples/ducatoreBromael.html)
+[<img title="House of Amber" src="examples/amber.png" width="auto" height="100">](https://blipz.github.io/Lignage/examples/amber.html)
+[<img title="House Atreides" src="https://static.wikia.nocookie.net/dune/images/5/56/Atreides_2021.png" width="100" height="100">](https://blipz.github.io/Lignage/examples/atreides.html)
 
 ## Limitations
 
