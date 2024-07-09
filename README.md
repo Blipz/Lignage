@@ -121,7 +121,7 @@ The following options can be used:
   - **y**: vertical position of the title (default: 0)
 - **emblem**: object representing an emblem associated to the tree, with the following attributes:
   - **url** (mandatory): link to an external image
-  - **scale**: scaling factor for the image (default: 1)
+  - **width**: width of the image (default: original width)
   - **x**: horizontal position of the image (default: 0)
   - **y**: vertical position of the image (default: 0)
 

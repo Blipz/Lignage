@@ -1045,9 +1045,9 @@ function Lignage(svg, nodes, options = {}) {
 			svg.append(makeElement("image", {
 				id: "emblem",
 				href: options.emblem.url,
-				x: 0,
-				y: 0,
-				transform: `translate(${bbox.x + (options.emblem.x || 0)} ${bbox.y + (options.emblem.y || 0)}) scale(${options.emblem.scale || 1})`
+				x: bbox.x + options.emblem.x || 0,
+				y: bbox.y + options.emblem.y || 0,
+				width: options.emblem.width
 			}));
 		}
 	}
