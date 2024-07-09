@@ -466,7 +466,8 @@ function Lignage(svg, nodes, options = {}) {
 				"font-variant": options.fontVariant,
 				"font-weight": options.fontWeight,
 				"text-anchor": "middle",
-				cursor: node.url ? "pointer" : "default"
+				cursor: node.url ? "pointer" : "default",
+				style: "display: none"  // start hidden so that it does not affect viewbox calculation
 			}, node.name || "");
 			elem.append(node.url ? makeElement("a", {href: node.url, target: "_blank"}, text) : text);
 
@@ -1011,12 +1012,19 @@ function Lignage(svg, nodes, options = {}) {
 		// Translate half a pixel so that line borders end up at pixel boundaries
 		svg.setAttribute("transform", "translate(0.5 0.5)");
 
-		// Cannot do this earlier: svg must have viewBox to the right value so that the calculations are consistent
-		svg.querySelectorAll(".name").forEach(function(text) {
-			for (let size = options.fontSize; text.getBBox().width > options.width && size > 0; size--) {
-				text.setAttribute("font-size", size);
-			}
-		});
+		function resizeText() {
+			// Note that svg must have viewBox to the right value so that the calculations are consistent
+			svg.querySelectorAll(".name").forEach(function(text) {
+				text.removeAttribute("style");
+				for (let size = options.fontSize; text.getBBox().width > options.width && size > 0; size--) {
+					text.setAttribute("font-size", size);
+				}
+			});
+		}
+
+		document.fonts.onloadingdone = resizeText;
+		document.fonts.onloadingerror = resizeText;
+		if (document.fonts.size == 0) resizeText();
 
 		if (options.title) {
 			svg.append(makeElement("text", {
@@ -1137,7 +1145,14 @@ function Lignage(svg, nodes, options = {}) {
 	}
 
 	async function embedFonts(fonts) {
-		let dataURLfonts = await loadFontsAsDataURI(fonts);
+		let dataURLfonts;
+		try {
+			dataURLfonts = await loadFontsAsDataURI(fonts);
+		}
+		catch(e) {
+			console.warn("Could not load fonts: " + e.message);
+			return;
+		}
 
 		let style = document.createElement("style");
 		style.setAttribute("id", "fonts");
