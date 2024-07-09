@@ -85,6 +85,7 @@ The following options can be used:
   - **end** (mandatory): identifier of the end node
   - **type**: one of the following values (default: union)
     - descent: for representing a parental link (start bottom -> end top)
+    - siblingDescent: same as `descent`, but integrates with other siblings
     - union: for representing a marriage link (start bottom -> end bottom)
     - closeUnion: for representing a marriage link between adjacent nodes (start right -> end left)
   - **startDx**: horizontal shift at the start of the link (default: 0)

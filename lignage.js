@@ -260,8 +260,8 @@ function Lignage(svg, nodes, options = {}) {
 		return elem;
 	}
 
-	function round(x) {
-		return Math.round(x * 10) / 10;
+	function round(x, precision = 0) {
+		return Math.round(x * 10 ** precision) / 10 ** precision;
 	}
 
 	function reversed() {
@@ -399,6 +399,43 @@ function Lignage(svg, nodes, options = {}) {
 	}
 
 	function drawTree() {
+		function drawCircle(container, x, y) {
+			if (!rotated()) {
+				container.append(makeElement("circle", {cx: round(x), cy: round(y), r: 5, fill: "black"}));
+			}
+			else {
+				container.append(makeElement("circle", {cx: round(y), cy: round(x), r: 5, fill: "black"}));
+			}
+		}
+
+		function drawLine(container, x1, y1, x2, y2, options = {}) {
+			let line;
+			if (!rotated()) {
+				line = makeElement("line", {x1: round(x1), y1: round(y1), x2: round(x2), y2: round(y2), stroke: "black"});
+			}
+			else {
+				line = makeElement("line", {x1: round(y1), y1: round(x1), x2: round(y2), y2: round(x2), stroke: "black"});
+			}
+			if (options.class) {
+				line.classList.add(options.class);
+			}
+			container.append(line);
+		}
+
+		function drawPath(container, x1, y1, x2, y2, dx, dy1, dy2, options = {}) {
+			let path;
+			if (!rotated()) {
+				path = makeElement("path", {d: `M${round(x1)} ${round(y1)} v${round(dy1)} h${round(dx)} V${round(y2 + dy2)} H${round(x2)} V${round(y2)}`, stroke: "black", fill: "none"});
+			}
+			else {
+				path = makeElement("path", {d: `M${round(y1)} ${round(x1)} h${round(dy1)} v${round(dx)} H${round(y2 + dy2)} V${round(x2)} H${round(y2)}`, stroke: "black", fill: "none"});
+			}
+			if (options.class) {
+				path.classList.add(options.class);
+			}
+			container.append(path);
+		}
+
 		function drawNodes(node, container) {
 			let {x, y} = node.getPosition();
 
@@ -639,21 +676,22 @@ function Lignage(svg, nodes, options = {}) {
 					if (!reversed()) {
 						y1 += getHeight();
 					}
-					for (let child of node.children) {
-						if (child.virtual || linkReplace.includes(child.id)) continue;
+					let dy = options.parentMargin * fraction;
+					if (reversed()) {
+						dy = -dy;
+					}
+					let children = node.children.filter(x => !x.virtual && !linkReplace.includes(x.id));
+					if (children.length > 0) {
+						drawLine(container, x1, y1, x1, y1 + dy);
+						drawLine(container, Math.min(x1, children[0].getCoord()[0] + getWidth() / 2), y1 + dy, Math.max(x1, children.at(-1).getCoord()[0] + getWidth() / 2), y1 + dy);
+					}
+					for (let child of children) {
 						let [x2, y2] = child.getCoord();
-						let dy = options.parentMargin * fraction;
 						x2 += getWidth() / 2;
 						if (reversed()) {
 							y2 += getHeight();
-							dy = -dy;
 						}
-						if (!rotated()) {
-							container.append(makeElement("path", {d: `M${round(x1)} ${round(y1)} v${round(dy)} H${round(x2)} V${round(y2)}`, stroke: "black", fill: "none"}));
-						}
-						else {
-							container.append(makeElement("path", {d: `M${round(y1)} ${round(x1)} h${round(dy)} V${round(x2)} H${round(y2)}`, stroke: "black", fill: "none"}));
-						}
+						drawLine(container, x2, y1 + dy, x2, y2);
 					}
 				}
 				for (let spouse of node.spouses) {
@@ -673,14 +711,8 @@ function Lignage(svg, nodes, options = {}) {
 			let x = (x1 + x2 + getWidth()) / 2;
 			let y = y1 + getHeight() / 2;
 			if (!node.spouses[0].virtual) {
-				if (!rotated()) {
-					container.append(makeElement("circle", {cx: round(x), cy: round(y), r: 5, fill: "black"}));
-					container.append(makeElement("path", {d: `M${round(x - options.spouseMargin / 2)} ${round(y)} h${round(options.spouseMargin)}`, stroke: "black"}));
-				}
-				else {
-					container.append(makeElement("circle", {cx: round(y), cy: round(x), r: 5, fill: "black"}));
-					container.append(makeElement("path", {d: `M${round(y)} ${round(x - options.spouseMargin / 2)} v${round(options.spouseMargin)}`, stroke: "black"}));
-				}
+				drawCircle(container, x, y);
+				drawLine(container, x - options.spouseMargin / 2, y, x + options.spouseMargin / 2, y);
 			}
 
 			// Draw links between parents and children
@@ -689,18 +721,17 @@ function Lignage(svg, nodes, options = {}) {
 			if (reversed()) {
 				dy = -dy;
 			}
-			for (let child of node.children) {
-				if (child.virtual || linkReplace.includes(child.id)) continue;
+			let children = node.children.filter(x => !x.virtual && !linkReplace.includes(x.id));
+			if (children.length > 0) {
+				drawLine(container, x, y, x, y + dy);
+				drawLine(container, Math.min(x, children[0].getCoord()[0] + getWidth() / 2), y + dy, Math.max(x, children.at(-1).getCoord()[0] + getWidth() / 2), y + dy);
+			}
+			for (let child of children) {
 				let [x3, y3] = child.getCoord();
 				if (reversed()) {
 					y3 += getHeight();
 				}
-				if (!rotated()) {
-					container.append(makeElement("path", {d: `M${round(x)} ${round(y)} v${round(dy)} H${round(x3 + getWidth() / 2)} V${round(y3)}`, stroke: "black", fill: "none"}));
-				}
-				else {
-					container.append(makeElement("path", {d: `M${round(y)} ${round(x)} h${round(dy)} V${round(x3 + getWidth() / 2)} H${round(y3)}`, stroke: "black", fill: "none"}));
-				}
+				drawLine(container, x3 + getWidth() / 2, y + dy, x3 + getWidth() / 2, y3);
 			}
 		}
 
@@ -735,37 +766,34 @@ function Lignage(svg, nodes, options = {}) {
 					console.warn(e.message);
 					continue;
 				}
-				let dx = (x2 - x1) * (link.x === undefined ? 0.5 : link.x);
+				if (link.replace) replacements.push(link.end);
 				let dy = options.parentMargin * (link.y === undefined ? 0.5 : link.y);
 				if (reversed()) {
 					dy = -dy;
 				}
-				let y3;
 				if (link.type == "union" || link.type === undefined) {
+					let dx = (x2 - x1) * (link.x === undefined ? 0.5 : link.x);
 					x1 += getWidth() / 2;
 					x2 += getWidth() / 2;
 					if (!reversed()) {
 						y1 += getHeight();
 						y2 += getHeight();
 					}
-					y3 = y2 + dy;
+					drawPath(container, x1, y1, x2, y2, dx, dy, dy, {class: link.class});
 				}
 				else if (link.type == "closeUnion") {
 					// This should be used only for same-level nodes that are next to each other
 					x1 += getWidth();
 					y1 += getHeight() / 2;
 					y2 += getHeight() / 2;
-					dx = 0;
-					dy = 0;
-					y3 = y2;
-					if (!rotated()) {
-						container.append(makeElement("circle", {cx: round((x1 + x2) / 2), cy: round((y1 + y2) / 2), r: 5, fill: "black"}));
-					}
-					else {
-						container.append(makeElement("circle", {cx: round((y1 + y2) / 2), cy: round((x1 + x2) / 2), r: 5, fill: "black"}));
-					}
+					drawCircle(container, (x1 + x2) / 2, (y1 + y2) / 2);
+					drawLine(container, x1, y1, x2, y2, {class: link.class});
 				}
-				else if (link.type == "descent") {
+				else if (link.type == "descent" || link.type == "siblingDescent" && (
+					typeof link.start == "object" && Node.get(link.start[0]).children.length == 0 && Node.get(link.start[1]).children.length == 0 ||
+					typeof link.start != "object" && Node.get(link.start).children.length == 0)
+				) {
+					let dx = (x2 - x1) * (link.x === undefined ? 0.5 : link.x);
 					x1 += getWidth() / 2;
 					x2 += getWidth() / 2;
 					if (!reversed()) {
@@ -774,26 +802,44 @@ function Lignage(svg, nodes, options = {}) {
 					else {
 						y2 += getHeight();
 					}
-					y3 = y2 - dy;
+					let dy1 = dy;
+					let dy2 = -dy;
 					if (typeof link.start == "object") {
+						dy1 += reversed() ? -getHeight() / 2 : getHeight() / 2;
+					}
+					drawPath(container, x1, y1, x2, y2, dx, dy1, dy2, {class: link.class});
+				}
+				else if (link.type == "siblingDescent") {
+					x2 += getWidth() / 2;
+					if (!reversed()) {
+						y1 += getHeight();
+					}
+					else {
+						y2 += getHeight();
+					}
+					let siblings;
+					if (typeof link.start == "object") {
+						siblings = Node.get(link.start[0]).isKin() ? Node.get(link.start[1]).children : Node.get(link.start[0]).children;
 						dy += reversed() ? -getHeight() / 2 : getHeight() / 2;
 					}
+					else {
+						siblings = Node.get(link.start).children;
+					}
+					if (Node.get(link.end).getCoord()[0] < siblings[0].getCoord()[0]) {
+						x1 = siblings[0].getCoord()[0] + getWidth() / 2;
+					}
+					else if (Node.get(link.end).getCoord()[0] > siblings.at(-1).getCoord()[0]) {
+						x1 = siblings.at(-1).getCoord()[0] + getWidth() / 2;
+					}
+					else {
+						drawLine(container, x2, y1 + dy, x2, y2, {class: link.class});
+						continue;
+					}
+					drawPath(container, x1, y1 + dy, x2, y2, x2 - x1, 0, 0, {class: link.class});
 				}
 				else {
 					console.warn(`Unknown link type: '${link.type}'`);
-					continue;
 				}
-				let path;
-				if (!rotated()) {
-					path = makeElement("path", {d: `M${round(x1)} ${round(y1)} v${round(dy)} h${round(dx)} V${round(y3)} H${round(x2)} V${round(y2)}`, stroke: "black", fill: "none"});
-				}
-				else {
-					path = makeElement("path", {d: `M${round(y1)} ${round(x1)} h${round(dy)} v${round(dx)} H${round(y3)} V${round(x2)} H${round(y2)}`, stroke: "black", fill: "none"});
-				}
-				if (link.class) path.classList.add(link.class);
-				container.append(path);
-
-				if (link.replace) replacements.push(link.end);
 			}
 
 			return replacements;
@@ -962,6 +1008,8 @@ function Lignage(svg, nodes, options = {}) {
 		svg.setAttribute("viewBox", `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + 2 * padding} ${bbox.height + 2 * padding}`);
 		svg.setAttribute("width", bbox.width + 2 * padding);
 		svg.setAttribute("height", bbox.height + 2 * padding);
+		// Translate half a pixel so that line borders end up at pixel boundaries
+		svg.setAttribute("transform", "translate(0.5 0.5)");
 
 		// Cannot do this earlier: svg must have viewBox to the right value so that the calculations are consistent
 		svg.querySelectorAll(".name").forEach(function(text) {
