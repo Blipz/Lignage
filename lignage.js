@@ -328,14 +328,7 @@ function Lignage(svg, nodes, options = {}) {
 				fonts.push({family, url});
 			}
 		}
-		if (!fontsReady && fonts.length > 0) {
-			embedFonts(fonts).then(function() {
-				fontsReady = true;
-				drawTree();
-			});
-			return false;
-		}
-		return true;
+		return fonts;
 	}
 
 	function redefineRoot() {
@@ -363,12 +356,9 @@ function Lignage(svg, nodes, options = {}) {
 	svg.append(defs);
 
 	let rootNode;
-	let fontsReady = false;
-	fontsReady = initializeOptions();
+	let fonts = initializeOptions();
 	initializeTree();
-	if (fontsReady) {
-		drawTree();
-	}
+	loadFonts(fonts).then(drawTree);
 
 	function initializeTree() {
 		for (let node of nodes) {
@@ -1012,19 +1002,13 @@ function Lignage(svg, nodes, options = {}) {
 		// Translate half a pixel so that line borders end up at pixel boundaries
 		svg.setAttribute("transform", "translate(0.5 0.5)");
 
-		function resizeText() {
-			// Note that svg must have viewBox to the right value so that the calculations are consistent
-			svg.querySelectorAll(".name").forEach(function(text) {
-				text.removeAttribute("style");
-				for (let size = options.fontSize; text.getBBox().width > options.width && size > 0; size--) {
-					text.setAttribute("font-size", size);
-				}
-			});
-		}
-
-		document.fonts.onloadingdone = resizeText;
-		document.fonts.onloadingerror = resizeText;
-		if (document.fonts.size == 0) resizeText();
+		// Note that svg must have viewBox to the right value so that the calculations are consistent
+		svg.querySelectorAll(".name").forEach(function(text) {
+			text.removeAttribute("style");
+			for (let size = options.fontSize; text.getBBox().width > options.width && size > 0; size--) {
+				text.setAttribute("font-size", size);
+			}
+		});
 
 		if (options.title) {
 			svg.append(makeElement("text", {
@@ -1144,7 +1128,9 @@ function Lignage(svg, nodes, options = {}) {
 		return await Promise.all(promises);
 	}
 
-	async function embedFonts(fonts) {
+	async function loadFonts(fonts) {
+		if (fonts.size == 0) return;
+
 		let dataURLfonts;
 		try {
 			dataURLfonts = await loadFontsAsDataURI(fonts);
@@ -1189,9 +1175,8 @@ function Lignage(svg, nodes, options = {}) {
 			redrawTree();
 		}
 		else {
-			removeTree();
-			initializeOptions();
-			if (fontsReady) drawTree();
+			let fonts = initializeOptions();
+			loadFonts(fonts).then(redrawTree);
 		}
 	};
 
