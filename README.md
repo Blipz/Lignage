@@ -44,13 +44,13 @@ See below for means to mitigate some of these limitations.
 <svg id="lignage"></svg>
 
 <script>
-    const nodes = [
-        {id: "johnDoe", name: "John Doe"},
-        {id: "janeDoe", name: "Jane Doe", spouse: "johnDoe"},
-        {id: "babyDoe", name: "Baby Doe", parent: "janeDoe"}
-    ];
-    const options = {};
-    Lignage(document.getElementById("lignage"), nodes, options);
+  const nodes = [
+    {id: "johnDoe", name: "John Doe"},
+    {id: "janeDoe", name: "Jane Doe", spouse: "johnDoe"},
+    {id: "babyDoe", name: "Baby Doe", parent: "janeDoe"}
+  ];
+  const options = {};
+  Lignage(document.getElementById("lignage"), nodes, options);
 </script>
 ```
 
@@ -160,14 +160,14 @@ For instance:
 
 ```html
 <svg id="lignage">
-    <style>
-        .royal rect {
-            fill: royalblue;
-        }
-        .royal text {
-            fill: white;
-        }
-    </style>
+  <style>
+    .royal rect {
+      fill: royalblue;
+    }
+    .royal text {
+      fill: white;
+    }
+  </style>
 </svg>
 ```
 
@@ -185,7 +185,7 @@ Example:
 
 ```javascript
 const links = [
-    {start: "spouse1", end: "spouse2"}
+  {start: "spouse1", end: "spouse2"}
 ];
 ```
 
@@ -200,7 +200,7 @@ Example:
 
 ```javascript
 const links = [
-    {start: ["parent1", "parent2"], end: "child", type: "descent"}
+  {start: ["parent1", "parent2"], end: "child", type: "descent"}
 ];
 ```
 
@@ -212,10 +212,10 @@ This means that consanguine unions will appear as soon as any two of these subtr
 Example:
 ```javascript
 const nodes = [
-    {id: "realRoot", virtual: true},
-    {id: "fakeRoot1", parent: "realRoot"},
-    {id: "fakeRoot2", parent: "realRoot"},
-    {id: "fakeRoot3", parent: "realRoot"}
+  {id: "realRoot", virtual: true},
+  {id: "fakeRoot1", parent: "realRoot"},
+  {id: "fakeRoot2", parent: "realRoot"},
+  {id: "fakeRoot3", parent: "realRoot"}
 ];
 ```
 

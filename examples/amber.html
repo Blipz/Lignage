@@ -1,103 +1,103 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>House of Amber</title>
-        <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
-        <script src="../lignage.js"></script>
-        <style>
-            html {
-                height: 100%;
-            }
-            body {
-                height: calc(100% - 16px);
-            }
-            #lignage {
-                width: 100%;
-                height: 100%;
-            }
-        </style>
-    </head>
-    <body>
-        <svg id="lignage">
-            <style>
-                .prince rect {
-                    fill: #ffbf00;
-                }
-                .prince text {
-                    fill: white;
-                }
-                .dashed {
-                    stroke-dasharray: 4 2;
-                }
-            </style>
-        </svg>
-        <script>
-            const nodes = [
-                {id: "root", virtual: true},
-                {id: "dworkin", name: "Dworkin", parent: "root"},
-                {id: "theUnicorn", name: "The Unicorn", spouse: "dworkin"},
-                {id: "paulette", name: "Paulette", parent: "root", skips: 2},
-                {id: "lora", name: "Lora", parent: "root", skips: 2},
-                {id: "deela", name: "Deela", parent: "root", skips: 2},
-                {id: "clarissa", name: "Clarissa", parent: "root", skips: 2},
-                {id: "kinta", name: "Kinta", parent: "root", skips: 2},
-                {id: "faiella", name: "Faiella", parent: "root", skips: 2},
-                {id: "moins", name: "Moins", parent: "root", skips: 2},
-                {id: "cymnea", name: "Cymnea", parent: "root", skips: 2},
-                {id: "dybele", name: "Dybele", parent: "root", skips: 2},
-                {id: "rilga", name: "Rilga", parent: "root", skips: 2},
-                {id: "oberon", name: "Oberon", parent: "theUnicorn"},
-                {id: "random", name: "RANDOM", parent: "paulette", class: "prince"},
-                {id: "morganthe", name: "Morganthe", spouse: "random"},
-                {id: "vialle", name: "Vialle", spouse: "random"},
-                {id: "mirelle", name: "Mirelle", parent: "paulette"},
-                {id: "delwin", name: "Delwin", parent: "lora"},
-                {id: "sand", name: "Sand", parent: "lora"},
-                {id: "dalt", name: "Dalt", parent: "deela"},
-                {id: "fiona", name: "Fiona", parent: "clarissa"},
-                {id: "brand", name: "BRAND", parent: "clarissa", class: "prince"},
-                {id: "jasra", name: "Jasra", spouse: "brand"},
-                {id: "bleys", name: "BLEYS", parent: "clarissa", class: "prince"},
-                {id: "coral", name: "Coral", parent: "kinta"},
-                {id: "deirdre", name: "Deirdre", parent: "faiella"},
-                {id: "corwin", name: "CORWIN", parent: "faiella", class: "prince"},
-                {id: "eric", name: "ERIC", parent: "faiella", class: "prince"},
-                {id: "llewella", name: "Llewella", parent: "moins"},
-                {id: "finndo", name: "Finndo", parent: "cymnea"},
-                {id: "benedict", name: "BENEDICT", parent: "cymnea", class: "prince"},
-                {id: "lintra", name: "Lintra", spouse: "benedict"},
-                {id: "osric", name: "Osric", parent: "cymnea"},
-                {id: "florimel", name: "Florimel", parent: "dybele"},
-                {id: "gerard", name: "GÉRARD", parent: "rilga", class: "prince"},
-                {id: "caine", name: "CAINE", parent: "rilga", class: "prince"},
-                {id: "julian", name: "JULIAN", parent: "rilga", class: "prince"},
-                {id: "martin", name: "Martin", parent: "morganthe"},
-                {id: "rinaldo", name: "Rinaldo", parent: "jasra"},
-                {id: "merlin", name: "Merlin", parent: "corwin", skips: 3},
-                {id: "node0", parent: "lintra"},
-                {id: "node1", parent: "node0"},
-                {id: "dara", name: "Dara", parent: "node1"},
-                {id: "sawal", name: "Sawal", spouse: "dara"},
-                {id: "jurt", name: "Jurt", parent: "sawal"},
-                {id: "despil", name: "Despil", parent: "sawal"},
-            ];
-            const links = [
-                {start: "oberon", end: "paulette", y: 0.25},
-                {start: "oberon", end: "lora", x: 0.8, y: 0.25},
-                {start: "oberon", end: "deela", x: 0.85, y: 0.25},
-                {start: "oberon", end: "clarissa", x: 0.87, y: 0.25},
-                {start: "oberon", end: "kinta", x: 0.92, y: 0.25},
-                {start: "oberon", end: "faiella", x: 0.93, y: 0.25},
-                {start: "oberon", end: "moins", x: 0.94, y: 0.25},
-                {start: "oberon", end: "cymnea", x: 0.96, y: 0.25},
-                {start: "oberon", end: "dybele", x: 0.96, y: 0.25},
-                {start: "oberon", end: "rilga", x: 0.96, y: 0.25},
-                {start: "rinaldo", end: "coral", x: 1},
-                {start: "dara", end: "merlin", type: "descent", x: 1, y: 0.25},
-            ];
-            const title = {text: "House of Amber", x: 500, y: 700, fontFamily: "Ballet", fontSize: 65, fontWeight: "bold"};
-            const emblem = {url: "amber.png", x: 640, y: 820, width: 160};
-            Lignage(document.getElementById("lignage"), nodes, {links, title, emblem, cousinMargin: 30, fontSize: 20, exclude: ["lora", "deela", "mirelle", "finndo", "osric"]});
-        </script>
-    </body>
+  <head>
+    <title>House of Amber</title>
+    <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
+    <script src="../lignage.js"></script>
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        height: calc(100% - 16px);
+      }
+      #lignage {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <svg id="lignage">
+      <style>
+        .prince rect {
+          fill: #ffbf00;
+        }
+        .prince text {
+          fill: white;
+        }
+        .dashed {
+          stroke-dasharray: 4 2;
+        }
+      </style>
+    </svg>
+    <script>
+      const nodes = [
+        {id: "root", virtual: true},
+        {id: "dworkin", name: "Dworkin", parent: "root"},
+        {id: "theUnicorn", name: "The Unicorn", spouse: "dworkin"},
+        {id: "paulette", name: "Paulette", parent: "root", skips: 2},
+        {id: "lora", name: "Lora", parent: "root", skips: 2},
+        {id: "deela", name: "Deela", parent: "root", skips: 2},
+        {id: "clarissa", name: "Clarissa", parent: "root", skips: 2},
+        {id: "kinta", name: "Kinta", parent: "root", skips: 2},
+        {id: "faiella", name: "Faiella", parent: "root", skips: 2},
+        {id: "moins", name: "Moins", parent: "root", skips: 2},
+        {id: "cymnea", name: "Cymnea", parent: "root", skips: 2},
+        {id: "dybele", name: "Dybele", parent: "root", skips: 2},
+        {id: "rilga", name: "Rilga", parent: "root", skips: 2},
+        {id: "oberon", name: "Oberon", parent: "theUnicorn"},
+        {id: "random", name: "RANDOM", parent: "paulette", class: "prince"},
+        {id: "morganthe", name: "Morganthe", spouse: "random"},
+        {id: "vialle", name: "Vialle", spouse: "random"},
+        {id: "mirelle", name: "Mirelle", parent: "paulette"},
+        {id: "delwin", name: "Delwin", parent: "lora"},
+        {id: "sand", name: "Sand", parent: "lora"},
+        {id: "dalt", name: "Dalt", parent: "deela"},
+        {id: "fiona", name: "Fiona", parent: "clarissa"},
+        {id: "brand", name: "BRAND", parent: "clarissa", class: "prince"},
+        {id: "jasra", name: "Jasra", spouse: "brand"},
+        {id: "bleys", name: "BLEYS", parent: "clarissa", class: "prince"},
+        {id: "coral", name: "Coral", parent: "kinta"},
+        {id: "deirdre", name: "Deirdre", parent: "faiella"},
+        {id: "corwin", name: "CORWIN", parent: "faiella", class: "prince"},
+        {id: "eric", name: "ERIC", parent: "faiella", class: "prince"},
+        {id: "llewella", name: "Llewella", parent: "moins"},
+        {id: "finndo", name: "Finndo", parent: "cymnea"},
+        {id: "benedict", name: "BENEDICT", parent: "cymnea", class: "prince"},
+        {id: "lintra", name: "Lintra", spouse: "benedict"},
+        {id: "osric", name: "Osric", parent: "cymnea"},
+        {id: "florimel", name: "Florimel", parent: "dybele"},
+        {id: "gerard", name: "GÉRARD", parent: "rilga", class: "prince"},
+        {id: "caine", name: "CAINE", parent: "rilga", class: "prince"},
+        {id: "julian", name: "JULIAN", parent: "rilga", class: "prince"},
+        {id: "martin", name: "Martin", parent: "morganthe"},
+        {id: "rinaldo", name: "Rinaldo", parent: "jasra"},
+        {id: "merlin", name: "Merlin", parent: "corwin", skips: 3},
+        {id: "node0", parent: "lintra"},
+        {id: "node1", parent: "node0"},
+        {id: "dara", name: "Dara", parent: "node1"},
+        {id: "sawal", name: "Sawal", spouse: "dara"},
+        {id: "jurt", name: "Jurt", parent: "sawal"},
+        {id: "despil", name: "Despil", parent: "sawal"},
+      ];
+      const links = [
+        {start: "oberon", end: "paulette", y: 0.25},
+        {start: "oberon", end: "lora", x: 0.8, y: 0.25},
+        {start: "oberon", end: "deela", x: 0.85, y: 0.25},
+        {start: "oberon", end: "clarissa", x: 0.87, y: 0.25},
+        {start: "oberon", end: "kinta", x: 0.92, y: 0.25},
+        {start: "oberon", end: "faiella", x: 0.93, y: 0.25},
+        {start: "oberon", end: "moins", x: 0.94, y: 0.25},
+        {start: "oberon", end: "cymnea", x: 0.96, y: 0.25},
+        {start: "oberon", end: "dybele", x: 0.96, y: 0.25},
+        {start: "oberon", end: "rilga", x: 0.96, y: 0.25},
+        {start: "rinaldo", end: "coral", x: 1},
+        {start: "dara", end: "merlin", type: "descent", x: 1, y: 0.25},
+      ];
+      const title = {text: "House of Amber", x: 500, y: 700, fontFamily: "Ballet", fontSize: 65, fontWeight: "bold"};
+      const emblem = {url: "amber.png", x: 640, y: 820, width: 160};
+      Lignage(document.getElementById("lignage"), nodes, {links, title, emblem, cousinMargin: 30, fontSize: 20, exclude: ["lora", "deela", "mirelle", "finndo", "osric"]});
+    </script>
+  </body>
 </html>

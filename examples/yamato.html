@@ -1,114 +1,114 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Yamato dynasty</title>
-        <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
-        <script src="../lignage.js"></script>
-        <style>
-            #lignage {
-                width: 100%;
-                height: 100%;
-            }
-        </style>
-    </head>
-    <body>
-        <svg id="lignage">
-            <style>
-                .tenno rect {
-                    fill: deeppink;
-                }
-                .tenno text {
-                    fill: white;
-                }
-                .dashed {
-                    stroke-dasharray: 4 2;
-                }
-            </style>
-        </svg>
-        <script>
-            const nodes = [
-                {id: "kazuhito", name: "GO-YŌZEI", text: "1572-1617", class: "tenno", url: "https://ja.wikipedia.org/wiki/後陽成天"},
-                {id: "konoeSakiko", name: "Konoe Sakiko", text: "1575-1630", spouse: "kazuhito"},
-                {id: "kokohito", name: "GO-MIZUNOO", text: "1596-1680", parent: "konoeSakiko", class: "tenno", url: "https://ja.wikipedia.org/wiki/後水尾天皇"},
-                {id: "tokugawaMasako", name: "Tokugawa Masako", text: "1607-1678", spouse: "kokohito"},
-                {id: "okiko", name: "MEISHŌ", text: "1624-1696", parent: "tokugawaMasako", class: "tenno", url: "https://ja.wikipedia.org/wiki/明正天皇"},
-                {id: "tsugohito", name: "GO-KŌMYŌ", text: "1633-1654", parent: "kokohito", class: "tenno", url: "https://ja.wikipedia.org/wiki/後光明天皇"},
-                {id: "niwataHideko", name: "Niwata Hideko", text: "", spouse: "tsugohito"},
-                {id: "nagahito", name: "GO-SAI", text: "1638-1685", parent: "kokohito", class: "tenno", url: "https://ja.wikipedia.org/wiki/後西天皇"},
-                {id: "princessAkiko", name: "Princess Akiko", text: "1638-1680", spouse: "nagahito"},
-                {id: "seikanjiTomoko", name: "Seikanji Tomoko", text: "", spouse: "nagahito"},
-                {id: "satohito", name: "REIGEN", text: "1654-1732", parent: "kokohito", class: "tenno", url: "https://ja.wikipedia.org/wiki/霊元天皇"},
-                {id: "takatsukasaFusako", name: "Takatsukasa Fusako", text: "1653-1712", spouse: "satohito"},
-                {id: "takako1", name: "Takako", text: "1650-1725", parent: "niwataHideko"},
-                {id: "mashiko", name: "Mashiko", text: "1669-1738", parent: "seikanjiTomoko"},
-                {id: "kujoSukezane", name: "Kujō Sukezane", text: "1669-1729", spouse: "mashiko", before: true},
-                {id: "asahito", name: "HIGASHIYAMA", text: "1675-1710", parent: "satohito", class: "tenno", url: "https://ja.wikipedia.org/wiki/東山天皇"},
-                {id: "princessYukiko", name: "Princess Yukiko", text: "1680-1720", spouse: "asahito"},
-                {id: "tomiko", name: "Tomiko", text: "1676-1707", parent: "satohito"},
-                {id: "fushimiKuninaga", name: "Fushimi Kuninaga", text: "1676-1726", spouse: "tomiko"},
-                {id: "yatsuhito", name: "NAKAMIKADO", text: "1702-1737", parent: "asahito", class: "tenno", url: "https://ja.wikipedia.org/wiki/中御門天皇"},
-                {id: "konoeHisako", name: "Konoe Hisako", text: "1702-1720", spouse: "yatsuhito"},
-                {id: "naohitoShinno", name: "Naohito shinnō", text: "1704-1753", parent: "asahito"},
-                {id: "fushimiSadatake", name: "Fushimi Sadatake", text: "1701-1754", parent: "fushimiKuninaga"},
-                {id: "teruhito", name: "SAKURAMACHI", text: "1720-1750", parent: "konoeHisako", class: "tenno", url: "https://ja.wikipedia.org/wiki/桜町天皇"},
-                {id: "nijoIeko", name: "Nijō Ieko", text: "1716-1790", spouse: "teruhito"},
-                {id: "sukehitoShinno", name: "Sukehito shinnō", text: "1733-1794", parent: "naohitoShinno", skips: 1},
-                {id: "fushimiKuniyori", name: "Fushimi Kuniyori", text: "1733-1802", parent: "fushimiSadatake", skips: 1},
-                {id: "noriko", name: "Noriko", text: "1737-1746", parent: "nijoIeko"},
-                {id: "toshiko1", name: "GO-SAKURAMACHI", text: "1740-1813", parent: "nijoIeko", class: "tenno", url: "https://ja.wikipedia.org/wiki/後桜町天皇"},
-                {id: "toohito", name: "MOMOZONO", text: "1741-1762", parent: "teruhito", class: "tenno", url: "https://ja.wikipedia.org/wiki/桃園天皇"},
-                {id: "ichijoTomiko", name: "Ichijō Tomiko", text: "1743-1796", spouse: "toohito"},
-                {id: "morohito", name: "KŌKAKU", text: "1771-1840", parent: "sukehitoShinno", skips: 1, class: "tenno", url: "https://ja.wikipedia.org/wiki/光格天皇"},
-                {id: "princessYoshiko", name: "Princess Yoshiko", text: "1779-1846", spouse: "morohito"},
-                {id: "kajyujiTadako", name: "Kajyūji Tadako", text: "1780-1843", spouse: "morohito"},
-                {id: "fushimiSadayuki", name: "Fushimi Sadayuki", text: "1776-1841", parent: "fushimiKuniyori", skips: 1},
-                {id: "hidehito", name: "GO-MOMOZONO", text: "1758-1779", parent: "ichijoTomiko", class: "tenno", url: "https://ja.wikipedia.org/wiki/後桃園天皇"},
-                {id: "konoeKoreko", name: "Konoe Koreko", text: "1760-1783", spouse: "hidehito"},
-                {id: "sadamochi", name: "Sadamochi", text: "1760-1772", parent: "ichijoTomiko"},
-                {id: "ayahito", name: "NINKŌ", text: "1800-1846", parent: "kajyujiTadako", class: "tenno", url: "https://ja.wikipedia.org/wiki/仁孝天皇"},
-                {id: "takatsukasaTsunako", name: "Takatsukasa Tsunako", text: "1798-1823", spouse: "ayahito"},
-                {id: "ogimachiNaoko", name: "Ōgimachi Naoko", text: "1803-1856", spouse: "ayahito"},
-                {id: "fushimiKuniie", name: "Fushimi Kuniie", text: "1802-1872", parent: "fushimiSadayuki"},
-                {id: "osahito", name: "KŌMEI", text: "1831-1867", parent: "ogimachiNaoko", class: "tenno", url: "https://ja.wikipedia.org/wiki/孝明天皇"},
-                {id: "asakoKujo", name: "Asako Kujō", text: "1835-1897", spouse: "osahito"},
-                {id: "nakayamaYoshiko", name: "Nakayama Yoshiko", text: "1836-1907", spouse: "osahito"},
-                {id: "kuniAsahiko", name: "Kuni Asahiko", text: "1824-1891", parent: "fushimiKuniie"},
-                {id: "mutsuhito", name: "MEIJI", text: "1852-1912", parent: "nakayamaYoshiko", class: "tenno", url: "https://ja.wikipedia.org/wiki/明治天皇"},
-                {id: "yanagiwaraNaruko", name: "Yanagiwara Naruko", text: "1859-1943", spouse: "mutsuhito", before: true},
-                {id: "yoshihito", name: "TAISHŌ", text: "1879-1926", parent: "yanagiwaraNaruko", class: "tenno", url: "https://ja.wikipedia.org/wiki/大正天皇"},
-                {id: "sadakoKujo", name: "Sadako Kujō", text: "1884-1951", spouse: "yoshihito", before: true},
-                {id: "naruhikoHigashikuni", name: "Naruhiko Higashikuni", text: "1887-1990", parent: "kuniAsahiko", skips: 1},
-                {id: "toshiko2", name: "Toshiko", text: "1896-1978", spouse: "naruhikoHigashikuni", before: true},
-                {id: "hirohito", name: "SHŌWA", text: "1901-1989", parent: "sadakoKujo", class: "tenno", url: "https://ja.wikipedia.org/wiki/昭和天皇"},
-                {id: "princessNagako", name: "Princess Nagako", text: "1903-2000", spouse: "hirohito"},
-                {id: "yasuhito", name: "Yasuhito", text: "1902-1953", parent: "sadakoKujo"},
-                {id: "nobuhito", name: "Nobuhito", text: "1905-1987", parent: "sadakoKujo"},
-                {id: "takahito", name: "Takahito", text: "1915-2016", parent: "sadakoKujo"},
-                {id: "morihiroHigashikuni", name: "Morihiro Higashikuni", text: "1916-1969", parent: "toshiko2"},
-                {id: "shigeko", name: "Shigeko", text: "1925-1961", parent: "princessNagako"},
-                {id: "sachiko", name: "Sachiko", text: "1927-1928", parent: "princessNagako"},
-                {id: "kazuko", name: "Kazuko", text: "1929-1989", parent: "princessNagako"},
-                {id: "atsuko", name: "Atsuko", text: "1931-", parent: "princessNagako"},
-                {id: "akihito", name: "AKIHITO", text: "1933-", parent: "princessNagako", class: "tenno", url: "https://ja.wikipedia.org/wiki/上皇"},
-                {id: "michikoShoda", name: "Michiko Shoda", text: "1934-", spouse: "akihito"},
-                {id: "masahito", name: "Masahito", text: "1935-", parent: "princessNagako"},
-                {id: "takako2", name: "Takako", text: "1939-", parent: "princessNagako"},
-                {id: "naruhito", name: "NARUHITO", text: "1960-", parent: "michikoShoda", class: "tenno", url: "https://ja.wikipedia.org/wiki/今上天皇"},
-                {id: "masakoOwada", name: "Masako Owada", text: "1963-", spouse: "naruhito"},
-                {id: "akishino", name: "Akishino", text: "1965-", parent: "michikoShoda"},
-                {id: "sayako", name: "Sayako", text: "1969-", parent: "michikoShoda"},
-                {id: "aiko", name: "Aiko", text: "2001-", parent: "masakoOwada"}
-            ];
-            const links = [
-                {start: ["hidehito", "konoeKoreko"], end: "princessYoshiko", type: "descent"},
-                {start: "kujoSukezane", end: "asakoKujo", type: "descent", x: -0.25, class: "dashed"},
-                {start: "kujoSukezane", end: "sadakoKujo", type: "descent", x: -0.25, class: "dashed"},
-                {start: "mutsuhito", end: "toshiko2", type: "descent"},
-                {start: "shigeko", end: "morihiroHigashikuni", x: 1, y: 0.25, class: "dashed"},
-            ];
-            const title = {text: "Yamato dynasty", x: 2200, y: 30, fontFamily: "Ballet", fontSize: 65, fontWeight: "bold"};
-            const emblem = {url: "https://upload.wikimedia.org/wikipedia/commons/3/37/Imperial_Seal_of_Japan.svg", x: 2320, y: 140, width: 130};
-            Lignage(document.getElementById("lignage"), nodes, {links, title, emblem, orient: "left", parentMargin: 50});
-        </script>
-    </body>
+  <head>
+    <title>Yamato dynasty</title>
+    <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
+    <script src="../lignage.js"></script>
+    <style>
+      #lignage {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <svg id="lignage">
+      <style>
+        .tenno rect {
+          fill: deeppink;
+        }
+        .tenno text {
+          fill: white;
+        }
+        .dashed {
+          stroke-dasharray: 4 2;
+        }
+      </style>
+    </svg>
+    <script>
+      const nodes = [
+        {id: "kazuhito", name: "GO-YŌZEI", text: "1572-1617", class: "tenno", url: "https://ja.wikipedia.org/wiki/後陽成天"},
+        {id: "konoeSakiko", name: "Konoe Sakiko", text: "1575-1630", spouse: "kazuhito"},
+        {id: "kokohito", name: "GO-MIZUNOO", text: "1596-1680", parent: "konoeSakiko", class: "tenno", url: "https://ja.wikipedia.org/wiki/後水尾天皇"},
+        {id: "tokugawaMasako", name: "Tokugawa Masako", text: "1607-1678", spouse: "kokohito"},
+        {id: "okiko", name: "MEISHŌ", text: "1624-1696", parent: "tokugawaMasako", class: "tenno", url: "https://ja.wikipedia.org/wiki/明正天皇"},
+        {id: "tsugohito", name: "GO-KŌMYŌ", text: "1633-1654", parent: "kokohito", class: "tenno", url: "https://ja.wikipedia.org/wiki/後光明天皇"},
+        {id: "niwataHideko", name: "Niwata Hideko", text: "", spouse: "tsugohito"},
+        {id: "nagahito", name: "GO-SAI", text: "1638-1685", parent: "kokohito", class: "tenno", url: "https://ja.wikipedia.org/wiki/後西天皇"},
+        {id: "princessAkiko", name: "Princess Akiko", text: "1638-1680", spouse: "nagahito"},
+        {id: "seikanjiTomoko", name: "Seikanji Tomoko", text: "", spouse: "nagahito"},
+        {id: "satohito", name: "REIGEN", text: "1654-1732", parent: "kokohito", class: "tenno", url: "https://ja.wikipedia.org/wiki/霊元天皇"},
+        {id: "takatsukasaFusako", name: "Takatsukasa Fusako", text: "1653-1712", spouse: "satohito"},
+        {id: "takako1", name: "Takako", text: "1650-1725", parent: "niwataHideko"},
+        {id: "mashiko", name: "Mashiko", text: "1669-1738", parent: "seikanjiTomoko"},
+        {id: "kujoSukezane", name: "Kujō Sukezane", text: "1669-1729", spouse: "mashiko", before: true},
+        {id: "asahito", name: "HIGASHIYAMA", text: "1675-1710", parent: "satohito", class: "tenno", url: "https://ja.wikipedia.org/wiki/東山天皇"},
+        {id: "princessYukiko", name: "Princess Yukiko", text: "1680-1720", spouse: "asahito"},
+        {id: "tomiko", name: "Tomiko", text: "1676-1707", parent: "satohito"},
+        {id: "fushimiKuninaga", name: "Fushimi Kuninaga", text: "1676-1726", spouse: "tomiko"},
+        {id: "yatsuhito", name: "NAKAMIKADO", text: "1702-1737", parent: "asahito", class: "tenno", url: "https://ja.wikipedia.org/wiki/中御門天皇"},
+        {id: "konoeHisako", name: "Konoe Hisako", text: "1702-1720", spouse: "yatsuhito"},
+        {id: "naohitoShinno", name: "Naohito shinnō", text: "1704-1753", parent: "asahito"},
+        {id: "fushimiSadatake", name: "Fushimi Sadatake", text: "1701-1754", parent: "fushimiKuninaga"},
+        {id: "teruhito", name: "SAKURAMACHI", text: "1720-1750", parent: "konoeHisako", class: "tenno", url: "https://ja.wikipedia.org/wiki/桜町天皇"},
+        {id: "nijoIeko", name: "Nijō Ieko", text: "1716-1790", spouse: "teruhito"},
+        {id: "sukehitoShinno", name: "Sukehito shinnō", text: "1733-1794", parent: "naohitoShinno", skips: 1},
+        {id: "fushimiKuniyori", name: "Fushimi Kuniyori", text: "1733-1802", parent: "fushimiSadatake", skips: 1},
+        {id: "noriko", name: "Noriko", text: "1737-1746", parent: "nijoIeko"},
+        {id: "toshiko1", name: "GO-SAKURAMACHI", text: "1740-1813", parent: "nijoIeko", class: "tenno", url: "https://ja.wikipedia.org/wiki/後桜町天皇"},
+        {id: "toohito", name: "MOMOZONO", text: "1741-1762", parent: "teruhito", class: "tenno", url: "https://ja.wikipedia.org/wiki/桃園天皇"},
+        {id: "ichijoTomiko", name: "Ichijō Tomiko", text: "1743-1796", spouse: "toohito"},
+        {id: "morohito", name: "KŌKAKU", text: "1771-1840", parent: "sukehitoShinno", skips: 1, class: "tenno", url: "https://ja.wikipedia.org/wiki/光格天皇"},
+        {id: "princessYoshiko", name: "Princess Yoshiko", text: "1779-1846", spouse: "morohito"},
+        {id: "kajyujiTadako", name: "Kajyūji Tadako", text: "1780-1843", spouse: "morohito"},
+        {id: "fushimiSadayuki", name: "Fushimi Sadayuki", text: "1776-1841", parent: "fushimiKuniyori", skips: 1},
+        {id: "hidehito", name: "GO-MOMOZONO", text: "1758-1779", parent: "ichijoTomiko", class: "tenno", url: "https://ja.wikipedia.org/wiki/後桃園天皇"},
+        {id: "konoeKoreko", name: "Konoe Koreko", text: "1760-1783", spouse: "hidehito"},
+        {id: "sadamochi", name: "Sadamochi", text: "1760-1772", parent: "ichijoTomiko"},
+        {id: "ayahito", name: "NINKŌ", text: "1800-1846", parent: "kajyujiTadako", class: "tenno", url: "https://ja.wikipedia.org/wiki/仁孝天皇"},
+        {id: "takatsukasaTsunako", name: "Takatsukasa Tsunako", text: "1798-1823", spouse: "ayahito"},
+        {id: "ogimachiNaoko", name: "Ōgimachi Naoko", text: "1803-1856", spouse: "ayahito"},
+        {id: "fushimiKuniie", name: "Fushimi Kuniie", text: "1802-1872", parent: "fushimiSadayuki"},
+        {id: "osahito", name: "KŌMEI", text: "1831-1867", parent: "ogimachiNaoko", class: "tenno", url: "https://ja.wikipedia.org/wiki/孝明天皇"},
+        {id: "asakoKujo", name: "Asako Kujō", text: "1835-1897", spouse: "osahito"},
+        {id: "nakayamaYoshiko", name: "Nakayama Yoshiko", text: "1836-1907", spouse: "osahito"},
+        {id: "kuniAsahiko", name: "Kuni Asahiko", text: "1824-1891", parent: "fushimiKuniie"},
+        {id: "mutsuhito", name: "MEIJI", text: "1852-1912", parent: "nakayamaYoshiko", class: "tenno", url: "https://ja.wikipedia.org/wiki/明治天皇"},
+        {id: "yanagiwaraNaruko", name: "Yanagiwara Naruko", text: "1859-1943", spouse: "mutsuhito", before: true},
+        {id: "yoshihito", name: "TAISHŌ", text: "1879-1926", parent: "yanagiwaraNaruko", class: "tenno", url: "https://ja.wikipedia.org/wiki/大正天皇"},
+        {id: "sadakoKujo", name: "Sadako Kujō", text: "1884-1951", spouse: "yoshihito", before: true},
+        {id: "naruhikoHigashikuni", name: "Naruhiko Higashikuni", text: "1887-1990", parent: "kuniAsahiko", skips: 1},
+        {id: "toshiko2", name: "Toshiko", text: "1896-1978", spouse: "naruhikoHigashikuni", before: true},
+        {id: "hirohito", name: "SHŌWA", text: "1901-1989", parent: "sadakoKujo", class: "tenno", url: "https://ja.wikipedia.org/wiki/昭和天皇"},
+        {id: "princessNagako", name: "Princess Nagako", text: "1903-2000", spouse: "hirohito"},
+        {id: "yasuhito", name: "Yasuhito", text: "1902-1953", parent: "sadakoKujo"},
+        {id: "nobuhito", name: "Nobuhito", text: "1905-1987", parent: "sadakoKujo"},
+        {id: "takahito", name: "Takahito", text: "1915-2016", parent: "sadakoKujo"},
+        {id: "morihiroHigashikuni", name: "Morihiro Higashikuni", text: "1916-1969", parent: "toshiko2"},
+        {id: "shigeko", name: "Shigeko", text: "1925-1961", parent: "princessNagako"},
+        {id: "sachiko", name: "Sachiko", text: "1927-1928", parent: "princessNagako"},
+        {id: "kazuko", name: "Kazuko", text: "1929-1989", parent: "princessNagako"},
+        {id: "atsuko", name: "Atsuko", text: "1931-", parent: "princessNagako"},
+        {id: "akihito", name: "AKIHITO", text: "1933-", parent: "princessNagako", class: "tenno", url: "https://ja.wikipedia.org/wiki/上皇"},
+        {id: "michikoShoda", name: "Michiko Shoda", text: "1934-", spouse: "akihito"},
+        {id: "masahito", name: "Masahito", text: "1935-", parent: "princessNagako"},
+        {id: "takako2", name: "Takako", text: "1939-", parent: "princessNagako"},
+        {id: "naruhito", name: "NARUHITO", text: "1960-", parent: "michikoShoda", class: "tenno", url: "https://ja.wikipedia.org/wiki/今上天皇"},
+        {id: "masakoOwada", name: "Masako Owada", text: "1963-", spouse: "naruhito"},
+        {id: "akishino", name: "Akishino", text: "1965-", parent: "michikoShoda"},
+        {id: "sayako", name: "Sayako", text: "1969-", parent: "michikoShoda"},
+        {id: "aiko", name: "Aiko", text: "2001-", parent: "masakoOwada"}
+      ];
+      const links = [
+        {start: ["hidehito", "konoeKoreko"], end: "princessYoshiko", type: "descent"},
+        {start: "kujoSukezane", end: "asakoKujo", type: "descent", x: -0.25, class: "dashed"},
+        {start: "kujoSukezane", end: "sadakoKujo", type: "descent", x: -0.25, class: "dashed"},
+        {start: "mutsuhito", end: "toshiko2", type: "descent"},
+        {start: "shigeko", end: "morihiroHigashikuni", x: 1, y: 0.25, class: "dashed"},
+      ];
+      const title = {text: "Yamato dynasty", x: 2200, y: 30, fontFamily: "Ballet", fontSize: 65, fontWeight: "bold"};
+      const emblem = {url: "https://upload.wikimedia.org/wikipedia/commons/3/37/Imperial_Seal_of_Japan.svg", x: 2320, y: 140, width: 130};
+      Lignage(document.getElementById("lignage"), nodes, {links, title, emblem, orient: "left", parentMargin: 50});
+    </script>
+  </body>
 </html>

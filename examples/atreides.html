@@ -1,63 +1,63 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>House Atreides</title>
-        <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
-        <script src="../lignage.js"></script>
-        <style>
-            html {
-                height: 100%;
-            }
-            body {
-                height: calc(100% - 16px);
-            }
-            #lignage {
-                width: 100%;
-                height: 100%;
-            }
-        </style>
-    </head>
-    <body>
-        <svg id="lignage"></svg>
-        <script>
-            const nodes = [
-                {id: "root", virtual: true},
-                {id: "pardotKynes", name: "Pardot Kynes", parent: "root", skips: 2},
-                {id: "frieth", name: "Frieth", spouse: "pardotKynes"},
-                {id: "elroodIX", name: "Elrood IX", text: "9999-10156", parent: "root"},
-                {id: "yvetteHagal", name: "Yvette Hagal", text: "10024-10075", spouse: "elroodIX"},
-                {id: "miklosAtreides", name: "Miklos Atreides", parent: "root"},
-                {id: "vladimirHarkonnen", name: "Vladimir Harkonnen", text: "10110-10193", parent: "root", skips: 2},
-                {id: "tanidiaNerus", name: "Tanidia Nerus", text: "† 10207", spouse: "vladimirHarkonnen"},
-                {id: "liet", name: "Liet", text: "† 10191", parent: "frieth"},
-                {id: "faroula", name: "Faroula", spouse: "liet"},
-                {id: "kean", name: "Kean", parent: "miklosAtreides"},
-                {id: "edwinaCorrino", name: "Edwina Corrino", text: "10070-10123", parent: "yvetteHagal"},
-                {id: "ilbanRichese", name: "Ilban Richese", spouse: "edwinaCorrino", before: true},
-                {id: "chani", name: "Chani", text: "† 10207", parent: "faroula"},
-                {id: "paulus", name: "Paulus", text: "10089-10156", parent: "kean"},
-                {id: "helenaRichese", name: "Helena Richese", text: "10095-10187", spouse: "paulus", before: true},
-                {id: "letoI", name: "Leto I", text: "10140-10191", parent: "helenaRichese"},
-                {id: "kaileaVernius", name: "Kailea Vernius", text: "† 10174", spouse: "letoI"},
-                {id: "jessica", name: "Jessica", text: "10154-10256", spouse: "letoI"},
-                {id: "victor", name: "Victor", text: "10168-10174", parent: "kaileaVernius"},
-                {id: "paul", name: "Paul", text: "10175-10217", parent: "jessica"},
-                {id: "alia", name: "Alia", text: "10191-10217", parent: "jessica"},
-                {id: "leto", name: "Leto", text: "10192-10193", parent: "paul"},
-                {id: "letoII", name: "Leto II", text: "10207", parent: "paul"},
-                {id: "hwiNoree", name: "Hwi Noree", spouse: "letoII"},
-                {id: "ghanima", name: "Ghanima", text: "10207", parent: "paul"},
-                {id: "faradnCorrino", name: "Farad'n Corrino", text: "10198", spouse: "ghanima"},
-            ];
-            const links = [
-                {start: ["edwinaCorrino", "ilbanRichese"], end: "helenaRichese", type: "descent"},
-                {start: ["vladimirHarkonnen", "tanidiaNerus"], end: "jessica", type: "descent"},
-                {start: "chani", end: "paul", y: 0.25},
-            ];
-            const fonts = [{family: "Dune Rise", url: "https://db.onlinewebfonts.com/t/bca5da28daa9ee1c2ca8bc9f8b15ee28.woff2"}];
-            const title = {text: "House Atreides", x: 850, y: 50, fontFamily: "Dune Rise", fontSize: 20, fontWeight: "bold"};
-            const emblem = {url: "https://static.wikia.nocookie.net/dune/images/5/56/Atreides_2021.png", x: 930, y: 70, width: 100};
-            Lignage(document.getElementById("lignage"), nodes, {links, fonts, title, emblem});
-        </script>
-    </body>
+  <head>
+    <title>House Atreides</title>
+    <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
+    <script src="../lignage.js"></script>
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        height: calc(100% - 16px);
+      }
+      #lignage {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <svg id="lignage"></svg>
+    <script>
+      const nodes = [
+        {id: "root", virtual: true},
+        {id: "pardotKynes", name: "Pardot Kynes", parent: "root", skips: 2},
+        {id: "frieth", name: "Frieth", spouse: "pardotKynes"},
+        {id: "elroodIX", name: "Elrood IX", text: "9999-10156", parent: "root"},
+        {id: "yvetteHagal", name: "Yvette Hagal", text: "10024-10075", spouse: "elroodIX"},
+        {id: "miklosAtreides", name: "Miklos Atreides", parent: "root"},
+        {id: "vladimirHarkonnen", name: "Vladimir Harkonnen", text: "10110-10193", parent: "root", skips: 2},
+        {id: "tanidiaNerus", name: "Tanidia Nerus", text: "† 10207", spouse: "vladimirHarkonnen"},
+        {id: "liet", name: "Liet", text: "† 10191", parent: "frieth"},
+        {id: "faroula", name: "Faroula", spouse: "liet"},
+        {id: "kean", name: "Kean", parent: "miklosAtreides"},
+        {id: "edwinaCorrino", name: "Edwina Corrino", text: "10070-10123", parent: "yvetteHagal"},
+        {id: "ilbanRichese", name: "Ilban Richese", spouse: "edwinaCorrino", before: true},
+        {id: "chani", name: "Chani", text: "† 10207", parent: "faroula"},
+        {id: "paulus", name: "Paulus", text: "10089-10156", parent: "kean"},
+        {id: "helenaRichese", name: "Helena Richese", text: "10095-10187", spouse: "paulus", before: true},
+        {id: "letoI", name: "Leto I", text: "10140-10191", parent: "helenaRichese"},
+        {id: "kaileaVernius", name: "Kailea Vernius", text: "† 10174", spouse: "letoI"},
+        {id: "jessica", name: "Jessica", text: "10154-10256", spouse: "letoI"},
+        {id: "victor", name: "Victor", text: "10168-10174", parent: "kaileaVernius"},
+        {id: "paul", name: "Paul", text: "10175-10217", parent: "jessica"},
+        {id: "alia", name: "Alia", text: "10191-10217", parent: "jessica"},
+        {id: "leto", name: "Leto", text: "10192-10193", parent: "paul"},
+        {id: "letoII", name: "Leto II", text: "10207", parent: "paul"},
+        {id: "hwiNoree", name: "Hwi Noree", spouse: "letoII"},
+        {id: "ghanima", name: "Ghanima", text: "10207", parent: "paul"},
+        {id: "faradnCorrino", name: "Farad'n Corrino", text: "10198", spouse: "ghanima"},
+      ];
+      const links = [
+        {start: ["edwinaCorrino", "ilbanRichese"], end: "helenaRichese", type: "descent"},
+        {start: ["vladimirHarkonnen", "tanidiaNerus"], end: "jessica", type: "descent"},
+        {start: "chani", end: "paul", y: 0.25},
+      ];
+      const fonts = [{family: "Dune Rise", url: "https://db.onlinewebfonts.com/t/bca5da28daa9ee1c2ca8bc9f8b15ee28.woff2"}];
+      const title = {text: "House Atreides", x: 850, y: 50, fontFamily: "Dune Rise", fontSize: 20, fontWeight: "bold"};
+      const emblem = {url: "https://static.wikia.nocookie.net/dune/images/5/56/Atreides_2021.png", x: 930, y: 70, width: 100};
+      Lignage(document.getElementById("lignage"), nodes, {links, fonts, title, emblem});
+    </script>
+  </body>
 </html>

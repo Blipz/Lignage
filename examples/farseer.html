@@ -1,69 +1,69 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Farseer dynasty</title>
-        <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
-        <script src="../lignage.js"></script>
-        <style>
-            html {
-                height: 100%;
-            }
-            body {
-                height: calc(100% - 16px);
-            }
-            #lignage {
-                width: 100%;
-                height: 100%;
-            }
-        </style>
-    </head>
-    <body>
-        <svg id="lignage">
-            <style>
-                .royal rect {
-                    fill: royalblue;
-                }
-                .royal text {
-                    fill: white;
-                }
-            </style>
-        </svg>
-        <script>
-            const nodes = [
-                {id: "bounty", name: "BOUNTY", class: "royal"},
-                {id: "hyacinth", name: "Hyacinth", text: "Fallstar", spouse: "bounty"},
-                {id: "queenBounty", spouse: "bounty"},
-                {id: "chade", name: "Chade", parent: "hyacinth"},
-                {id: "laurel", name: "Laurel", before: true, spouse: "chade"},
-                {id: "shrewd", name: "SHREWD", parent: "queenBounty", class: "royal"},
-                {id: "constance", name: "Constance", text: "of Shoaks", spouse: "shrewd"},
-                {id: "desire", name: "Desire", text: "Mountwell of Farrow", spouse: "shrewd"},
-                {id: "merry", name: "Merry", parent: "queenBounty"},
-                {id: "lantern", name: "Lantern", parent: "laurel"},
-                {id: "shine", name: "Shine", parent: "chade"},
-                {id: "chivalry", name: "Chivalry", parent: "constance"},
-                {id: "patience", name: "Patience", text: "of Tradeford", spouse: "chivalry"},
-                {id: "verity", name: "VERITY", parent: "constance", class: "royal"},
-                {id: "kettricken", name: "Kettricken", text: "of the Mountains", spouse: "verity"},
-                {id: "regal", name: "REGAL", text: "the Pretender", parent: "desire", class: "royal"},
-                {id: "august", name: "August", text: "of Withywoods", parent: "merry"},
-                {id: "fitz", name: "FitzChivalry", parent: "chivalry"},
-                {id: "molly", name: "Molly", text: "Chandler", spouse: "fitz"},
-                {id: "sacrifice", name: "Sacrifice", text: "(stillborn)", parent: "kettricken"},
-                {id: "dutiful", name: "DUTIFUL", parent: "kettricken", class: "royal"},
-                {id: "elliania", name: "Elliania", text: "Blackwater", spouse: "dutiful"},
-                {id: "hap", name: "Hap", text: "(adopted)", parent: "fitz"},
-                {id: "nettle", name: "Nettle", parent: "molly"},
-                {id: "riddle", name: "Riddle", before: true, spouse: "nettle"},
-                {id: "bee", name: "Bee", parent: "molly"},
-                {id: "prosper", name: "Prosper", parent: "elliania"},
-                {id: "integrity", name: "Integrity", parent: "elliania"},
-                {id: "promise", name: "Promise", text: "(announced)", parent: "elliania"},
-                {id: "hope", name: "Hope", parent: "riddle"},
-            ];
-            const title = {text: "Farseer dynasty", x: 0, y: 370, fontFamily: "Ballet", fontSize: 35, fontWeight: "bold"};
-            const emblem = {url: "farseer.png", x: 50, y: 430, width: 85};
-            Lignage(document.getElementById("lignage"), nodes, {title, emblem});
-        </script>
-    </body>
+  <head>
+    <title>Farseer dynasty</title>
+    <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
+    <script src="../lignage.js"></script>
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        height: calc(100% - 16px);
+      }
+      #lignage {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <svg id="lignage">
+      <style>
+        .royal rect {
+          fill: royalblue;
+        }
+        .royal text {
+          fill: white;
+        }
+      </style>
+    </svg>
+    <script>
+      const nodes = [
+        {id: "bounty", name: "BOUNTY", class: "royal"},
+        {id: "hyacinth", name: "Hyacinth", text: "Fallstar", spouse: "bounty"},
+        {id: "queenBounty", spouse: "bounty"},
+        {id: "chade", name: "Chade", parent: "hyacinth"},
+        {id: "laurel", name: "Laurel", before: true, spouse: "chade"},
+        {id: "shrewd", name: "SHREWD", parent: "queenBounty", class: "royal"},
+        {id: "constance", name: "Constance", text: "of Shoaks", spouse: "shrewd"},
+        {id: "desire", name: "Desire", text: "Mountwell of Farrow", spouse: "shrewd"},
+        {id: "merry", name: "Merry", parent: "queenBounty"},
+        {id: "lantern", name: "Lantern", parent: "laurel"},
+        {id: "shine", name: "Shine", parent: "chade"},
+        {id: "chivalry", name: "Chivalry", parent: "constance"},
+        {id: "patience", name: "Patience", text: "of Tradeford", spouse: "chivalry"},
+        {id: "verity", name: "VERITY", parent: "constance", class: "royal"},
+        {id: "kettricken", name: "Kettricken", text: "of the Mountains", spouse: "verity"},
+        {id: "regal", name: "REGAL", text: "the Pretender", parent: "desire", class: "royal"},
+        {id: "august", name: "August", text: "of Withywoods", parent: "merry"},
+        {id: "fitz", name: "FitzChivalry", parent: "chivalry"},
+        {id: "molly", name: "Molly", text: "Chandler", spouse: "fitz"},
+        {id: "sacrifice", name: "Sacrifice", text: "(stillborn)", parent: "kettricken"},
+        {id: "dutiful", name: "DUTIFUL", parent: "kettricken", class: "royal"},
+        {id: "elliania", name: "Elliania", text: "Blackwater", spouse: "dutiful"},
+        {id: "hap", name: "Hap", text: "(adopted)", parent: "fitz"},
+        {id: "nettle", name: "Nettle", parent: "molly"},
+        {id: "riddle", name: "Riddle", before: true, spouse: "nettle"},
+        {id: "bee", name: "Bee", parent: "molly"},
+        {id: "prosper", name: "Prosper", parent: "elliania"},
+        {id: "integrity", name: "Integrity", parent: "elliania"},
+        {id: "promise", name: "Promise", text: "(announced)", parent: "elliania"},
+        {id: "hope", name: "Hope", parent: "riddle"},
+      ];
+      const title = {text: "Farseer dynasty", x: 0, y: 370, fontFamily: "Ballet", fontSize: 35, fontWeight: "bold"};
+      const emblem = {url: "farseer.png", x: 50, y: 430, width: 85};
+      Lignage(document.getElementById("lignage"), nodes, {title, emblem});
+    </script>
+  </body>
 </html>

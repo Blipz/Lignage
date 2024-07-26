@@ -1,61 +1,61 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>House Ducatore-Bromael</title>
-        <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
-        <script src="../lignage.js"></script>
-        <style>
-            html {
-                height: 100%;
-            }
-            body {
-                height: calc(100% - 16px);
-            }
-            #lignage {
-                width: 100%;
-                height: 100%;
-            }
-        </style>
-    </head>
-    <body>
-        <svg id="lignage">
-            <style>
-                .dashed {
-                    stroke-dasharray: 4 2;
-                }
-            </style>
-        </svg>
-        <script>
-            const nodes = [
-                {id: "root", virtual: true},
-                {id: "oriabel", name: "Oriabel Coilvert", text: "Révérende mère", parent: "root", skips: 2},
-                {id: "griffon", name: "Griffon", text: "Duc de Bromael", parent: "root", skips: 1},
-                {id: "vertigier", name: "Vertigier", parent: "griffon"},
-                {id: "ganelon", name: "Ganelon", text: "Duc de Bromael", parent: "griffon"},
-                {id: "hodierne", name: "Hodierne", text: "de Brochmail", spouse: "ganelon"},
-                {id: "audearde", name: "Audéarde", text: "de Maginois", spouse: "ganelon"},
-                {id: "domnal", name: "Domnal", text: "Grand Bâtard", parent: "oriabel"},
-                {id: "lanval", name: "Lanval", parent: "hodierne"},
-                {id: "meleagant", name: "Méléagant", text: "Seigneur de Vayre", parent: "audearde"},
-                {id: "azalais", name: "Azalaïs", text: "de Landeviesse", spouse: "meleagant"},
-                {id: "blancandin", name: "Blancandin", text: "sans Escreigne", parent: "audearde"},
-                {id: "fatherRasicari", parent: "root"},
-                {id: "siblingRasicari", parent: "fatherRasicari"},
-                {id: "hieratina", name: "Hieratina Rasicari", parent: "fatherRasicari"},
-                {id: "leonide", name: "Leonide Ducatore", text: "Podestat de Ciudalia", spouse: "hieratina"},
-                {id: "cesarino", name: "Cesarino", parent: "siblingRasicari"},
-                {id: "mucio", name: "Mucio", parent: "leonide"},
-                {id: "belisario", name: "Belisario", text: "Chevalier du Sacre", parent: "leonide"},
-                {id: "clarissima", name: "Clarissima", parent: "leonide"},
-                {id: "laegaire", name: "Laegaire", parent: "clarissima"},
-            ];
-            const links = [
-                {start: "ganelon", end: "oriabel", startDx: -5, y: 0.17, class: "dashed"},
-                {start: "ganelon", end: "clarissima", startDx: 5, y: 0.25, class: "dashed"},
-            ];
-            const title = {text: "Maison Ducatore-Bromael", x: 480, y: 0, fontFamily: "Ballet", fontSize: 35, fontWeight: "bold"};
-            const emblem = {url: "ducatoreBromael.png", x: 620, y: 50, width: 85};
-            Lignage(document.getElementById("lignage"), nodes, {links, title, emblem});
-        </script>
-    </body>
+  <head>
+    <title>House Ducatore-Bromael</title>
+    <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
+    <script src="../lignage.js"></script>
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        height: calc(100% - 16px);
+      }
+      #lignage {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <svg id="lignage">
+      <style>
+        .dashed {
+          stroke-dasharray: 4 2;
+        }
+      </style>
+    </svg>
+    <script>
+      const nodes = [
+        {id: "root", virtual: true},
+        {id: "oriabel", name: "Oriabel Coilvert", text: "Révérende mère", parent: "root", skips: 2},
+        {id: "griffon", name: "Griffon", text: "Duc de Bromael", parent: "root", skips: 1},
+        {id: "vertigier", name: "Vertigier", parent: "griffon"},
+        {id: "ganelon", name: "Ganelon", text: "Duc de Bromael", parent: "griffon"},
+        {id: "hodierne", name: "Hodierne", text: "de Brochmail", spouse: "ganelon"},
+        {id: "audearde", name: "Audéarde", text: "de Maginois", spouse: "ganelon"},
+        {id: "domnal", name: "Domnal", text: "Grand Bâtard", parent: "oriabel"},
+        {id: "lanval", name: "Lanval", parent: "hodierne"},
+        {id: "meleagant", name: "Méléagant", text: "Seigneur de Vayre", parent: "audearde"},
+        {id: "azalais", name: "Azalaïs", text: "de Landeviesse", spouse: "meleagant"},
+        {id: "blancandin", name: "Blancandin", text: "sans Escreigne", parent: "audearde"},
+        {id: "fatherRasicari", parent: "root"},
+        {id: "siblingRasicari", parent: "fatherRasicari"},
+        {id: "hieratina", name: "Hieratina Rasicari", parent: "fatherRasicari"},
+        {id: "leonide", name: "Leonide Ducatore", text: "Podestat de Ciudalia", spouse: "hieratina"},
+        {id: "cesarino", name: "Cesarino", parent: "siblingRasicari"},
+        {id: "mucio", name: "Mucio", parent: "leonide"},
+        {id: "belisario", name: "Belisario", text: "Chevalier du Sacre", parent: "leonide"},
+        {id: "clarissima", name: "Clarissima", parent: "leonide"},
+        {id: "laegaire", name: "Laegaire", parent: "clarissima"},
+      ];
+      const links = [
+        {start: "ganelon", end: "oriabel", startDx: -5, y: 0.17, class: "dashed"},
+        {start: "ganelon", end: "clarissima", startDx: 5, y: 0.25, class: "dashed"},
+      ];
+      const title = {text: "Maison Ducatore-Bromael", x: 480, y: 0, fontFamily: "Ballet", fontSize: 35, fontWeight: "bold"};
+      const emblem = {url: "ducatoreBromael.png", x: 620, y: 50, width: 85};
+      Lignage(document.getElementById("lignage"), nodes, {links, title, emblem});
+    </script>
+  </body>
 </html>

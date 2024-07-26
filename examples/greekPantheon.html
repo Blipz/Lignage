@@ -1,106 +1,106 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Greek Pantheon</title>
-        <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
-        <script src="../lignage.js"></script>
-        <style>
-            html {
-                height: 100%;
-            }
-            body {
-                height: calc(100% - 16px);
-            }
-            #lignage {
-                width: 100%;
-                height: 100%;
-            }
-        </style>
-    </head>
-    <body>
-        <svg id="lignage">
-            <style>
-                .olympian rect {
-                    fill: skyblue;
-                }
-                .olympian text {
-                    fill: white;
-                }
-                .dashed {
-                    stroke-dasharray: 4 2;
-                }
-            </style>
-        </svg>
-        <script>
-            const nodes = [
-                {id: "gaia", name: "Gaia"},
-                {id: "ouranos", name: "Ouranos", spouse: "gaia"},
-                {id: "okeanos", name: "Okeanos", parent: "ouranos"},
-                {id: "thetys", name: "Thetys", spouse: "okeanos"},
-                {id: "koios", name: "Koios", parent: "ouranos"},
-                {id: "phoibe", name: "Phoibe", spouse: "koios"},
-                {id: "krios", name: "Krios", parent: "ouranos"},
-                {id: "iapetos", name: "Iapetos", parent: "ouranos"},
-                {id: "klymene", name: "Klymene", spouse: "iapetos"},
-                {id: "cronos", name: "Cronos", parent: "ouranos"},
-                {id: "rhea", name: "Rhea", spouse: "cronos"},
-                {id: "hyperion", name: "Hyperion", parent: "ouranos"},
-                {id: "theia", name: "Theia", spouse: "hyperion"},
-                {id: "themis", name: "Themis", parent: "ouranos"},
-                {id: "mnemosyne", name: "Mnemosyne", parent: "ouranos"},
-                {id: "hestia", name: "HESTIA", text: "Goddess of the hearth", parent: "rhea", class: "olympian"},
-                {id: "hades", name: "Hades", text: "God of the dead", parent: "rhea"},
-                {id: "demeter", name: "DEMETER", text: "Goddess of fertility", parent: "rhea", class: "olympian"},
-                {id: "iasion", name: "Iasion", before: true, spouse: "demeter"},
-                {id: "zeus", name: "ZEUS", text: "God of the sky", parent: "rhea", class: "olympian"},
-                {id: "hera", name: "HERA", text: "Goddess of marriage", spouse: "zeus", class: "olympian"},
-                {id: "poseidon", name: "POSEIDON", text: "God of the sea", parent: "rhea", class: "olympian"},
-                {id: "amphitrite", name: "Amphitrite", text: "Goddess of the sea", spouse: "poseidon"},
-                {id: "ploutos", name: "Ploutos", text: "God of wealth", parent: "iasion"},
-                {id: "persephone", name: "Persephone", text: "Goddess of spring", parent: "demeter"},
-                {id: "athena", name: "ATHENA", text: "Goddess of wisdom", parent: "zeus", class: "olympian"},
-                {id: "apollon", name: "APOLLON", text: "God of the arts", parent: "zeus", class: "olympian"},
-                {id: "artemis", name: "ARTEMIS", text: "Goddess of the hunt", parent: "zeus", class: "olympian"},
-                {id: "hermes", name: "HERMES", text: "God of commerce", parent: "zeus", class: "olympian"},
-                {id: "eileithyia", name: "Eileithyia", text: "Goddess of childbirth", parent: "hera"},
-                {id: "hebe", name: "Hebe", text: "Goddess of youth", parent: "hera"},
-                {id: "ares", name: "ARES", text: "God of war", parent: "hera", class: "olympian"},
-                {id: "aphrodite", name: "APHRODITE", text: "Goddess of love", spouse: "ares", class: "olympian"},
-                {id: "hephaistos", name: "HEPHAISTOS", text: "God of metallurgy", parent: "hera", class: "olympian"},
-                {id: "triton", name: "Triton", parent: "amphitrite"},
-                {id: "kymopoleia", name: "Kymopoleia", parent: "amphitrite"},
-                {id: "rhodos", name: "Rhodos", parent: "amphitrite"},
-                {id: "asklepios", name: "Asklepios", text: "God of medicine", parent: "apollon"},
-                {id: "lapithes", name: "Lapithes", parent: "apollon"},
-                {id: "aristaios", name: "Aristaios", parent: "apollon"},
-                {id: "pan", name: "Pan", text: "God of the wild", parent: "hermes"},
-                {id: "autolykos", name: "Autolykos", parent: "hermes"},
-                {id: "harmonia", name: "Harmonia", text: "Goddess of harmonia", parent: "aphrodite"},
-                {id: "kadmos", name: "Kadmos", spouse: "harmonia"},
-                {id: "deimos", name: "Deimos", parent: "aphrodite"},
-                {id: "phobos", name: "Phobos", parent: "aphrodite"},
-                {id: "semele", name: "Semele", parent: "kadmos"},
-                {id: "ino", name: "Ino", parent: "kadmos"},
-                {id: "agaue", name: "Agaue", parent: "kadmos"},
-                {id: "autonoe", name: "Autonoe", parent: "kadmos"},
-                {id: "polydoros", name: "Polydoros", parent: "kadmos"},
-                {id: "dionysos", name: "DIONYSOS", text: "God of wine", parent: "semele", class: "olympian"},
-                {id: "aktaion", name: "Aktaion", parent: "autonoe"},
-            ];
-            const links = [
-                {start: ["gaia", "ouranos"], end: "thetys", type: "siblingDescent"},
-                {start: ["gaia", "ouranos"], end: "phoibe", type: "siblingDescent"},
-                {start: ["gaia", "ouranos"], end: "rhea", type: "siblingDescent"},
-                {start: ["gaia", "ouranos"], end: "theia", type: "siblingDescent"},
-                {start: ["cronos", "rhea"], end: "hera", type: "siblingDescent"},
-                {start: "ouranos", end: "aphrodite", type: "descent", y: 0.25, x: 1.1, class: "dashed"},
-                {start: "zeus", end: "demeter", startDx: -10, y: 0.25, class: "dashed"},
-                {start: "hades", end: "persephone", x: 0},
-                {start: "zeus", end: "semele", startDx: 10, x: -3.2, y: 0.75, class: "dashed"},
-                {start: "aristaios", end: "autonoe", x: 0, y: 0.25, class: "dashed"},
-            ];
-            const title = {text: "Olympian Gods", x: 100, y: 600, fontFamily: "Cinzel", fontSize: 50};
-            Lignage(document.getElementById("lignage"), nodes, {links, title, cousinMargin: 80});
-        </script>
-    </body>
+  <head>
+    <title>Greek Pantheon</title>
+    <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg"/>
+    <script src="../lignage.js"></script>
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        height: calc(100% - 16px);
+      }
+      #lignage {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <svg id="lignage">
+      <style>
+        .olympian rect {
+          fill: skyblue;
+        }
+        .olympian text {
+          fill: white;
+        }
+        .dashed {
+          stroke-dasharray: 4 2;
+        }
+      </style>
+    </svg>
+    <script>
+      const nodes = [
+        {id: "gaia", name: "Gaia"},
+        {id: "ouranos", name: "Ouranos", spouse: "gaia"},
+        {id: "okeanos", name: "Okeanos", parent: "ouranos"},
+        {id: "thetys", name: "Thetys", spouse: "okeanos"},
+        {id: "koios", name: "Koios", parent: "ouranos"},
+        {id: "phoibe", name: "Phoibe", spouse: "koios"},
+        {id: "krios", name: "Krios", parent: "ouranos"},
+        {id: "iapetos", name: "Iapetos", parent: "ouranos"},
+        {id: "klymene", name: "Klymene", spouse: "iapetos"},
+        {id: "cronos", name: "Cronos", parent: "ouranos"},
+        {id: "rhea", name: "Rhea", spouse: "cronos"},
+        {id: "hyperion", name: "Hyperion", parent: "ouranos"},
+        {id: "theia", name: "Theia", spouse: "hyperion"},
+        {id: "themis", name: "Themis", parent: "ouranos"},
+        {id: "mnemosyne", name: "Mnemosyne", parent: "ouranos"},
+        {id: "hestia", name: "HESTIA", text: "Goddess of the hearth", parent: "rhea", class: "olympian"},
+        {id: "hades", name: "Hades", text: "God of the dead", parent: "rhea"},
+        {id: "demeter", name: "DEMETER", text: "Goddess of fertility", parent: "rhea", class: "olympian"},
+        {id: "iasion", name: "Iasion", before: true, spouse: "demeter"},
+        {id: "zeus", name: "ZEUS", text: "God of the sky", parent: "rhea", class: "olympian"},
+        {id: "hera", name: "HERA", text: "Goddess of marriage", spouse: "zeus", class: "olympian"},
+        {id: "poseidon", name: "POSEIDON", text: "God of the sea", parent: "rhea", class: "olympian"},
+        {id: "amphitrite", name: "Amphitrite", text: "Goddess of the sea", spouse: "poseidon"},
+        {id: "ploutos", name: "Ploutos", text: "God of wealth", parent: "iasion"},
+        {id: "persephone", name: "Persephone", text: "Goddess of spring", parent: "demeter"},
+        {id: "athena", name: "ATHENA", text: "Goddess of wisdom", parent: "zeus", class: "olympian"},
+        {id: "apollon", name: "APOLLON", text: "God of the arts", parent: "zeus", class: "olympian"},
+        {id: "artemis", name: "ARTEMIS", text: "Goddess of the hunt", parent: "zeus", class: "olympian"},
+        {id: "hermes", name: "HERMES", text: "God of commerce", parent: "zeus", class: "olympian"},
+        {id: "eileithyia", name: "Eileithyia", text: "Goddess of childbirth", parent: "hera"},
+        {id: "hebe", name: "Hebe", text: "Goddess of youth", parent: "hera"},
+        {id: "ares", name: "ARES", text: "God of war", parent: "hera", class: "olympian"},
+        {id: "aphrodite", name: "APHRODITE", text: "Goddess of love", spouse: "ares", class: "olympian"},
+        {id: "hephaistos", name: "HEPHAISTOS", text: "God of metallurgy", parent: "hera", class: "olympian"},
+        {id: "triton", name: "Triton", parent: "amphitrite"},
+        {id: "kymopoleia", name: "Kymopoleia", parent: "amphitrite"},
+        {id: "rhodos", name: "Rhodos", parent: "amphitrite"},
+        {id: "asklepios", name: "Asklepios", text: "God of medicine", parent: "apollon"},
+        {id: "lapithes", name: "Lapithes", parent: "apollon"},
+        {id: "aristaios", name: "Aristaios", parent: "apollon"},
+        {id: "pan", name: "Pan", text: "God of the wild", parent: "hermes"},
+        {id: "autolykos", name: "Autolykos", parent: "hermes"},
+        {id: "harmonia", name: "Harmonia", text: "Goddess of harmonia", parent: "aphrodite"},
+        {id: "kadmos", name: "Kadmos", spouse: "harmonia"},
+        {id: "deimos", name: "Deimos", parent: "aphrodite"},
+        {id: "phobos", name: "Phobos", parent: "aphrodite"},
+        {id: "semele", name: "Semele", parent: "kadmos"},
+        {id: "ino", name: "Ino", parent: "kadmos"},
+        {id: "agaue", name: "Agaue", parent: "kadmos"},
+        {id: "autonoe", name: "Autonoe", parent: "kadmos"},
+        {id: "polydoros", name: "Polydoros", parent: "kadmos"},
+        {id: "dionysos", name: "DIONYSOS", text: "God of wine", parent: "semele", class: "olympian"},
+        {id: "aktaion", name: "Aktaion", parent: "autonoe"},
+      ];
+      const links = [
+        {start: ["gaia", "ouranos"], end: "thetys", type: "siblingDescent"},
+        {start: ["gaia", "ouranos"], end: "phoibe", type: "siblingDescent"},
+        {start: ["gaia", "ouranos"], end: "rhea", type: "siblingDescent"},
+        {start: ["gaia", "ouranos"], end: "theia", type: "siblingDescent"},
+        {start: ["cronos", "rhea"], end: "hera", type: "siblingDescent"},
+        {start: "ouranos", end: "aphrodite", type: "descent", y: 0.25, x: 1.1, class: "dashed"},
+        {start: "zeus", end: "demeter", startDx: -10, y: 0.25, class: "dashed"},
+        {start: "hades", end: "persephone", x: 0},
+        {start: "zeus", end: "semele", startDx: 10, x: -3.2, y: 0.75, class: "dashed"},
+        {start: "aristaios", end: "autonoe", x: 0, y: 0.25, class: "dashed"},
+      ];
+      const title = {text: "Olympian Gods", x: 100, y: 600, fontFamily: "Cinzel", fontSize: 50};
+      Lignage(document.getElementById("lignage"), nodes, {links, title, cousinMargin: 80});
+    </script>
+  </body>
 </html>
