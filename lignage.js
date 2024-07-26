@@ -64,7 +64,7 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		getCoord() {
-			let {x, y} = this.getPosition();
+			const {x, y} = this.getPosition();
 			return !rotated() ? [x, y] : [y, x];
 		}
 
@@ -143,7 +143,7 @@ function Lignage(svg, nodes, options = {}) {
 		static TREE = {};
 
 		static get(id) {
-			let ret = Node.TREE[id];
+			const ret = Node.TREE[id];
 			if (!ret) {
 				throw Error(`Unknown id '${id}'`);
 			}
@@ -183,7 +183,7 @@ function Lignage(svg, nodes, options = {}) {
 			if (obj.url) this.url = obj.url;
 			if (obj.image) this.image = obj.image;
 			if (obj.parent) {
-				let parent = Node.get(obj.parent);
+				const parent = Node.get(obj.parent);
 				if (parent.isKin()) {
 					this.parents = [parent];
 					if (parent.children.length == 0 && parent.hasChildren()) {
@@ -242,7 +242,7 @@ function Lignage(svg, nodes, options = {}) {
 				this.y = node.y;
 			}
 			else {
-				let child = new PseudoNode(node, level - 1);
+				const child = new PseudoNode(node, level - 1);
 				this.children = [child];
 				this.x = child.x;
 				this.y = child.y;
@@ -321,9 +321,9 @@ function Lignage(svg, nodes, options = {}) {
 				defs.append(icon);
 			});
 		}
-		let fonts = options.fonts;
+		const fonts = options.fonts;
 		for (let family of [options.fontFamily, options.title?.fontFamily]) {
-			let url = DEFAULT_FONTS[family];
+			const url = DEFAULT_FONTS[family];
 			if (url) {
 				fonts.push({family, url});
 			}
@@ -332,7 +332,7 @@ function Lignage(svg, nodes, options = {}) {
 	}
 
 	function redefineRoot() {
-		let node = Node.get(options.root);
+		const node = Node.get(options.root);
 		if (node != rootNode) {
 			for (let parent of node.parents) {
 				parent.children = parent.children.filter(x => x != node);
@@ -356,7 +356,7 @@ function Lignage(svg, nodes, options = {}) {
 	svg.append(defs);
 
 	let rootNode;
-	let fonts = initializeOptions();
+	const fonts = initializeOptions();
 	initializeTree();
 	loadFonts(fonts).then(drawTree);
 
@@ -427,9 +427,9 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		function drawNodes(node, container) {
-			let {x, y} = node.getPosition();
+			const {x, y} = node.getPosition();
 
-			let elem = makeElement("g", {id: node.id, class: "node", transform: `translate(${round(x)} ${round(y)})`});
+			const elem = makeElement("g", {id: node.id, class: "node", transform: `translate(${round(x)} ${round(y)})`});
 			if (node.class) elem.classList.add(node.class);
 			if (!node.virtual) container.append(elem);
 
@@ -444,7 +444,7 @@ function Lignage(svg, nodes, options = {}) {
 				stroke: "black"
 			}));
 
-			let text = makeElement("text", {
+			const text = makeElement("text", {
 				class: "name",
 				x: options.width / 2,
 				y: 15,
@@ -485,13 +485,13 @@ function Lignage(svg, nodes, options = {}) {
 			}
 
 			if (options.editable) {
-				let buttons = makeElement("g", {class: "buttons", style: "display: none;"});
-				let addButton = makeElement("use", {href: "#iconAdd", transform: `translate(${(options.width - (node.isKin() && !node.isRemarried() ? 0 : 22.5)) / 2} ${options.height - 25}) scale(2.25)`});
-				let editButton = makeElement("use", {href: "#iconEdit", transform: `translate(2.5 2.5) scale(2.25)`});
-				let joinButton = makeElement("use", {href: "#iconJoin", transform: `translate(${options.width / 2 - 22.5} ${options.height - 25}) scale(2.25)`});
-				let leftButton = makeElement("use", {href: !rotated() ? "#iconLeft" : "#iconTop", transform: `translate(2.5 ${options.height - 25}) scale(2.25)`});
-				let rightButton = makeElement("use", {href: !rotated() ? "#iconRight" : "#iconBottom", transform: `translate(${options.width - 25} ${options.height - 25}) scale(2.25)`});
-				let removeButton = makeElement("use", {href: "#iconRemove", transform: `translate(${options.width - 25} 2.5) scale(2.25)`});
+				const buttons = makeElement("g", {class: "buttons", style: "display: none;"});
+				const addButton = makeElement("use", {href: "#iconAdd", transform: `translate(${(options.width - (node.isKin() && !node.isRemarried() ? 0 : 22.5)) / 2} ${options.height - 25}) scale(2.25)`});
+				const editButton = makeElement("use", {href: "#iconEdit", transform: `translate(2.5 2.5) scale(2.25)`});
+				const joinButton = makeElement("use", {href: "#iconJoin", transform: `translate(${options.width / 2 - 22.5} ${options.height - 25}) scale(2.25)`});
+				const leftButton = makeElement("use", {href: !rotated() ? "#iconLeft" : "#iconTop", transform: `translate(2.5 ${options.height - 25}) scale(2.25)`});
+				const rightButton = makeElement("use", {href: !rotated() ? "#iconRight" : "#iconBottom", transform: `translate(${options.width - 25} ${options.height - 25}) scale(2.25)`});
+				const removeButton = makeElement("use", {href: "#iconRemove", transform: `translate(${options.width - 25} 2.5) scale(2.25)`});
 				buttons.append(addButton, editButton, joinButton, leftButton, rightButton, removeButton);
 				elem.append(buttons);
 
@@ -514,30 +514,30 @@ function Lignage(svg, nodes, options = {}) {
 						}
 						return `${id}${index}`;
 					}
-					let input = prompt("Name (Text)");
+					const input = prompt("Name (Text)");
 					if (input === null) return null;
 
-					let match = input.match(/([^(]*)\((.*)\)/);
+					const match = input.match(/([^(]*)\((.*)\)/);
 					if (match) {
-						let id = generateID(match[1].trim());
+						const id = generateID(match[1].trim());
 						return {id, name: match[1].trim(), text: match[2].trim()};
 					}
 					else {
-						let id = generateID(input.trim());
+						const id = generateID(input.trim());
 						return {id, name: input.trim()};
 					}
 				}
 				addButton.addEventListener("click", function() {
-					let obj = prepareAdd();
+					const obj = prepareAdd();
 					if (obj !== null) {
 						obj.parent = node.id;
 						ret.add(obj);
 					}
 				});
 				editButton.addEventListener("click", function() {
-					let input = prompt("Name (Text)", (node.name || "") + (node.text ? ` (${node.text})` : ""));
+					const input = prompt("Name (Text)", (node.name || "") + (node.text ? ` (${node.text})` : ""));
 					if (input !== null) {
-						let match = input.match(/([^(]*)\((.*)\)/);
+						const match = input.match(/([^(]*)\((.*)\)/);
 						if (match) {
 							node.name = match[1].trim();
 							node.text = match[2].trim();
@@ -550,7 +550,7 @@ function Lignage(svg, nodes, options = {}) {
 					}
 				});
 				joinButton.addEventListener("click", function() {
-					let obj = prepareAdd();
+					const obj = prepareAdd();
 					if (obj !== null) {
 						obj.spouse = node.id;
 						ret.add(obj);
@@ -558,8 +558,8 @@ function Lignage(svg, nodes, options = {}) {
 				});
 				leftButton.addEventListener("click", function() {
 					if (node.hasParents()) {
-						let siblings = node.parents[0].children;
-						let index = siblings.indexOf(node);
+						const siblings = node.parents[0].children;
+						const index = siblings.indexOf(node);
 						if (index > 0) {
 							siblings[index] = siblings[index - 1];
 							siblings[index - 1] = node;
@@ -577,8 +577,8 @@ function Lignage(svg, nodes, options = {}) {
 				});
 				rightButton.addEventListener("click", function() {
 					if (node.hasParents()) {
-						let siblings = node.parents[0].children;
-						let index = siblings.indexOf(node);
+						const siblings = node.parents[0].children;
+						const index = siblings.indexOf(node);
 						if (index < siblings.length - 1) {
 							siblings[index] = siblings[index + 1];
 							siblings[index + 1] = node;
@@ -645,8 +645,8 @@ function Lignage(svg, nodes, options = {}) {
 				else {
 					return 1/2;
 				}
-				let x1 = child1.getCoord()[0] + getWidth() / 2;
-				let x2 = child2.getCoord()[0] + getWidth() / 2;
+				const x1 = child1.getCoord()[0] + getWidth() / 2;
+				const x2 = child2.getCoord()[0] + getWidth() / 2;
 				if (x1 <= max1 && x2 >= min2) {
 					return 1/2;
 				}
@@ -661,7 +661,7 @@ function Lignage(svg, nodes, options = {}) {
 			if (node.isKin()) {
 				if (!node.virtual && node.children.length > 0) {
 					// Draw links between a single parent and their children
-					let fraction = computeFraction(node);
+					const fraction = computeFraction(node);
 					let [x1, y1] = node.getCoord();
 					x1 += getWidth() / 2;
 					if (!reversed()) {
@@ -671,7 +671,7 @@ function Lignage(svg, nodes, options = {}) {
 					if (reversed()) {
 						dy = -dy;
 					}
-					let children = node.children.filter(x => !x.virtual && !linkReplace.includes(x.id));
+					const children = node.children.filter(x => !x.virtual && !linkReplace.includes(x.id));
 					if (children.length > 0) {
 						drawLine(container, x1, y1, x1, y1 + dy);
 						drawLine(container, Math.min(x1, children[0].getCoord()[0] + getWidth() / 2), y1 + dy, Math.max(x1, children.at(-1).getCoord()[0] + getWidth() / 2), y1 + dy);
@@ -697,22 +697,22 @@ function Lignage(svg, nodes, options = {}) {
 			if (node.virtual || linkReplace.includes(node.id)) return;
 
 			// Draw a link between spouses
-			let [x1, y1] = node.getCoord();
-			let [x2, y2] = node.spouses[0].getCoord();
-			let x = (x1 + x2 + getWidth()) / 2;
-			let y = y1 + getHeight() / 2;
+			const [x1, y1] = node.getCoord();
+			const [x2, y2] = node.spouses[0].getCoord();
+			const x = (x1 + x2 + getWidth()) / 2;
+			const y = y1 + getHeight() / 2;
 			if (!node.spouses[0].virtual) {
 				drawCircle(container, x, y);
 				drawLine(container, x - options.spouseMargin / 2, y, x + options.spouseMargin / 2, y);
 			}
 
 			// Draw links between parents and children
-			let fraction = computeFraction(node.spouses[0]);
+			const fraction = computeFraction(node.spouses[0]);
 			let dy = getHeight() / 2 + options.parentMargin * fraction;
 			if (reversed()) {
 				dy = -dy;
 			}
-			let children = node.children.filter(x => !x.virtual && !linkReplace.includes(x.id));
+			const children = node.children.filter(x => !x.virtual && !linkReplace.includes(x.id));
 			if (children.length > 0) {
 				drawLine(container, x, y, x, y + dy);
 				drawLine(container, Math.min(x, children[0].getCoord()[0] + getWidth() / 2), y + dy, Math.max(x, children.at(-1).getCoord()[0] + getWidth() / 2), y + dy);
@@ -727,12 +727,12 @@ function Lignage(svg, nodes, options = {}) {
 		}
 
 		function drawExtraLinks(container) {
-			let replacements = [];
+			const replacements = [];
 
 			function getCoordinates(id, delta) {
 				if (typeof id == "object") {
-					let [x1, y1] = Node.get(id[0]).getCoord();
-					let [x2, y2] = Node.get(id[1]).getCoord();
+					const [x1, y1] = Node.get(id[0]).getCoord();
+					const [x2, y2] = Node.get(id[1]).getCoord();
 					if (!reversed()) {
 						return [(x1 + x2) / 2, (y1 + y2 - getHeight()) / 2];
 					}
@@ -741,13 +741,13 @@ function Lignage(svg, nodes, options = {}) {
 					}
 				}
 				else {
-					let [x, y] = Node.get(id).getCoord();
+					const [x, y] = Node.get(id).getCoord();
 					return [x + (delta || 0), y];
 				}
 			}
 
 			/* Draw additional links that are not expressed by the tree structure */
-			for (link of options.links) {
+			for (let link of options.links) {
 				let x1, x2, y1, y2;
 				try {
 					[x1, y1] = getCoordinates(link.start, link.startDx);
@@ -843,7 +843,7 @@ function Lignage(svg, nodes, options = {}) {
 			}
 			else if (depth == 1) {
 				if (node.skips > 0 && !skips[node.id]) return [[new PseudoNode(node, node.skips)]];
-				let children = node.getChildren().map(x => x.skips == 0 || skips[x.id] ? x : new PseudoNode(x, x.skips));
+				const children = node.getChildren().map(x => x.skips == 0 || skips[x.id] ? x : new PseudoNode(x, x.skips));
 				return children.length > 0 ? [children] : [];
 			}
 			else {
@@ -866,9 +866,9 @@ function Lignage(svg, nodes, options = {}) {
 			if (!node.hasChildren()) {
 				return null;
 			}
-			let children = node.getChildren();
+			const children = node.getChildren();
 			let nodeWidth = node.getSize();
-			let align = node.align || options.align;
+			const align = node.align || options.align;
 			if (align == "left") {
 				return children[0].getX();
 			}
@@ -897,13 +897,13 @@ function Lignage(svg, nodes, options = {}) {
 			let basePos = 0;
 			let currentShift = 0;
 			let anchored = false;
-			let levelNodes = getNodes(rootNode, depth);
+			const levelNodes = getNodes(rootNode, depth);
 
 			for (let [index, nodes] of levelNodes.entries()) {
 				if (currentShift) {
 					for (let node of nodes) node.translate(currentShift);
 				}
-				let positions = nodes.map(computePosition);
+				const positions = nodes.map(computePosition);
 				let start = 0;
 				while (start < positions.length) {
 					let end = start;
@@ -963,8 +963,8 @@ function Lignage(svg, nodes, options = {}) {
 
 							if (index > 0) {
 								// Reposition previous unanchored cousins to avoid losing space
-								let latestCousin = levelNodes[index - 1].at(-1);
-								let delta = levelNodes[index][0].getX() - options.cousinMargin - latestCousin.getX() - latestCousin.getSize();
+								const latestCousin = levelNodes[index - 1].at(-1);
+								const delta = levelNodes[index][0].getX() - options.cousinMargin - latestCousin.getX() - latestCousin.getSize();
 								for (let i=0; i<index; i++) {
 									for (let node of levelNodes[i]) {
 										node.translate(delta);
@@ -985,17 +985,17 @@ function Lignage(svg, nodes, options = {}) {
 			adjustPositions(depth);
 		}
 
-		let nodeContainer = makeElement("g", {id: "nodes"});
+		const nodeContainer = makeElement("g", {id: "nodes"});
 		svg.append(nodeContainer);
 		drawNodes(rootNode, nodeContainer);
 
-		let linkContainer = makeElement("g", {id: "links"});
+		const linkContainer = makeElement("g", {id: "links"});
 		svg.append(linkContainer);
-		let linkReplace = drawExtraLinks(linkContainer);
+		const linkReplace = drawExtraLinks(linkContainer);
 		drawLinks(rootNode, linkContainer);
 
-		let padding = 5;
-		let bbox = svg.getBBox();
+		const padding = 5;
+		const bbox = svg.getBBox();
 		svg.setAttribute("viewBox", `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + 2 * padding} ${bbox.height + 2 * padding}`);
 		svg.setAttribute("width", bbox.width + 2 * padding);
 		svg.setAttribute("height", bbox.height + 2 * padding);
@@ -1039,9 +1039,9 @@ function Lignage(svg, nodes, options = {}) {
 	function removeTree() {
 		svg.getElementById("nodes").remove();
 		svg.getElementById("links").remove();
-		let title = svg.getElementById("title");
+		const title = svg.getElementById("title");
 		if (title) title.remove();
-		let emblem = svg.getElementById("emblem")
+		const emblem = svg.getElementById("emblem")
 		if (emblem) emblem.remove();
 	}
 
@@ -1051,8 +1051,8 @@ function Lignage(svg, nodes, options = {}) {
 	}
 
 	function serializeTree(node) {
-		let obj = {id: node.id};
-		let ret = [[obj]];
+		const obj = {id: node.id};
+		const ret = [[obj]];
 		for (let k of ["name", "text", "class", "url", "image", "align", "before", "skips", "virtual"]) {
 			if (node[k]) obj[k] = node[k];
 		}
@@ -1075,11 +1075,11 @@ function Lignage(svg, nodes, options = {}) {
 	}
 
 	function serializeSVG(callback) {
-		let clone = svg.cloneNode(true);
+		const clone = svg.cloneNode(true);
 		for (let button of clone.querySelectorAll(".buttons")) {
 			button.remove();
 		}
-		let svgImages = clone.querySelectorAll("image");
+		const svgImages = clone.querySelectorAll("image");
 		let remaining = svgImages.length;
 		if (remaining == 0) {
 			let xml = new XMLSerializer().serializeToString(clone);
@@ -1088,10 +1088,10 @@ function Lignage(svg, nodes, options = {}) {
 
 		for (let svgImage of svgImages) {
 			// Replace each image link by the corresponding base64 data
-			let img = new Image();
+			const img = new Image();
 			img.src = svgImage.getAttribute("href");
 			img.onload = function() {
-				let canvas = document.createElement("canvas");
+				const canvas = document.createElement("canvas");
 				canvas.width = img.width;
 				canvas.height = img.height;
 				canvas.getContext("2d").drawImage(img, 0, 0);
@@ -1102,7 +1102,7 @@ function Lignage(svg, nodes, options = {}) {
 					// Possible CORS-related error
 				}
 				if (--remaining == 0) {
-					let xml = new XMLSerializer().serializeToString(clone);
+					const xml = new XMLSerializer().serializeToString(clone);
 					callback("data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml));
 				}
 			};
@@ -1140,7 +1140,7 @@ function Lignage(svg, nodes, options = {}) {
 			return;
 		}
 
-		let style = document.createElement("style");
+		const style = document.createElement("style");
 		style.setAttribute("id", "fonts");
 		style.innerHTML = dataURLfonts.map(({family, src}) => {
 			return `@font-face {font-family: "${family}"; src: ${src};}`;
@@ -1149,7 +1149,7 @@ function Lignage(svg, nodes, options = {}) {
 		svg.append(style);
 	}
 
-	let ret = {};
+	const ret = {};
 	ret.get = function(id) {
 		return Node.get(id);
 	};
@@ -1175,7 +1175,7 @@ function Lignage(svg, nodes, options = {}) {
 			redrawTree();
 		}
 		else {
-			let fonts = initializeOptions();
+			const fonts = initializeOptions();
 			loadFonts(fonts).then(redrawTree);
 		}
 	};
