@@ -305,14 +305,14 @@ function Lignage(svg, nodes, options = {}) {
     }
     if (options.editable) {
       const icons = {
-        "iconAdd": ["limegreen", "M4 0 h2 v4 h4 v2 h-4 v4 h-2 v-4 h-4 v-2 h4z"],
-        "iconEdit": ["royalblue", "M0 0 h10 v2 h-10z M0 4 h10 v2 h-10z M0 8 h10 v2 h-10z"],
-        "iconJoin": ["purple", "M5 2 a4 4 0 0 0 0 8 4 4 0 0 0 0 -8 m0 1.5 a2.5 2.5 0 0 1 0 5 2.5 2.5 0 0 1 0 -5 M3 0 h4 v2 h-4z"],
-        "iconLeft": ["darkgray", "M6.75 0 L1.75 5 L6.75 10 L8.25 8.5 L4.75 5 L8.25 1.5z"],
-        "iconRight": ["darkgray", "M3.25 0 L8.25 5 L3.25 10 L1.75 8.5 L5.25 5 L1.75 1.5z"],
-        "iconTop": ["darkgray", "M0 6.75 L5 1.75 L10 6.75 L8.5 8.25 L5 4.75 L1.5 8.25z"],
-        "iconBottom": ["darkgray", "M0 3.25 L5 8.25 L10 3.25 L8.5 1.75 L5 5.25 L1.5 1.75z"],
-        "iconRemove": ["red", "M1.5 0 L5 3.5 L8.5 0 L10 1.5 L6.5 5 L10 8.5 L8.5 10 L5 6.5 L1.5 10 L0 8.5 L3.5 5 L0 1.5z"],
+        iconAdd: ["limegreen", "M4 0 h2 v4 h4 v2 h-4 v4 h-2 v-4 h-4 v-2 h4z"],
+        iconEdit: ["royalblue", "M0 0 h10 v2 h-10z M0 4 h10 v2 h-10z M0 8 h10 v2 h-10z"],
+        iconJoin: ["purple", "M5 2 a4 4 0 0 0 0 8 4 4 0 0 0 0 -8 m0 1.5 a2.5 2.5 0 0 1 0 5 2.5 2.5 0 0 1 0 -5 M3 0 h4 v2 h-4z"],
+        iconLeft: ["darkgray", "M6.75 0 L1.75 5 L6.75 10 L8.25 8.5 L4.75 5 L8.25 1.5z"],
+        iconRight: ["darkgray", "M3.25 0 L8.25 5 L3.25 10 L1.75 8.5 L5.25 5 L1.75 1.5z"],
+        iconTop: ["darkgray", "M0 6.75 L5 1.75 L10 6.75 L8.5 8.25 L5 4.75 L1.5 8.25z"],
+        iconBottom: ["darkgray", "M0 3.25 L5 8.25 L10 3.25 L8.5 1.75 L5 5.25 L1.5 1.75z"],
+        iconRemove: ["red", "M1.5 0 L5 3.5 L8.5 0 L10 1.5 L6.5 5 L10 8.5 L8.5 10 L5 6.5 L1.5 10 L0 8.5 L3.5 5 L0 1.5z"],
       };
       Object.entries(icons).forEach(function([id, [color, d]]) {
         const icon = makeElement("symbol", {id});
