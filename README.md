@@ -219,4 +219,4 @@ const nodes = [
 ];
 ```
 
-See the [Stark family](examples/stark.html) for a concrete use case.
+See the [Ducatore-Bromael family](examples/ducatoreBromael.html) for a concrete use case.
